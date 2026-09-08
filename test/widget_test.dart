@@ -8,6 +8,16 @@ void main() {
   ) async {
     await tester.pumpWidget(SoccerBookingApp());
 
+    expect(find.text('تسجيل الدخول'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('phone_number_field')),
+      '01012345678',
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('continue_button')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.byKey(const Key('continue_button')));
     await tester.pumpAndSettle();
 

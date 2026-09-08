@@ -14,10 +14,15 @@ class MockLoginScreen extends StatefulWidget {
 }
 
 class _MockLoginScreenState extends State<MockLoginScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _phone = TextEditingController();
   UserRole _selectedRole = UserRole.player;
   String? _errorMessage;
 
   Future<void> _continue() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     setState(() => _errorMessage = null);
     try {
       final AppUser user = await widget.repository.signInAs(_selectedRole);
@@ -39,64 +44,113 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
   }
 
   @override
+  void dispose() {
+    _phone.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 28),
-              Center(
-                child: _PitchLogo(color: Theme.of(context).colorScheme.primary),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  const SizedBox(height: 28),
+                  Center(
+                    child: _PitchLogo(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'تسجيل الدخول',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'اكتب رقم موبايلك واختار نوع دخولك.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 28),
+                  TextFormField(
+                    key: const Key('phone_number_field'),
+                    controller: _phone,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    autofillHints: const [AutofillHints.telephoneNumber],
+                    decoration: const InputDecoration(
+                      labelText: 'رقم الموبايل',
+                      hintText: '01xxxxxxxxx',
+                      prefixIcon: Icon(Icons.phone_outlined),
+                    ),
+                    validator: (String? value) {
+                      final String digits = (value ?? '').replaceAll(
+                        RegExp(r'[^0-9]'),
+                        '',
+                      );
+                      return RegExp(r'^01[0-9]{9}$').hasMatch(digits)
+                          ? null
+                          : 'اكتب رقم موبايل مصري صحيح.';
+                    },
+                  ),
+                  const SizedBox(height: 28),
+                  Text(
+                    'هتدخل بصفتك إيه؟',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  _RoleCard(
+                    selected: _selectedRole == UserRole.player,
+                    icon: Icons.sports_soccer_outlined,
+                    title: 'لاعب',
+                    subtitle: 'شوف المواعيد واحجز ماتشك.',
+                    onTap: () =>
+                        setState(() => _selectedRole = UserRole.player),
+                  ),
+                  const SizedBox(height: 12),
+                  _RoleCard(
+                    selected: _selectedRole == UserRole.admin,
+                    icon: Icons.admin_panel_settings_outlined,
+                    title: 'مدير ملعب',
+                    subtitle: 'تابع الحجوزات والملاعب.',
+                    onTap: () => setState(() => _selectedRole = UserRole.admin),
+                  ),
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    key: const Key('continue_button'),
+                    onPressed: _continue,
+                    child: Text(
+                      _selectedRole == UserRole.player
+                          ? 'دخول كلاعب'
+                          : 'دخول كمدير ملعب',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'نسخة تجريبية: التحقق برمز SMS هيتفعل قريباً.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              Text(
-                'احجز ملعبك',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'اختار نوع دخولك وابدأ في ثواني.',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 32),
-              _RoleCard(
-                selected: _selectedRole == UserRole.player,
-                icon: Icons.sports_soccer_outlined,
-                title: 'لاعب',
-                subtitle: 'شوف المواعيد واحجز ماتشك.',
-                onTap: () => setState(() => _selectedRole = UserRole.player),
-              ),
-              const SizedBox(height: 12),
-              _RoleCard(
-                selected: _selectedRole == UserRole.admin,
-                icon: Icons.admin_panel_settings_outlined,
-                title: 'أدمن',
-                subtitle: 'تابع الحجوزات والملاعب.',
-                onTap: () => setState(() => _selectedRole = UserRole.admin),
-              ),
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  _errorMessage!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              ],
-              const Spacer(),
-              FilledButton(
-                key: const Key('continue_button'),
-                onPressed: _continue,
-                child: Text(
-                  _selectedRole == UserRole.player
-                      ? 'ابدأ الحجز كلاعب'
-                      : 'افتح لوحة الأدمن',
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

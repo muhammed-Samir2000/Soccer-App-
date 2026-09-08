@@ -370,3 +370,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: booking state remains mock-only until the approved backend adds persistent, concurrent-safe availability.
 - Source control: committed as `b9bca15` (`Add player slot booking icon`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before adding persistent booking state or live availability.
+
+### 2026-09-08 17:30 | Phone-Based Login Screen | Status: completed
+
+- Actor: Codex.
+- Intent: turn the start screen into a clear player/admin login page with a mobile-number entry field.
+- Changed: `lib/features/auth/presentation/mock_login_screen.dart`; `test/widget_test.dart`; `doc/DECISIONS_LOG.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: login requires a locally validated Egyptian mobile number and a selected player or manager role. The form is scrollable on small screens and constrained on wider web screens. SMS OTP remains visibly deferred, not faked.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 17 tests.
+- Blockers/Risks: phone numbers are not retained or authenticated in mock mode. Real identity verification requires approved OTP provider, backend storage, and rate-limiting scope.
+- Next action: rebuild the web preview and commit/push this verified login page to `origin/main`.
