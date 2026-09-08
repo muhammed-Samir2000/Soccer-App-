@@ -335,4 +335,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: the global filled-button minimum width is finite (`64`) instead of an infinite width inherited by compact list actions. Every free hour now exposes a small, Arabic-labelled add-player icon while the whole row remains tappable.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 15 tests.
 - Blockers/Risks: the local web server must be refreshed after the rebuilt bundle. Data persistence and live conflict protection remain backend work.
-- Next action: rebuild the web preview and commit/push this verified layout fix to `origin/main`.
+- Source control: committed as `fe8b860` (`Fix admin hour action layout`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
+- Next action: await approved backend scope before adding persistence or live conflict protection.
