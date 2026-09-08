@@ -253,7 +253,11 @@ class _SlotCard extends StatelessWidget {
                   ),
                 ),
                 if (isAvailable)
-                  Icon(Icons.arrow_back, color: style.foreground),
+                  IconButton.filledTonal(
+                    tooltip: 'احجز الموعد',
+                    onPressed: onTap,
+                    icon: const Icon(Icons.add_circle_outline),
+                  ),
               ],
             ),
           ),

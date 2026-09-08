@@ -16,6 +16,7 @@ void main() {
     expect(find.text('محجوز مؤقتاً'), findsOneWidget);
     expect(find.text('محجوز'), findsOneWidget);
     expect(find.byIcon(Icons.timer_outlined), findsOneWidget);
+    expect(find.byTooltip('احجز الموعد'), findsAtLeastNWidgets(1));
 
     await tester.tap(find.byKey(const Key('slot-003')));
     await tester.pumpAndSettle();

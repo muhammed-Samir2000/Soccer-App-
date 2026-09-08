@@ -359,3 +359,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: the mock calendar deliberately cannot select future weeks until a backend supplies actual schedule availability and operating dates.
 - Source control: committed as `2d85ae7` (`Add Arabic calendar day picker`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before adding a real schedule range or live availability dates.
+
+### 2026-09-08 17:22 | Player Slot Booking Icon | Status: completed
+
+- Actor: Codex.
+- Intent: give each player-facing available slot the same compact action affordance used by the admin schedule.
+- Changed: `lib/features/slots/presentation/available_slots_screen.dart`; `test/widget_test.dart`; `doc/WORKFLOW_LOG.md`.
+- Decisions: available slots display a compact filled-tonal add-booking icon with the Arabic tooltip `احجز الموعد`; temporary and booked slots remain non-actionable and do not show that icon.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 17 tests.
+- Blockers/Risks: booking state remains mock-only until the approved backend adds persistent, concurrent-safe availability.
+- Next action: rebuild the web preview and commit/push this verified player booking affordance to `origin/main`.
