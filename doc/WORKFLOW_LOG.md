@@ -305,7 +305,7 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: none.
 - Next action: apply this policy to every future completed user-requested change set.
 
-### 2026-09-08 15:20 | RTL And UX Refinement | Status: in-progress
+### 2026-09-08 15:20 | RTL And UX Refinement | Status: completed
 
 - Actor: Codex.
 - Intent: improve RTL navigation, role selection, player slot booking, admin scanning, accessibility labels, and future live-availability readiness.
@@ -313,4 +313,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: Flutter directional widgets replace absolute right/left spacing where touched. The admin uses a primary FAB for booking creation and a settings menu for lower-frequency tools. Slot availability is consumed as a stream, while the mock implementation emits one value and retains no external connection.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 13 tests.
 - Blockers/Risks: no live backend, WebSocket, or optimistic write reconciliation is activated because the application has no approved backend scope. The stream contract is the safe replacement boundary.
-- Next action: commit and push the verified refinement to `origin/main`, then record the commit hash.
+- Source control: committed as `acb7553` (`Improve RTL navigation and booking UX`) and pushed successfully to `origin/main`.
+- Next action: continue only with a new approved product or backend scope.
