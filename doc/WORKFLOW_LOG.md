@@ -379,4 +379,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: login requires a locally validated Egyptian mobile number and a selected player or manager role. The form is scrollable on small screens and constrained on wider web screens. SMS OTP remains visibly deferred, not faked.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 17 tests.
 - Blockers/Risks: phone numbers are not retained or authenticated in mock mode. Real identity verification requires approved OTP provider, backend storage, and rate-limiting scope.
-- Next action: rebuild the web preview and commit/push this verified login page to `origin/main`.
+- Source control: committed as `e8eeb9b` (`Add phone-based login screen`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
+- Next action: await approved backend scope before adding real SMS OTP, identity verification, or phone-number storage.
