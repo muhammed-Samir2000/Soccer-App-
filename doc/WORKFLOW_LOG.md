@@ -390,4 +390,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: the dashboard calculates weekly total and per-field occupancy from the shared booking repository. Settings allow 1-12 fields plus full-hour opening and closing times; they update admin availability and field allocation. Reducing capacity below an already allocated field is refused to preserve bookings.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 21 tests, including dashboard occupancy, settings validation, and configurable allocation.
 - Blockers/Risks: settings are mock/in-memory. Player slot data is still a separate mock source, so a real backend must provide one authoritative schedule, field capacity, and concurrent booking lock.
-- Next action: rebuild the web preview and commit/push this verified admin operations change to `origin/main`.
+- Source control: committed as `6578cc1` (`Add admin operations dashboard and venue settings`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
+- Next action: await approved backend scope before unifying player/admin scheduling and adding persistent settings.
