@@ -392,3 +392,14 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: settings are mock/in-memory. Player slot data is still a separate mock source, so a real backend must provide one authoritative schedule, field capacity, and concurrent booking lock.
 - Source control: committed as `6578cc1` (`Add admin operations dashboard and venue settings`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before unifying player/admin scheduling and adding persistent settings.
+
+### 2026-09-08 18:04 | Visual System Refinement | Status: completed
+
+- Actor: Codex.
+- Intent: give the player and manager experiences a deliberate, modern visual hierarchy without changing booking scope or behavior.
+- Changed: shared application theme; player availability hero; admin occupancy summary and per-field cards; player widget test; `doc/DECISIONS_LOG.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: the product now uses an emerald football-club palette with a restrained warm accent, rounded but purposeful surfaces, and clear hierarchy. Player availability and manager occupancy lead with compact summaries; Arabic labels and icons communicate state without relying on color alone.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 21 tests.
+- Blockers/Risks: this is a mock-only visual release. A future production accessibility review should include device testing, dynamic text scaling, and contrast checks against final brand assets.
+- Source control: pending commit and push for this completed change set.
+- Next action: await approved backend scope before adding persistence, real-time booking updates, or payment/OTP integrations.

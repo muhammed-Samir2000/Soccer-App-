@@ -84,6 +84,9 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
+                final int availableCount = snapshot.data!
+                    .where((TimeSlot slot) => slot.isAvailable)
+                    .length;
 
                 return ListView(
                   padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 20, 24),
@@ -177,8 +180,13 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
+                    _PlayerSlotsHero(
+                      day: _selectedDay,
+                      availableCount: availableCount,
+                    ),
+                    const SizedBox(height: 24),
                     Text(
-                      'ملعب 1',
+                      'مواعيد الملعب',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 12),
@@ -202,6 +210,62 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                 );
               },
         ),
+      ),
+    );
+  }
+}
+
+class _PlayerSlotsHero extends StatelessWidget {
+  const _PlayerSlotsHero({required this.day, required this.availableCount});
+
+  final DateTime day;
+  final int availableCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [colors.primary, const Color(0xFF124535)],
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+        ),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'جاهز للماتش؟',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: colors.onPrimary),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${_dayLabel(day)} قدامك $availableCount مواعيد فاضية.',
+                  style: TextStyle(
+                    color: colors.onPrimary.withValues(alpha: 0.82),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: colors.onPrimary.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.sports_soccer, color: colors.onPrimary, size: 30),
+          ),
+        ],
       ),
     );
   }
@@ -231,7 +295,7 @@ class _SlotCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(18),
             child: Row(
               children: [
                 Icon(style.icon, color: style.foreground),

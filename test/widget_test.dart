@@ -23,8 +23,14 @@ void main() {
 
     expect(find.text('المواعيد الفاضية'), findsOneWidget);
     expect(find.text('المواعيد المتاحة قدامك لمدة 7 أيام.'), findsOneWidget);
-    expect(find.text('محجوز مؤقتاً'), findsOneWidget);
-    expect(find.text('محجوز'), findsOneWidget);
+    expect(find.text('جاهز للماتش؟'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('slot-003')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('محجوز مؤقتاً'), findsAtLeastNWidgets(1));
+    expect(find.text('محجوز'), findsAtLeastNWidgets(1));
     expect(find.byIcon(Icons.timer_outlined), findsOneWidget);
     expect(find.byTooltip('احجز الموعد'), findsAtLeastNWidgets(1));
 
@@ -32,6 +38,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('ملخص الحجز'), findsNothing);
 
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('slot-001')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.byKey(const Key('slot-001')));
     await tester.pumpAndSettle();
 

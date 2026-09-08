@@ -1130,55 +1130,98 @@ class _OccupancySummary extends StatelessWidget {
     final int percentage = (progress * 100).round();
     final int perFieldCapacity = settings.operatingHours * week.length;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.insights_outlined),
-                const SizedBox(width: 8),
-                Text(
-                  'نسبة إشغال الملاعب',
-                  style: Theme.of(context).textTheme.titleLarge,
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [colors.primary, const Color(0xFF123C31)],
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+            ),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'نسبة إشغال الملاعب',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleLarge?.copyWith(color: colors.onPrimary),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '$occupied من $total ساعة ملعب محجوزة الأسبوع ده.',
+                      style: TextStyle(
+                        color: colors.onPrimary.withValues(alpha: 0.82),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 8,
+                        color: colors.secondary,
+                        backgroundColor: colors.onPrimary.withValues(
+                          alpha: 0.18,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const Spacer(),
-                Text('$percentage%'),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(value: progress, minHeight: 10),
-            ),
-            const SizedBox(height: 8),
-            Text('$occupied من $total ساعة ملعب محجوزة الأسبوع ده.'),
-            const SizedBox(height: 18),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List<Widget>.generate(settings.fieldCount, (int index) {
-                final int field = index + 1;
-                final int fieldBookings = weekBookings
-                    .where((Booking booking) => booking.fieldNumber == field)
-                    .length;
-                final int fieldPercentage =
-                    (fieldBookings / perFieldCapacity * 100).round();
-                return SizedBox(
-                  width: 142,
-                  child: _FieldOccupancyCard(
-                    fieldNumber: field,
-                    percentage: fieldPercentage,
-                    occupiedHours: fieldBookings,
+              ),
+              const SizedBox(width: 16),
+              Container(
+                width: 72,
+                height: 72,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: colors.onPrimary.withValues(alpha: 0.14),
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '$percentage%',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: colors.onPrimary,
+                    fontWeight: FontWeight.w800,
                   ),
-                );
-              }),
-            ),
-          ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        const SizedBox(height: 16),
+        Text('توزيع الإشغال', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: List<Widget>.generate(settings.fieldCount, (int index) {
+            final int field = index + 1;
+            final int fieldBookings = weekBookings
+                .where((Booking booking) => booking.fieldNumber == field)
+                .length;
+            final int fieldPercentage = (fieldBookings / perFieldCapacity * 100)
+                .round();
+            return SizedBox(
+              width: 142,
+              child: _FieldOccupancyCard(
+                fieldNumber: field,
+                percentage: fieldPercentage,
+                occupiedHours: fieldBookings,
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 
@@ -1202,15 +1245,24 @@ class _FieldOccupancyCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: Theme.of(context).colorScheme.primaryContainer,
       borderRadius: BorderRadius.circular(16),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('ملعب $fieldNumber'),
+        Row(
+          children: [
+            const Icon(Icons.sports_soccer_outlined, size: 18),
+            const SizedBox(width: 6),
+            Text('ملعب $fieldNumber'),
+          ],
+        ),
         const SizedBox(height: 4),
-        Text('$percentage% إشغال'),
+        Text(
+          '$percentage% إشغال',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
         Text('$occupiedHours ساعة محجوزة'),
       ],
     ),
