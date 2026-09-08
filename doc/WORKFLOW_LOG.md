@@ -326,3 +326,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: registrations remain mock/in-memory and reset on restart. A production backend must persist the booking and enforce allocation atomically under concurrent requests.
 - Source control: committed as `ec1ee49` (`Add admin player registration flow`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before connecting persistence or live concurrency control.
+
+### 2026-09-08 16:33 | Admin Hour Action Layout Fix | Status: completed
+
+- Actor: Codex.
+- Intent: repair the broken web layout reported for the daily admin schedule and use a compact add-player affordance for every available hour.
+- Changed: `lib/app/theme/app_theme.dart`; `lib/features/admin/presentation/admin_week_screen.dart`; `test/features/admin/admin_week_screen_test.dart`; `doc/WORKFLOW_LOG.md`.
+- Decisions: the global filled-button minimum width is finite (`64`) instead of an infinite width inherited by compact list actions. Every free hour now exposes a small, Arabic-labelled add-player icon while the whole row remains tappable.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 15 tests.
+- Blockers/Risks: the local web server must be refreshed after the rebuilt bundle. Data persistence and live conflict protection remain backend work.
+- Next action: rebuild the web preview and commit/push this verified layout fix to `origin/main`.

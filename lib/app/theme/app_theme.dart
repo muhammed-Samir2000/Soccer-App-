@@ -22,7 +22,9 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(56),
+          // Keep actions comfortably tall without forcing an infinite width
+          // when a compact button is placed inside a ListTile.
+          minimumSize: const Size(64, 56),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),

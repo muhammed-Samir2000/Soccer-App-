@@ -257,11 +257,15 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
                   title: Text(
                     '${_formatHour(hour)} - ${_formatHour(hour + 1)}',
                   ),
-                  subtitle: Text('$freeFields ملعب فاضي - اختارها لتسجيل لاعب'),
-                  trailing: FilledButton.tonalIcon(
-                    onPressed: () => _registerPlayer(hour, freeFields),
-                    icon: const Icon(Icons.person_add_alt_1_outlined),
-                    label: const Text('تسجيل لاعب'),
+                  subtitle: Text('$freeFields ملعب فاضي'),
+                  trailing: Semantics(
+                    label: 'تسجيل لاعب في الساعة دي',
+                    button: true,
+                    child: IconButton.filledTonal(
+                      tooltip: 'تسجيل لاعب',
+                      onPressed: () => _registerPlayer(hour, freeFields),
+                      icon: const Icon(Icons.person_add_alt_1_outlined),
+                    ),
                   ),
                   onTap: () => _registerPlayer(hour, freeFields),
                 ),

@@ -23,8 +23,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('تسجيل لاعب'), findsNWidgets(5));
-    await tester.tap(find.text('تسجيل لاعب').first);
+    expect(find.byTooltip('تسجيل لاعب'), findsNWidgets(5));
+    await tester.tap(find.byTooltip('تسجيل لاعب').first);
     await tester.pumpAndSettle();
 
     expect(find.text('تسجيل لاعب جديد'), findsOneWidget);
