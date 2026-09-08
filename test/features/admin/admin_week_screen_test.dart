@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/features/admin/presentation/admin_week_screen.dart';
+import 'package:soccer_booking_app/features/admin/data/mock_notification_repository.dart';
+import 'package:soccer_booking_app/features/admin/data/mock_staff_repository.dart';
+import 'package:soccer_booking_app/features/admin/data/mock_venue_settings_repository.dart';
 import 'package:soccer_booking_app/features/bookings/data/mock_booking_repository.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking.dart';
 import 'package:soccer_booking_app/features/slots/data/mock_slot_repository.dart';
@@ -21,6 +24,7 @@ void main() {
           child: AdminDayScreen(
             day: MockSlotRepository.weekStart,
             repository: repository,
+            venueSettingsRepository: MockVenueSettingsRepository(),
           ),
         ),
       ),
@@ -57,6 +61,7 @@ void main() {
           child: AdminDayScreen(
             day: MockSlotRepository.weekStart,
             repository: repository,
+            venueSettingsRepository: MockVenueSettingsRepository(),
           ),
         ),
       ),
@@ -87,14 +92,42 @@ void main() {
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         home: Directionality(
           textDirection: TextDirection.rtl,
-          child: AdminBookingToolsScreen(repository: MockBookingRepository()),
+          child: AdminBookingToolsScreen(
+            repository: MockBookingRepository(),
+            venueSettingsRepository: MockVenueSettingsRepository(),
+          ),
         ),
       ),
     );
 
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.calendar_month_outlined));
     await tester.pumpAndSettle();
 
     expect(find.text('اختار يوم الحجز'), findsOneWidget);
+  });
+
+  testWidgets('shows overall and per-field occupancy on the admin dashboard', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: AdminWeekScreen(
+            bookingRepository: MockBookingRepository.seeded(),
+            staffRepository: MockStaffRepository(),
+            notificationRepository: MockNotificationRepository(),
+            venueSettingsRepository: MockVenueSettingsRepository(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('نسبة إشغال الملاعب'), findsOneWidget);
+    expect(find.text('ملعب 1'), findsOneWidget);
+    expect(find.text('ملعب 2'), findsOneWidget);
+    expect(find.text('ملعب 3'), findsOneWidget);
   });
 }

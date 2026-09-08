@@ -1,8 +1,10 @@
 import '../core/config/backend_configuration.dart';
 import '../features/admin/data/mock_notification_repository.dart';
 import '../features/admin/data/mock_staff_repository.dart';
+import '../features/admin/data/mock_venue_settings_repository.dart';
 import '../features/admin/domain/notification_repository.dart';
 import '../features/admin/domain/staff_repository.dart';
+import '../features/admin/domain/venue_settings_repository.dart';
 import '../features/auth/data/mock_auth_repository.dart';
 import '../features/auth/domain/auth_repository.dart';
 import '../features/bookings/data/mock_booking_repository.dart';
@@ -17,6 +19,7 @@ class AppDependencies {
     required this.bookingRepository,
     required this.staffRepository,
     required this.notificationRepository,
+    required this.venueSettingsRepository,
     this.backendConfiguration = const BackendConfiguration(),
   });
 
@@ -26,6 +29,7 @@ class AppDependencies {
     bookingRepository: MockBookingRepository.seeded(),
     staffRepository: MockStaffRepository(),
     notificationRepository: MockNotificationRepository(),
+    venueSettingsRepository: MockVenueSettingsRepository(),
   );
 
   final AuthRepository authRepository;
@@ -33,5 +37,6 @@ class AppDependencies {
   final BookingRepository bookingRepository;
   final StaffRepository staffRepository;
   final NotificationRepository notificationRepository;
+  final VenueSettingsRepository venueSettingsRepository;
   final BackendConfiguration backendConfiguration;
 }

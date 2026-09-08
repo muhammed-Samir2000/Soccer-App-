@@ -93,6 +93,9 @@ class _EmptyBookingRepository implements BookingRepository {
   }) => throw UnimplementedError();
 
   @override
+  Future<void> updateFieldCount(int fieldCount) async {}
+
+  @override
   Future<List<Booking>> getBookingsForPlayer(String playerId) async =>
       <Booking>[];
 
@@ -139,6 +142,9 @@ class _FailingBookingRepository implements BookingRepository {
     required BookingDraft draft,
     required BookingStatus status,
   }) => throw UnimplementedError();
+
+  @override
+  Future<void> updateFieldCount(int fieldCount) async {}
 
   @override
   Future<List<Booking>> getBookingsForPlayer(String playerId) =>

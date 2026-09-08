@@ -113,4 +113,21 @@ void main() {
     expect(booking.status, BookingStatus.confirmed);
     expect(booking.fieldNumber, 2);
   });
+
+  test('uses the configured field count for new booking allocation', () async {
+    final MockBookingRepository repository = MockBookingRepository();
+    final BookingDraft draft = BookingDraft(slot: slot, basePrice: 800);
+    await repository.updateFieldCount(4);
+
+    final List<Booking> bookings = await Future.wait(
+      List<Future<Booking>>.generate(4, (_) => repository.createBooking(draft)),
+    );
+
+    expect(bookings.map((Booking booking) => booking.fieldNumber), <int>[
+      1,
+      2,
+      3,
+      4,
+    ]);
+  });
 }

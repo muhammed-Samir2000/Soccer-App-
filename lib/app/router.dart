@@ -57,6 +57,7 @@ class AppRouter {
               bookingRepository: dependencies.bookingRepository,
               staffRepository: dependencies.staffRepository,
               notificationRepository: dependencies.notificationRepository,
+              venueSettingsRepository: dependencies.venueSettingsRepository,
             );
           case launchRoute:
           default:

@@ -381,3 +381,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: phone numbers are not retained or authenticated in mock mode. Real identity verification requires approved OTP provider, backend storage, and rate-limiting scope.
 - Source control: committed as `e8eeb9b` (`Add phone-based login screen`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before adding real SMS OTP, identity verification, or phone-number storage.
+
+### 2026-09-08 17:48 | Admin Operations Dashboard And Venue Settings | Status: completed
+
+- Actor: Codex.
+- Intent: give the manager a practical weekly operations dashboard and gear-menu controls for field capacity and opening hours.
+- Changed: venue-settings domain/data repository; booking repository capacity contract/mock implementation; application dependency composition and routing; admin dashboard, daily schedule, quick-booking tools, tests; `doc/DECISIONS_LOG.md`; `doc/KNOWN_ISSUES.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: the dashboard calculates weekly total and per-field occupancy from the shared booking repository. Settings allow 1-12 fields plus full-hour opening and closing times; they update admin availability and field allocation. Reducing capacity below an already allocated field is refused to preserve bookings.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 21 tests, including dashboard occupancy, settings validation, and configurable allocation.
+- Blockers/Risks: settings are mock/in-memory. Player slot data is still a separate mock source, so a real backend must provide one authoritative schedule, field capacity, and concurrent booking lock.
+- Next action: rebuild the web preview and commit/push this verified admin operations change to `origin/main`.

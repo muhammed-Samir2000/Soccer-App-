@@ -39,6 +39,7 @@ class MockBookingRepository implements BookingRepository {
 
   final int firstReferenceNumber;
   int _nextReferenceNumber;
+  int _fieldCount = 3;
   final List<Booking> _bookings;
 
   @override
@@ -140,7 +141,7 @@ class MockBookingRepository implements BookingRepository {
         .map((Booking item) => item.fieldNumber)
         .toSet();
     final List<int> availableFields = List<int>.generate(
-      3,
+      _fieldCount,
       (int fieldIndex) => fieldIndex + 1,
     ).where((int field) => !occupiedFields.contains(field)).toList();
     if (availableFields.isEmpty) {
@@ -154,6 +155,19 @@ class MockBookingRepository implements BookingRepository {
     _bookings.removeWhere(
       (Booking booking) => booking.reference == bookingReference,
     );
+  }
+
+  @override
+  Future<void> updateFieldCount(int fieldCount) async {
+    if (fieldCount < 1 || fieldCount > 12) {
+      throw ArgumentError('عدد الملاعب لازم يكون بين 1 و12.');
+    }
+    if (_bookings.any((Booking booking) => booking.fieldNumber > fieldCount)) {
+      throw StateError(
+        'مش ينفع تقلل العدد عن الملاعب اللي عليها حجوزات حالياً.',
+      );
+    }
+    _fieldCount = fieldCount;
   }
 
   Future<Booking> _create({
@@ -171,7 +185,7 @@ class MockBookingRepository implements BookingRepository {
         .map((Booking booking) => booking.fieldNumber)
         .toSet();
     final List<int> availableFields = List<int>.generate(
-      3,
+      _fieldCount,
       (int index) => index + 1,
     ).where((int field) => !occupiedFields.contains(field)).toList();
     if (availableFields.isEmpty) {

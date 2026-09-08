@@ -24,6 +24,8 @@ abstract interface class BookingRepository {
     required BookingStatus status,
   });
 
+  Future<void> updateFieldCount(int fieldCount);
+
   Future<Booking> createRecurringBooking({
     required String playerName,
     required String phoneNumber,
