@@ -337,3 +337,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: the local web server must be refreshed after the rebuilt bundle. Data persistence and live conflict protection remain backend work.
 - Source control: committed as `fe8b860` (`Fix admin hour action layout`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before adding persistence or live conflict protection.
+
+### 2026-09-08 16:42 | Admin Booking Repetition Choice | Status: completed
+
+- Actor: Codex.
+- Intent: add the requested `ثابت` and `لمرة` choice below confirmed/tentative booking state in the admin player-registration form.
+- Changed: `lib/features/admin/presentation/admin_week_screen.dart`; `test/features/admin/admin_week_screen_test.dart`; `doc/DECISIONS_LOG.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: a one-off booking retains the selected confirmed or tentative state. Selecting fixed maps to the existing `recurring` domain status and clearly tells the admin that it repeats at the same weekly day and hour in mock mode.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 16 tests, including fixed-booking mapping.
+- Blockers/Risks: recurring data is still a mock representation, not a persisted schedule generator; approved backend work is required for production recurrence and collision handling.
+- Next action: rebuild the web preview and commit/push this verified form update to `origin/main`.

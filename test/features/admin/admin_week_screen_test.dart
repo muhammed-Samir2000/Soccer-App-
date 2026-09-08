@@ -28,6 +28,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('تسجيل لاعب جديد'), findsOneWidget);
+    expect(find.text('لمرة'), findsOneWidget);
+    expect(find.text('ثابت'), findsOneWidget);
     await tester.enterText(find.byType(TextFormField).at(0), 'الكابتن عمر');
     await tester.enterText(find.byType(TextFormField).at(1), '01098765432');
     await tester.tap(find.text('حفظ الحجز'));
@@ -38,5 +40,36 @@ void main() {
     expect(bookings.single.playerName, 'الكابتن عمر');
     expect(bookings.single.status, BookingStatus.confirmed);
     expect(bookings.single.fieldNumber, 1);
+  });
+
+  testWidgets('marks a fixed admin booking as recurring', (
+    WidgetTester tester,
+  ) async {
+    final MockBookingRepository repository = MockBookingRepository();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: AdminDayScreen(
+            day: MockSlotRepository.weekStart,
+            repository: repository,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('تسجيل لاعب').first);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).at(0), 'مجموعة الجمعة');
+    await tester.enterText(find.byType(TextFormField).at(1), '01112345678');
+    await tester.tap(find.text('ثابت'));
+    await tester.tap(find.text('حفظ الحجز'));
+    await tester.pumpAndSettle();
+
+    expect(
+      (await repository.getBookings()).single.status,
+      BookingStatus.recurring,
+    );
   });
 }

@@ -498,7 +498,9 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
         playerName: registration.playerName,
         phoneNumber: registration.phoneNumber,
         draft: draft,
-        status: registration.status,
+        status: registration.recurrence == _BookingRecurrence.weekly
+            ? BookingStatus.recurring
+            : registration.status,
       );
       _reload();
       if (mounted) {
@@ -531,12 +533,16 @@ class _AdminRegistration {
     required this.playerName,
     required this.phoneNumber,
     required this.status,
+    required this.recurrence,
   });
 
   final String playerName;
   final String phoneNumber;
   final BookingStatus status;
+  final _BookingRecurrence recurrence;
 }
+
+enum _BookingRecurrence { oneOff, weekly }
 
 class _PlayerRegistrationSheet extends StatefulWidget {
   const _PlayerRegistrationSheet({
@@ -559,6 +565,7 @@ class _PlayerRegistrationSheetState extends State<_PlayerRegistrationSheet> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _phone = TextEditingController();
   BookingStatus _status = BookingStatus.confirmed;
+  _BookingRecurrence _recurrence = _BookingRecurrence.oneOff;
 
   @override
   void dispose() {
@@ -651,6 +658,34 @@ class _PlayerRegistrationSheetState extends State<_PlayerRegistrationSheet> {
               },
             ),
             const SizedBox(height: 20),
+            Text('تكرار الحجز', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            SegmentedButton<_BookingRecurrence>(
+              segments: const [
+                ButtonSegment(
+                  value: _BookingRecurrence.oneOff,
+                  icon: Icon(Icons.looks_one_outlined),
+                  label: Text('لمرة'),
+                ),
+                ButtonSegment(
+                  value: _BookingRecurrence.weekly,
+                  icon: Icon(Icons.repeat_outlined),
+                  label: Text('ثابت'),
+                ),
+              ],
+              selected: <_BookingRecurrence>{_recurrence},
+              onSelectionChanged: (Set<_BookingRecurrence> selection) {
+                setState(() => _recurrence = selection.single);
+              },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _recurrence == _BookingRecurrence.weekly
+                  ? 'الثابت بيتسجل لنفس اليوم والساعة كل أسبوع.'
+                  : 'الحجز ده لموعد واحد فقط.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
@@ -659,6 +694,7 @@ class _PlayerRegistrationSheetState extends State<_PlayerRegistrationSheet> {
                       playerName: _name.text,
                       phoneNumber: _phone.text,
                       status: _status,
+                      recurrence: _recurrence,
                     ),
                   );
                 }
