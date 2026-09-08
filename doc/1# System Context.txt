@@ -1,0 +1,38 @@
+# System Context
+
+## Product Summary
+This is a mobile app for booking football playgrounds.
+
+## Users
+- Players
+- Admins
+
+## Core Features (MVP)
+- View available slots
+- Book a slot
+- Add optional services:
+  - Drinks
+  - Photography
+  - Referee
+- Basic payment (manual or placeholder)
+- Booking confirmation
+- Admin booking management
+
+## Business Rules
+- Ball is included by default in every booking
+- Only optional services are drinks, photography, referee
+- Only two user roles exist: player and admin
+
+## Tech Stack
+- React Native (Expo)
+- TypeScript
+- Supabase (later)
+
+## Exclusions (MVP)
+- No WhatsApp integration
+- No push notifications
+- No advanced payments
+- No loyalty system
+
+## Goal
+Build a working MVP to validate the booking experience with real users.

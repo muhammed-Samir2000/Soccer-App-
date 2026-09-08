@@ -1,0 +1,9 @@
+# Decisions Log
+
+- Ball is included by default (not optional)
+- Optional services limited to
+  - Drinks
+  - Photography
+  - Referee
+- MVP will NOT include notifications
+- MVP will use manual payment

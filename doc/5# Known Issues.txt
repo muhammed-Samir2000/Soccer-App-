@@ -1,0 +1,6 @@
+📄 5. KNOWN_ISSUES.md (اختياري لكن مهم)
+# Known Issues
+
+- No real payment integration yet
+- No notifications yet
+- Using mock data in early phase

@@ -1,0 +1,14 @@
+Create the Available Slots screen.
+
+Requirements:
+- Show list of time slots for a selected day
+- Each slot shows:
+  - Time
+  - Status (available / booked)
+- Available slots can be selected
+- Booked slots are disabled
+
+Output:
+- Screen component
+- Slot card component
+- Mock data

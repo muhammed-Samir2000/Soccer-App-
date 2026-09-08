@@ -1,0 +1,15 @@
+# Current Phase
+
+We are currently building the MVP.
+
+Current focus:
+- Mobile app UI
+- Booking flow
+- Admin basic panel
+
+Completed:
+- Documentation
+
+Next:
+- Setup project
+- Build UI screens
