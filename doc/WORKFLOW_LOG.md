@@ -346,4 +346,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: a one-off booking retains the selected confirmed or tentative state. Selecting fixed maps to the existing `recurring` domain status and clearly tells the admin that it repeats at the same weekly day and hour in mock mode.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 16 tests, including fixed-booking mapping.
 - Blockers/Risks: recurring data is still a mock representation, not a persisted schedule generator; approved backend work is required for production recurrence and collision handling.
-- Next action: rebuild the web preview and commit/push this verified form update to `origin/main`.
+- Source control: committed as `62b6652` (`Add fixed booking choice for admin`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
+- Next action: await approved backend scope before adding persistence, generated recurring schedules, or live collision handling.
