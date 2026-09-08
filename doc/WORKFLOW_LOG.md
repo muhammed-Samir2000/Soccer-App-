@@ -324,4 +324,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: the hour is selected before the form opens, so the date and time cannot be entered inconsistently. The form requires the player or group name and phone number, supports confirmed or tentative status, and the repository automatically assigns the first empty field while rejecting a full hour.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; the focused registration widget test passed; `flutter test` passed with 15 tests.
 - Blockers/Risks: registrations remain mock/in-memory and reset on restart. A production backend must persist the booking and enforce allocation atomically under concurrent requests.
-- Next action: rebuild the local web preview and commit/push the verified change set to `origin/main`.
+- Source control: committed as `ec1ee49` (`Add admin player registration flow`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
+- Next action: await approved backend scope before connecting persistence or live concurrency control.
