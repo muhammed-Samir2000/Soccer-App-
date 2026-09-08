@@ -401,5 +401,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: the product now uses an emerald football-club palette with a restrained warm accent, rounded but purposeful surfaces, and clear hierarchy. Player availability and manager occupancy lead with compact summaries; Arabic labels and icons communicate state without relying on color alone.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 21 tests.
 - Blockers/Risks: this is a mock-only visual release. A future production accessibility review should include device testing, dynamic text scaling, and contrast checks against final brand assets.
-- Source control: pending commit and push for this completed change set.
+- Source control: committed as `1831d29` (`Refine football booking visual system`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before adding persistence, real-time booking updates, or payment/OTP integrations.
