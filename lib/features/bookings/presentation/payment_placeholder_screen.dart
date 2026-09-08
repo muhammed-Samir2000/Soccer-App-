@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../../../shared/widgets/app_page_app_bar.dart';
 import '../domain/booking.dart';
 import '../domain/booking_draft.dart';
 import '../domain/booking_repository.dart';
@@ -54,7 +55,7 @@ class _PaymentPlaceholderScreenState extends State<PaymentPlaceholderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('طريقة الدفع')),
+      appBar: const AppPageAppBar(title: 'طريقة الدفع'),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),

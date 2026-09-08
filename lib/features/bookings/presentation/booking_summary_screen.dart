@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../slots/domain/time_slot.dart';
 import '../data/mock_optional_services.dart';
 import '../domain/booking_draft.dart';
@@ -31,7 +32,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ملخص الحجز')),
+      appBar: const AppPageAppBar(title: 'ملخص الحجز'),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),

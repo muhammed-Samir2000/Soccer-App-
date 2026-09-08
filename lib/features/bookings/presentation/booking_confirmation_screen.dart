@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../slots/domain/time_slot.dart';
 import '../domain/booking.dart';
 import '../domain/optional_service.dart';
@@ -13,7 +14,7 @@ class BookingConfirmationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('تأكيد الحجز')),
+      appBar: const AppPageAppBar(title: 'تأكيد الحجز'),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(24),

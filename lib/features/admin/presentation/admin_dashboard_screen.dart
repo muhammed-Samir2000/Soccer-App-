@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/app_page_app_bar.dart';
+
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_draft.dart';
 import '../../bookings/domain/booking_repository.dart';
@@ -33,7 +35,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('إدارة الملاعب')),
+    appBar: const AppPageAppBar(title: 'إدارة الملاعب'),
     body: FutureBuilder<List<Booking>>(
       future: _bookings,
       builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
@@ -179,7 +181,7 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('حجز سريع أو ثابت')),
+    appBar: const AppPageAppBar(title: 'حجز سريع أو ثابت'),
     body: Padding(
       padding: const EdgeInsets.all(20),
       child: ListView(
@@ -265,7 +267,7 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('صلاحيات الموظفين')),
+    appBar: const AppPageAppBar(title: 'صلاحيات الموظفين'),
     body: FutureBuilder<List<StaffMember>>(
       future: _staff,
       builder: (context, snapshot) {
@@ -339,7 +341,7 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('إعدادات التنبيهات')),
+    appBar: const AppPageAppBar(title: 'إعدادات التنبيهات'),
     body: FutureBuilder<List<NotificationSetting>>(
       future: _settings,
       builder: (context, snapshot) {

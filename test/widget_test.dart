@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/app/app.dart';
 
@@ -12,8 +12,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('المواعيد الفاضية'), findsOneWidget);
+    expect(find.text('المواعيد المتاحة قدامك لمدة 7 أيام.'), findsOneWidget);
     expect(find.text('محجوز مؤقتاً'), findsOneWidget);
     expect(find.text('محجوز'), findsOneWidget);
+    expect(find.byIcon(Icons.timer_outlined), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('slot-003')));
     await tester.pumpAndSettle();
@@ -23,6 +25,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('ملخص الحجز'), findsOneWidget);
+    expect(find.byTooltip('رجوع'), findsOneWidget);
     expect(find.text('الكرة مشمولة مع الحجز'), findsOneWidget);
 
     await tester.scrollUntilVisible(

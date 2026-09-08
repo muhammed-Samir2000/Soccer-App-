@@ -69,4 +69,9 @@ class MockSlotRepository implements SlotRepository {
       ),
     ];
   }
+
+  @override
+  Stream<List<TimeSlot>> watchSlotsForDay(DateTime day) async* {
+    yield await getSlotsForDay(day);
+  }
 }

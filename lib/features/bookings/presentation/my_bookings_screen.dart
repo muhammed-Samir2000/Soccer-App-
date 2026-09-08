@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/app_page_app_bar.dart';
 import '../domain/booking.dart';
 import '../domain/booking_repository.dart';
 import '../domain/match_result.dart';
@@ -33,7 +34,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('حجوزاتي')),
+    appBar: const AppPageAppBar(title: 'حجوزاتي'),
     body: FutureBuilder<List<Booking>>(
       future: _bookings,
       builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {

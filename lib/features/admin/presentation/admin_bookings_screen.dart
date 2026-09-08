@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/app_page_app_bar.dart';
+
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_repository.dart';
 import '../../bookings/domain/optional_service.dart';
@@ -25,7 +27,7 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('حجوزات الأدمن')),
+      appBar: const AppPageAppBar(title: 'حجوزات الأدمن'),
       body: SafeArea(
         child: FutureBuilder<List<Booking>>(
           future: _bookings,

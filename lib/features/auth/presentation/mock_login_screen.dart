@@ -45,50 +45,39 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Spacer(),
-              Container(
-                width: 76,
-                height: 76,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Icon(
-                  Icons.sports_soccer,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  size: 40,
-                ),
+              const SizedBox(height: 28),
+              Center(
+                child: _PitchLogo(color: Theme.of(context).colorScheme.primary),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               Text(
                 'احجز ملعبك',
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               const SizedBox(height: 12),
               Text(
-                'اختار هتدخل لاعب ولا أدمن، وابدأ تحجز معانا.',
+                'اختار نوع دخولك وابدأ في ثواني.',
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 32),
-              SegmentedButton<UserRole>(
-                segments: const [
-                  ButtonSegment<UserRole>(
-                    value: UserRole.player,
-                    icon: Icon(Icons.sports_soccer_outlined),
-                    label: Text('لاعب'),
-                  ),
-                  ButtonSegment<UserRole>(
-                    value: UserRole.admin,
-                    icon: Icon(Icons.manage_accounts_outlined),
-                    label: Text('أدمن'),
-                  ),
-                ],
-                selected: {_selectedRole},
-                onSelectionChanged: (Set<UserRole> selection) {
-                  setState(() => _selectedRole = selection.single);
-                },
+              _RoleCard(
+                selected: _selectedRole == UserRole.player,
+                icon: Icons.sports_soccer_outlined,
+                title: 'لاعب',
+                subtitle: 'شوف المواعيد واحجز ماتشك.',
+                onTap: () => setState(() => _selectedRole = UserRole.player),
+              ),
+              const SizedBox(height: 12),
+              _RoleCard(
+                selected: _selectedRole == UserRole.admin,
+                icon: Icons.admin_panel_settings_outlined,
+                title: 'أدمن',
+                subtitle: 'تابع الحجوزات والملاعب.',
+                onTap: () => setState(() => _selectedRole = UserRole.admin),
               ),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 16),
@@ -103,11 +92,103 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                 onPressed: _continue,
                 child: Text(
                   _selectedRole == UserRole.player
-                      ? 'شوف المواعيد الفاضية'
-                      : 'ادخل معاينة الأدمن',
+                      ? 'ابدأ الحجز كلاعب'
+                      : 'افتح لوحة الأدمن',
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PitchLogo extends StatelessWidget {
+  const _PitchLogo({required this.color});
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 108,
+    height: 108,
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(32),
+    ),
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        Icon(
+          Icons.crop_square,
+          color: Colors.white.withValues(alpha: 0.65),
+          size: 68,
+        ),
+        const Icon(Icons.sports_soccer, color: Colors.white, size: 42),
+      ],
+    ),
+  );
+}
+
+class _RoleCard extends StatelessWidget {
+  const _RoleCard({
+    required this.selected,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+  final bool selected;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    return Semantics(
+      label: 'اختيار دور $title',
+      button: true,
+      selected: selected,
+      child: Material(
+        color: selected ? colors.primaryContainer : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: selected ? colors.primary : colors.outlineVariant,
+                width: selected ? 2 : 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: colors.primary, size: 30),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(subtitle),
+                    ],
+                  ),
+                ),
+                Icon(
+                  selected ? Icons.check_circle : Icons.circle_outlined,
+                  color: selected ? colors.primary : colors.outline,
+                ),
+              ],
+            ),
           ),
         ),
       ),

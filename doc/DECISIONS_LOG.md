@@ -13,3 +13,4 @@
 - Tentative and recurring bookings, staff permissions, and notification preferences are supported in mock mode. OTP delivery, QR rendering/scanning, and push delivery are intentionally not connected.
 - The operational week starts on Saturday. The admin starts on a weekly availability summary, opens a day for its available hours, and manages existing bookings from a separate management section.
 - GitHub versioning is mandatory for every completed user-requested change set: verify, commit with a descriptive message, push to `origin/main`, and record the resulting commit in the workflow log. Generated builds, local logs, and secrets must remain excluded.
+- Flutter is the active UI layer: RTL is implemented through Flutter directionality and directional layout APIs, not CSS. Shared navigation uses a left-facing, Arabic-labelled back action. Slot repositories expose a watch stream so a future Supabase/WebSocket implementation can publish live availability.

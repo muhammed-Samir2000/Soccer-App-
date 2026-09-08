@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../auth/domain/app_user.dart';
 import '../data/mock_slot_repository.dart';
 import '../domain/slot_repository.dart';
@@ -22,19 +23,19 @@ class AvailableSlotsScreen extends StatefulWidget {
 
 class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
   late DateTime _selectedDay;
-  late Future<List<TimeSlot>> _slots;
+  late Stream<List<TimeSlot>> _slots;
 
   @override
   void initState() {
     super.initState();
     _selectedDay = MockSlotRepository.weekStart;
-    _slots = widget.repository.getSlotsForDay(_selectedDay);
+    _slots = widget.repository.watchSlotsForDay(_selectedDay);
   }
 
   void _selectDay(DateTime day) {
     setState(() {
       _selectedDay = day;
-      _slots = widget.repository.getSlotsForDay(day);
+      _slots = widget.repository.watchSlotsForDay(day);
     });
   }
 
@@ -46,25 +47,30 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('المواعيد الفاضية'),
+      appBar: AppPageAppBar(
+        title: 'المواعيد الفاضية',
         actions: [
-          IconButton(
-            tooltip: 'حجوزاتي',
-            onPressed: () => Navigator.of(
-              context,
-            ).pushNamed(AppRouter.myBookingsRoute, arguments: widget.player.id),
-            icon: const Icon(Icons.calendar_month_outlined),
+          Semantics(
+            label: 'فتح حجوزاتي',
+            button: true,
+            child: IconButton(
+              tooltip: 'حجوزاتي',
+              onPressed: () => Navigator.of(context).pushNamed(
+                AppRouter.myBookingsRoute,
+                arguments: widget.player.id,
+              ),
+              icon: const Icon(Icons.calendar_month_outlined),
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.only(right: 20),
+            padding: const EdgeInsetsDirectional.only(end: 12),
             child: Center(child: Text('أهلاً يا ${widget.player.name}')),
           ),
         ],
       ),
       body: SafeArea(
-        child: FutureBuilder<List<TimeSlot>>(
-          future: _slots,
+        child: StreamBuilder<List<TimeSlot>>(
+          stream: _slots,
           builder:
               (BuildContext context, AsyncSnapshot<List<TimeSlot>> snapshot) {
                 if (snapshot.hasError) {
@@ -80,7 +86,7 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                 }
 
                 return ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 20, 24),
                   children: [
                     Text(
                       'اختار ميعاد ماتشك',
@@ -88,24 +94,86 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'المواعيد المتاحة قدامك لمدة 3 أيام.',
+                      'المواعيد المتاحة قدامك لمدة ${days.length} أيام.',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 24),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: days.map((DateTime day) {
+                    SizedBox(
+                      height: 92,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: days.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
+                        itemBuilder: (BuildContext context, int index) {
+                          final DateTime day = days[index];
                           final bool isSelected = _sameDay(day, _selectedDay);
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: ChoiceChip(
-                              label: Text(_dayLabel(day)),
-                              selected: isSelected,
-                              onSelected: (_) => _selectDay(day),
+                          return Semantics(
+                            label: 'اختيار ${_dayLabel(day)}',
+                            selected: isSelected,
+                            button: true,
+                            child: InkWell(
+                              onTap: () => _selectDay(day),
+                              borderRadius: BorderRadius.circular(16),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                width: 74,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(
+                                            context,
+                                          ).colorScheme.outlineVariant,
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      _weekdayName(day),
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary
+                                            : null,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${day.day}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            color: isSelected
+                                                ? Theme.of(
+                                                    context,
+                                                  ).colorScheme.onPrimary
+                                                : null,
+                                          ),
+                                    ),
+                                    Text(
+                                      'سبتمبر',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: isSelected
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary
+                                            : null,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           );
-                        }).toList(),
+                        },
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -149,18 +217,14 @@ class _SlotCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colors = Theme.of(context).colorScheme;
     final bool isAvailable = slot.isAvailable;
-    final Color background = isAvailable
-        ? colors.primaryContainer
-        : colors.surfaceContainerHighest;
-    final Color foreground = isAvailable
-        ? colors.onPrimaryContainer
-        : colors.onSurfaceVariant;
+    final _SlotStyle style = _slotStyle(colors, slot.status);
 
     return Semantics(
+      label: '${_statusLabel(slot.status)}، ${_timeRange(slot)}',
       button: isAvailable,
       enabled: isAvailable,
       child: Material(
-        color: background,
+        color: style.background,
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           key: Key(slot.id),
@@ -170,10 +234,7 @@ class _SlotCard extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                Icon(
-                  isAvailable ? Icons.sports_soccer : Icons.lock_outline,
-                  color: foreground,
-                ),
+                Icon(style.icon, color: style.foreground),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -184,11 +245,15 @@ class _SlotCard extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 4),
-                      Text(_statusLabel(slot.status)),
+                      Text(
+                        _statusLabel(slot.status),
+                        style: TextStyle(color: style.foreground),
+                      ),
                     ],
                   ),
                 ),
-                if (isAvailable) Icon(Icons.arrow_back, color: foreground),
+                if (isAvailable)
+                  Icon(Icons.arrow_back, color: style.foreground),
               ],
             ),
           ),
@@ -204,23 +269,43 @@ class _SlotLegend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Wrap(
-      spacing: 16,
-      children: [Text('الأخضر: فاضي'), Text('الرمادي: مش متاح')],
+      spacing: 10,
+      runSpacing: 8,
+      children: [
+        _LegendItem(color: Color(0xFFD7F7E8), label: 'فاضي'),
+        _LegendItem(color: Color(0xFFFFF0D6), label: 'محجوز مؤقتاً'),
+        _LegendItem(color: Color(0xFFE4E9E7), label: 'محجوز'),
+      ],
     );
   }
 }
 
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({required this.color, required this.label});
+  final Color color;
+  final String label;
+  @override
+  Widget build(BuildContext context) => Chip(
+    avatar: CircleAvatar(backgroundColor: color, radius: 7),
+    label: Text(label),
+  );
+}
+
 String _dayLabel(DateTime day) {
+  return '${_weekdayName(day)} ${day.day} سبتمبر';
+}
+
+String _weekdayName(DateTime day) {
   const List<String> weekdays = [
-    'الاتنين',
-    'التلات',
-    'الأربع',
+    'الاثنين',
+    'الثلاثاء',
+    'الأربعاء',
     'الخميس',
     'الجمعة',
     'السبت',
     'الأحد',
   ];
-  return '${weekdays[day.weekday - 1]} ${day.day} سبتمبر';
+  return weekdays[day.weekday - 1];
 }
 
 String _timeRange(TimeSlot slot) =>
@@ -245,3 +330,33 @@ bool _sameDay(DateTime first, DateTime second) {
       first.month == second.month &&
       first.day == second.day;
 }
+
+class _SlotStyle {
+  const _SlotStyle({
+    required this.background,
+    required this.foreground,
+    required this.icon,
+  });
+  final Color background;
+  final Color foreground;
+  final IconData icon;
+}
+
+_SlotStyle _slotStyle(ColorScheme colors, SlotStatus status) =>
+    switch (status) {
+      SlotStatus.available => const _SlotStyle(
+        background: Color(0xFFD7F7E8),
+        foreground: Color(0xFF075E42),
+        icon: Icons.sports_soccer,
+      ),
+      SlotStatus.held => const _SlotStyle(
+        background: Color(0xFFFFF0D6),
+        foreground: Color(0xFF9A5A00),
+        icon: Icons.timer_outlined,
+      ),
+      SlotStatus.booked => _SlotStyle(
+        background: const Color(0xFFE4E9E7),
+        foreground: colors.onSurfaceVariant,
+        icon: Icons.lock_outline,
+      ),
+    };

@@ -5,6 +5,7 @@ import '../../bookings/domain/booking_draft.dart';
 import '../../bookings/domain/booking_repository.dart';
 import '../../slots/data/mock_slot_repository.dart';
 import '../../slots/domain/time_slot.dart';
+import '../../../shared/widgets/app_page_app_bar.dart';
 import '../domain/notification_repository.dart';
 import '../domain/staff_repository.dart';
 import 'admin_dashboard_screen.dart'
@@ -40,7 +41,50 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('إدارة الملاعب')),
+    appBar: AppPageAppBar(
+      title: 'إدارة الملاعب',
+      actions: [
+        Semantics(
+          label: 'إعدادات لوحة الأدمن',
+          button: true,
+          child: PopupMenuButton<String>(
+            tooltip: 'الإعدادات',
+            icon: const Icon(Icons.settings_outlined),
+            onSelected: (String value) {
+              final Widget page = value == 'staff'
+                  ? StaffPermissionsScreen(repository: widget.staffRepository)
+                  : NotificationSettingsScreen(
+                      repository: widget.notificationRepository,
+                    );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute<void>(builder: (_) => page));
+            },
+            itemBuilder: (BuildContext context) => const [
+              PopupMenuItem(value: 'staff', child: Text('الصلاحيات')),
+              PopupMenuItem(value: 'notifications', child: Text('التنبيهات')),
+            ],
+          ),
+        ),
+      ],
+    ),
+    floatingActionButton: Semantics(
+      label: 'إضافة حجز سريع أو ثابت',
+      button: true,
+      child: FloatingActionButton.extended(
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) =>
+                  AdminBookingToolsScreen(repository: widget.bookingRepository),
+            ),
+          );
+          _reload();
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('حجز سريع أو ثابت'),
+      ),
+    ),
     body: FutureBuilder<List<Booking>>(
       future: _bookings,
       builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
@@ -79,49 +123,7 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilledButton.tonalIcon(
-                  onPressed: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => AdminBookingToolsScreen(
-                          repository: widget.bookingRepository,
-                        ),
-                      ),
-                    );
-                    _reload();
-                  },
-                  icon: const Icon(Icons.add_circle_outline),
-                  label: const Text('حجز سريع أو ثابت'),
-                ),
-                FilledButton.tonalIcon(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => StaffPermissionsScreen(
-                        repository: widget.staffRepository,
-                      ),
-                    ),
-                  ),
-                  icon: const Icon(Icons.manage_accounts_outlined),
-                  label: const Text('الصلاحيات'),
-                ),
-                FilledButton.tonalIcon(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => NotificationSettingsScreen(
-                        repository: widget.notificationRepository,
-                      ),
-                    ),
-                  ),
-                  icon: const Icon(Icons.notifications_outlined),
-                  label: const Text('التنبيهات'),
-                ),
-              ],
-            ),
+            const SizedBox(height: 96),
           ],
         );
       },
@@ -145,7 +147,24 @@ class _DaySummaryCard extends StatelessWidget {
       onTap: onTap,
       leading: const CircleAvatar(child: Icon(Icons.calendar_today_outlined)),
       title: Text(_dayLabel(day)),
-      subtitle: Text('$freeFieldHours ساعة ملعب فاضية'),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 4),
+          Text('$freeFieldHours ساعة ملعب فاضية'),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: freeFieldHours / 15,
+              minHeight: 7,
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHighest,
+            ),
+          ),
+        ],
+      ),
       trailing: const Icon(Icons.arrow_back),
     ),
   );
@@ -175,7 +194,7 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(_dayLabel(widget.day))),
+    appBar: AppPageAppBar(title: _dayLabel(widget.day)),
     body: FutureBuilder<List<Booking>>(
       future: _bookings,
       builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
@@ -459,7 +478,7 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
       (int index) => MockSlotRepository.weekStart.add(Duration(days: index)),
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('حجز سريع أو ثابت')),
+      appBar: const AppPageAppBar(title: 'حجز سريع أو ثابت'),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
