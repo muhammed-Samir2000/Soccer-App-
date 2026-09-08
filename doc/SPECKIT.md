@@ -300,6 +300,7 @@ For every future coding session:
 5. Run the required verification commands before claiming a phase is complete.
 6. Update `CURRENT_PHASE.md`, `NEXT_TASK.md`, and `KNOWN_ISSUES.md` when their state changes.
 7. At the very end of a successfully completed phase, output the exact next-phase prompt from this document, with no edits, so the user can copy it.
+8. After every completed user-requested change set, run the required verification, review `git status`, create a descriptive Git commit, and push it to the configured `origin/main`. Record the commit hash and push outcome in `WORKFLOW_LOG.md`. Do not commit secrets, generated build outputs, or local logs.
 
 If blocked, record the blocker and the exact recovery action in `WORKFLOW_LOG.md`; do not silently skip verification or move to the next phase.
 

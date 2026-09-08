@@ -294,3 +294,13 @@ At the end of your response, provide the final completion summary and state that
 - Verification: initial commit `99db770` (`Initial Flutter booking MVP`) was pushed successfully; local `main` tracks `origin/main`.
 - Blockers/Risks: release APKs and local logs remain intentionally excluded. Future application changes require a new commit and push to become a recoverable version.
 - Next action: commit and push this workflow-log entry as the next source-control version.
+
+### 2026-09-08 14:50 | Source Control Policy | Status: in-progress
+
+- Actor: Codex.
+- Intent: make remote versioning mandatory for every future completed change set.
+- Changed: `doc/SPECKIT.md`; `doc/DECISIONS_LOG.md`; `doc/NEXT_TASK.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: all completed user-requested changes must be verified, committed with a descriptive message, pushed to `origin/main`, and logged with the commit hash. Secrets, generated builds, and local logs remain excluded through `.gitignore` and review.
+- Verification: documentation policy updated; Git commit and push pending.
+- Blockers/Risks: none.
+- Next action: commit and push this policy, then record its commit hash.
