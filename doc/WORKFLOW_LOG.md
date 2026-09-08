@@ -357,4 +357,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: `BookingDatePickerField` is the single reusable calendar control. It displays the selected date, opens a right-to-left Arabic Material date picker, and limits selection to the seven operational mock days. It is used for quick/fixed bookings and booking edits.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 17 tests, including opening the Arabic calendar.
 - Blockers/Risks: the mock calendar deliberately cannot select future weeks until a backend supplies actual schedule availability and operating dates.
-- Next action: rebuild the web preview and commit/push the verified calendar change to `origin/main`.
+- Source control: committed as `2d85ae7` (`Add Arabic calendar day picker`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
+- Next action: await approved backend scope before adding a real schedule range or live availability dates.
