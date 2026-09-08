@@ -6,6 +6,7 @@ import '../../bookings/domain/booking_repository.dart';
 import '../../slots/data/mock_slot_repository.dart';
 import '../../slots/domain/time_slot.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
+import '../../../shared/widgets/booking_date_picker_field.dart';
 import '../domain/notification_repository.dart';
 import '../domain/staff_repository.dart';
 import 'admin_dashboard_screen.dart'
@@ -343,27 +344,14 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<DateTime>(
-                      initialValue: selectedDay,
-                      decoration: const InputDecoration(labelText: 'اليوم'),
-                      items:
-                          List<DateTime>.generate(
-                                7,
-                                (int index) => MockSlotRepository.weekStart.add(
-                                  Duration(days: index),
-                                ),
-                              )
-                              .map(
-                                (DateTime day) => DropdownMenuItem<DateTime>(
-                                  value: day,
-                                  child: Text(_dayLabel(day)),
-                                ),
-                              )
-                              .toList(),
-                      onChanged: (DateTime? day) {
-                        if (day != null) {
-                          setDialogState(() => selectedDay = day);
-                        }
+                    BookingDatePickerField(
+                      selectedDate: selectedDay,
+                      firstDate: MockSlotRepository.weekStart,
+                      lastDate: MockSlotRepository.weekStart.add(
+                        const Duration(days: 6),
+                      ),
+                      onChanged: (DateTime day) {
+                        setDialogState(() => selectedDay = day);
                       },
                     ),
                     const SizedBox(height: 12),
@@ -739,10 +727,6 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<DateTime> week = List<DateTime>.generate(
-      7,
-      (int index) => MockSlotRepository.weekStart.add(Duration(days: index)),
-    );
     return Scaffold(
       appBar: const AppPageAppBar(title: 'حجز سريع أو ثابت'),
       body: ListView(
@@ -765,18 +749,11 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
             decoration: const InputDecoration(labelText: 'رقم الهاتف'),
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<DateTime>(
-            initialValue: _day,
-            decoration: const InputDecoration(labelText: 'اليوم'),
-            items: week
-                .map(
-                  (DateTime day) =>
-                      DropdownMenuItem(value: day, child: Text(_dayLabel(day))),
-                )
-                .toList(),
-            onChanged: (DateTime? day) {
-              if (day != null) setState(() => _day = day);
-            },
+          BookingDatePickerField(
+            selectedDate: _day,
+            firstDate: MockSlotRepository.weekStart,
+            lastDate: MockSlotRepository.weekStart.add(const Duration(days: 6)),
+            onChanged: (DateTime day) => setState(() => _day = day),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(

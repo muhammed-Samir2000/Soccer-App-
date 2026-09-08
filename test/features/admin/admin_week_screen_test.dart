@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/features/admin/presentation/admin_week_screen.dart';
 import 'package:soccer_booking_app/features/bookings/data/mock_booking_repository.dart';
@@ -12,6 +13,9 @@ void main() {
     final MockBookingRepository repository = MockBookingRepository();
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('ar', 'EG'),
+        supportedLocales: const [Locale('ar', 'EG')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         home: Directionality(
           textDirection: TextDirection.rtl,
           child: AdminDayScreen(
@@ -71,5 +75,26 @@ void main() {
       (await repository.getBookings()).single.status,
       BookingStatus.recurring,
     );
+  });
+
+  testWidgets('opens an Arabic calendar for the quick-booking day', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ar', 'EG'),
+        supportedLocales: const [Locale('ar', 'EG')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: AdminBookingToolsScreen(repository: MockBookingRepository()),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.calendar_month_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('اختار يوم الحجز'), findsOneWidget);
   });
 }

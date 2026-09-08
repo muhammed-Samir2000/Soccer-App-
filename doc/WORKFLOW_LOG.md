@@ -348,3 +348,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: recurring data is still a mock representation, not a persisted schedule generator; approved backend work is required for production recurrence and collision handling.
 - Source control: committed as `62b6652` (`Add fixed booking choice for admin`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before adding persistence, generated recurring schedules, or live collision handling.
+
+### 2026-09-08 17:05 | Admin Arabic Calendar Selection | Status: completed
+
+- Actor: Codex.
+- Intent: replace the long admin day dropdowns with a clear Arabic calendar in every admin workflow that selects a booking day.
+- Changed: `lib/shared/widgets/booking_date_picker_field.dart`; `lib/features/admin/presentation/admin_week_screen.dart`; `test/features/admin/admin_week_screen_test.dart`; `doc/DECISIONS_LOG.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: `BookingDatePickerField` is the single reusable calendar control. It displays the selected date, opens a right-to-left Arabic Material date picker, and limits selection to the seven operational mock days. It is used for quick/fixed bookings and booking edits.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; `flutter test` passed with 17 tests, including opening the Arabic calendar.
+- Blockers/Risks: the mock calendar deliberately cannot select future weeks until a backend supplies actual schedule availability and operating dates.
+- Next action: rebuild the web preview and commit/push the verified calendar change to `origin/main`.
