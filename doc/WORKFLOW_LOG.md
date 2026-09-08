@@ -284,3 +284,13 @@ At the end of your response, provide the final completion summary and state that
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 13 tests.
 - Blockers/Risks: mock schedule edits still reset on restart and require a backend transaction for concurrent production use.
 - Next action: await approved backend scope before connecting persistence, OTP, QR, or notifications.
+
+### 2026-09-08 14:40 | Source Control | Status: completed
+
+- Actor: Codex.
+- Intent: establish a durable remote version history for the current Flutter application.
+- Changed: Git metadata only; `doc/WORKFLOW_LOG.md` records the action.
+- Decisions: initialized `main`, committed source and documentation while respecting `.gitignore`, and connected the project to `https://github.com/muhammed-Samir2000/Soccer-App-.git`.
+- Verification: initial commit `99db770` (`Initial Flutter booking MVP`) was pushed successfully; local `main` tracks `origin/main`.
+- Blockers/Risks: release APKs and local logs remain intentionally excluded. Future application changes require a new commit and push to become a recoverable version.
+- Next action: commit and push this workflow-log entry as the next source-control version.
