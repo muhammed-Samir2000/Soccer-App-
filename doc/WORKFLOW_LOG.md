@@ -368,4 +368,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: available slots display a compact filled-tonal add-booking icon with the Arabic tooltip `احجز الموعد`; temporary and booked slots remain non-actionable and do not show that icon.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 17 tests.
 - Blockers/Risks: booking state remains mock-only until the approved backend adds persistent, concurrent-safe availability.
-- Next action: rebuild the web preview and commit/push this verified player booking affordance to `origin/main`.
+- Source control: committed as `b9bca15` (`Add player slot booking icon`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
+- Next action: await approved backend scope before adding persistent booking state or live availability.
