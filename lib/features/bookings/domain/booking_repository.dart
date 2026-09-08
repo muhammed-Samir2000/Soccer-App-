@@ -15,6 +15,15 @@ abstract interface class BookingRepository {
     required BookingDraft draft,
   });
 
+  /// Records a walk-in or reception booking against a selected free hour.
+  /// The data layer assigns the first unoccupied identical field.
+  Future<Booking> createAdminBooking({
+    required String playerName,
+    required String phoneNumber,
+    required BookingDraft draft,
+    required BookingStatus status,
+  });
+
   Future<Booking> createRecurringBooking({
     required String playerName,
     required String phoneNumber,

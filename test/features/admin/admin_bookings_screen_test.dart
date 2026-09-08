@@ -85,6 +85,14 @@ class _EmptyBookingRepository implements BookingRepository {
   }) => throw UnimplementedError();
 
   @override
+  Future<Booking> createAdminBooking({
+    required String playerName,
+    required String phoneNumber,
+    required BookingDraft draft,
+    required BookingStatus status,
+  }) => throw UnimplementedError();
+
+  @override
   Future<List<Booking>> getBookingsForPlayer(String playerId) async =>
       <Booking>[];
 
@@ -122,6 +130,14 @@ class _FailingBookingRepository implements BookingRepository {
     required String playerName,
     required String phoneNumber,
     required BookingDraft draft,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<Booking> createAdminBooking({
+    required String playerName,
+    required String phoneNumber,
+    required BookingDraft draft,
+    required BookingStatus status,
   }) => throw UnimplementedError();
 
   @override

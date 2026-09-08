@@ -36,8 +36,11 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
     _bookings = widget.bookingRepository.getBookings();
   }
 
-  void _reload() =>
-      setState(() => _bookings = widget.bookingRepository.getBookings());
+  void _reload() {
+    setState(() {
+      _bookings = widget.bookingRepository.getBookings();
+    });
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -190,7 +193,11 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
     _bookings = widget.repository.getBookings();
   }
 
-  void _reload() => setState(() => _bookings = widget.repository.getBookings());
+  void _reload() {
+    setState(() {
+      _bookings = widget.repository.getBookings();
+    });
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -250,7 +257,13 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
                   title: Text(
                     '${_formatHour(hour)} - ${_formatHour(hour + 1)}',
                   ),
-                  subtitle: Text('$freeFields ملعب فاضي'),
+                  subtitle: Text('$freeFields ملعب فاضي - اختارها لتسجيل لاعب'),
+                  trailing: FilledButton.tonalIcon(
+                    onPressed: () => _registerPlayer(hour, freeFields),
+                    icon: const Icon(Icons.person_add_alt_1_outlined),
+                    label: const Text('تسجيل لاعب'),
+                  ),
+                  onTap: () => _registerPlayer(hour, freeFields),
                 ),
               );
             }),
@@ -441,6 +454,219 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
       _reload();
     }
   }
+
+  Future<void> _registerPlayer(int hour, int freeFields) async {
+    final _AdminRegistration? registration =
+        await showModalBottomSheet<_AdminRegistration>(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => _PlayerRegistrationSheet(
+            day: widget.day,
+            hour: hour,
+            freeFields: freeFields,
+          ),
+        );
+    if (registration == null) {
+      return;
+    }
+
+    final BookingDraft draft = BookingDraft(
+      slot: TimeSlot(
+        id: 'admin-${widget.day.toIso8601String()}-$hour',
+        startTime: DateTime(
+          widget.day.year,
+          widget.day.month,
+          widget.day.day,
+          hour,
+        ),
+        endTime: DateTime(
+          widget.day.year,
+          widget.day.month,
+          widget.day.day,
+          hour + 1,
+        ),
+        status: SlotStatus.available,
+      ),
+      basePrice: 800,
+    );
+    try {
+      final Booking booking = await widget.repository.createAdminBooking(
+        playerName: registration.playerName,
+        phoneNumber: registration.phoneNumber,
+        draft: draft,
+        status: registration.status,
+      );
+      _reload();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'اتسجل ${booking.playerName} في ملعب ${booking.fieldNumber}.',
+            ),
+          ),
+        );
+      }
+    } on ArgumentError catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.message.toString())));
+      }
+    } on StateError catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.message.toString())));
+      }
+    }
+  }
+}
+
+class _AdminRegistration {
+  const _AdminRegistration({
+    required this.playerName,
+    required this.phoneNumber,
+    required this.status,
+  });
+
+  final String playerName;
+  final String phoneNumber;
+  final BookingStatus status;
+}
+
+class _PlayerRegistrationSheet extends StatefulWidget {
+  const _PlayerRegistrationSheet({
+    required this.day,
+    required this.hour,
+    required this.freeFields,
+  });
+
+  final DateTime day;
+  final int hour;
+  final int freeFields;
+
+  @override
+  State<_PlayerRegistrationSheet> createState() =>
+      _PlayerRegistrationSheetState();
+}
+
+class _PlayerRegistrationSheetState extends State<_PlayerRegistrationSheet> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _phone = TextEditingController();
+  BookingStatus _status = BookingStatus.confirmed;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _phone.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    child: Padding(
+      padding: EdgeInsetsDirectional.fromSTEB(
+        20,
+        12,
+        20,
+        MediaQuery.viewInsetsOf(context).bottom + 20,
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'تسجيل لاعب جديد',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '${_dayLabel(widget.day)} | ${_formatHour(widget.hour)} - ${_formatHour(widget.hour + 1)} | ${widget.freeFields} ملعب فاضي',
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: _name,
+              autofocus: true,
+              textInputAction: TextInputAction.next,
+              decoration: const InputDecoration(
+                labelText: 'اسم اللاعب أو المجموعة',
+                prefixIcon: Icon(Icons.person_outline),
+              ),
+              validator: (String? value) =>
+                  value == null || value.trim().isEmpty
+                  ? 'اكتب اسم اللاعب أو المجموعة.'
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _phone,
+              keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.done,
+              decoration: const InputDecoration(
+                labelText: 'رقم الهاتف',
+                prefixIcon: Icon(Icons.phone_outlined),
+              ),
+              validator: (String? value) =>
+                  value == null || value.trim().isEmpty
+                  ? 'اكتب رقم هاتف للتواصل.'
+                  : null,
+            ),
+            const SizedBox(height: 20),
+            Text('حالة الحجز', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            SegmentedButton<BookingStatus>(
+              segments: const [
+                ButtonSegment(
+                  value: BookingStatus.confirmed,
+                  icon: Icon(Icons.check_circle_outline),
+                  label: Text('مؤكد'),
+                ),
+                ButtonSegment(
+                  value: BookingStatus.tentative,
+                  icon: Icon(Icons.timer_outlined),
+                  label: Text('مبدئي'),
+                ),
+              ],
+              selected: <BookingStatus>{_status},
+              onSelectionChanged: (Set<BookingStatus> selection) {
+                setState(() => _status = selection.single);
+              },
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  Navigator.of(context).pop(
+                    _AdminRegistration(
+                      playerName: _name.text,
+                      phoneNumber: _phone.text,
+                      status: _status,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.save_outlined),
+              label: const Text('حفظ الحجز'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 class AdminBookingToolsScreen extends StatefulWidget {

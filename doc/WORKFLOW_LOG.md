@@ -315,3 +315,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: no live backend, WebSocket, or optimistic write reconciliation is activated because the application has no approved backend scope. The stream contract is the safe replacement boundary.
 - Source control: committed as `acb7553` (`Improve RTL navigation and booking UX`) and pushed successfully to `origin/main`.
 - Next action: continue only with a new approved product or backend scope.
+
+### 2026-09-08 16:02 | Admin Player Registration | Status: completed
+
+- Actor: Codex.
+- Intent: let an admin register a player directly from a selected available hour in the daily schedule.
+- Changed: `lib/features/bookings/domain/booking_repository.dart`; `lib/features/bookings/data/mock_booking_repository.dart`; `lib/features/admin/presentation/admin_week_screen.dart`; repository and admin widget tests; `doc/DECISIONS_LOG.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: the hour is selected before the form opens, so the date and time cannot be entered inconsistently. The form requires the player or group name and phone number, supports confirmed or tentative status, and the repository automatically assigns the first empty field while rejecting a full hour.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes after formatting; `flutter analyze` passed with no issues; the focused registration widget test passed; `flutter test` passed with 15 tests.
+- Blockers/Risks: registrations remain mock/in-memory and reset on restart. A production backend must persist the booking and enforce allocation atomically under concurrent requests.
+- Next action: rebuild the local web preview and commit/push the verified change set to `origin/main`.

@@ -74,6 +74,29 @@ class MockBookingRepository implements BookingRepository {
   );
 
   @override
+  Future<Booking> createAdminBooking({
+    required String playerName,
+    required String phoneNumber,
+    required BookingDraft draft,
+    required BookingStatus status,
+  }) {
+    final String cleanedName = playerName.trim();
+    final String cleanedPhone = phoneNumber.trim();
+    if (cleanedName.isEmpty) {
+      throw ArgumentError('اكتب اسم اللاعب أو المجموعة.');
+    }
+    if (cleanedPhone.isEmpty) {
+      throw ArgumentError('اكتب رقم هاتف للتواصل.');
+    }
+    return _create(
+      playerId: 'phone-$cleanedPhone',
+      playerName: cleanedName,
+      draft: draft,
+      status: status,
+    );
+  }
+
+  @override
   Future<Booking> createRecurringBooking({
     required String playerName,
     required String phoneNumber,

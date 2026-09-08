@@ -95,4 +95,22 @@ void main() {
     await repository.deleteBooking(created.reference);
     expect(await repository.getBookings(), isEmpty);
   });
+
+  test('registers an admin player and assigns the next free field', () async {
+    final MockBookingRepository repository = MockBookingRepository();
+    final BookingDraft draft = BookingDraft(slot: slot, basePrice: 800);
+
+    await repository.createBooking(draft);
+    final Booking booking = await repository.createAdminBooking(
+      playerName: 'الكابتن محمد',
+      phoneNumber: '01012345678',
+      draft: draft,
+      status: BookingStatus.confirmed,
+    );
+
+    expect(booking.playerName, 'الكابتن محمد');
+    expect(booking.playerId, 'phone-01012345678');
+    expect(booking.status, BookingStatus.confirmed);
+    expect(booking.fieldNumber, 2);
+  });
 }
