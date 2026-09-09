@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/app/app.dart';
+import 'package:soccer_booking_app/app/app_dependencies.dart';
+import 'package:soccer_booking_app/app/router.dart';
+import 'package:soccer_booking_app/features/auth/domain/app_user.dart';
 
 void main() {
   testWidgets('only an available slot opens the booking summary route', (
@@ -8,7 +11,7 @@ void main() {
   ) async {
     await tester.pumpWidget(SoccerBookingApp());
 
-    expect(find.text('تسجيل الدخول'), findsOneWidget);
+    expect(find.text('تسجيل دخول اللاعب'), findsOneWidget);
     await tester.enterText(
       find.byKey(const Key('phone_number_field')),
       '01012345678',
@@ -76,5 +79,40 @@ void main() {
     expect(find.text('HAGZ-1001'), findsOneWidget);
     expect(find.text('مشروبات ساقعة'), findsOneWidget);
     expect(find.textContaining('860'), findsAtLeastNWidgets(1));
+  });
+
+  testWidgets('keeps a public admin link out of the player experience', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      SoccerBookingApp(initialRoute: AppRouter.adminBookingsRoute),
+    );
+
+    expect(find.text('تسجيل دخول اللاعب'), findsOneWidget);
+    expect(find.text('دخول لوحة الإدارة'), findsNothing);
+  });
+
+  testWidgets('opens the admin dashboard only for an admin session', (
+    WidgetTester tester,
+  ) async {
+    final AppDependencies dependencies = AppDependencies.mock();
+    dependencies.session.signIn(
+      const AppUser(
+        id: 'admin-test',
+        name: 'مدير الاختبار',
+        role: UserRole.admin,
+      ),
+    );
+
+    await tester.pumpWidget(
+      SoccerBookingApp(
+        dependencies: dependencies,
+        initialRoute: AppRouter.adminBookingsRoute,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('لوحة التحكم'), findsOneWidget);
+    expect(find.text('تسجيل دخول اللاعب'), findsNothing);
   });
 }

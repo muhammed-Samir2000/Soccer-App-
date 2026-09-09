@@ -24,6 +24,7 @@ class AppRouter {
   static const paymentPlaceholderRoute = '/payment-placeholder';
   static const bookingConfirmationRoute = '/booking-confirmation';
   static const adminBookingsRoute = '/admin-bookings';
+  static const adminLoginRoute = '/admin-login';
   static const myBookingsRoute = '/my-bookings';
 
   Route<void> onGenerateRoute(RouteSettings settings) {
@@ -32,8 +33,12 @@ class AppRouter {
       builder: (BuildContext context) {
         switch (settings.name) {
           case slotsRoute:
+            final AppUser? player = _playerFrom(settings.arguments);
+            if (player == null) {
+              return _playerEntry();
+            }
             return AvailableSlotsScreen(
-              player: settings.arguments! as AppUser,
+              player: player,
               repository: dependencies.slotRepository,
             );
           case bookingSummaryRoute:
@@ -53,17 +58,50 @@ class AppRouter {
               repository: dependencies.bookingRepository,
             );
           case adminBookingsRoute:
+            if (!dependencies.session.isAdmin) {
+              return _playerEntry();
+            }
             return AdminWeekScreen(
               bookingRepository: dependencies.bookingRepository,
               staffRepository: dependencies.staffRepository,
               notificationRepository: dependencies.notificationRepository,
               venueSettingsRepository: dependencies.venueSettingsRepository,
             );
+          case adminLoginRoute:
+            return MockLoginScreen(
+              repository: dependencies.authRepository,
+              session: dependencies.session,
+              audience: LoginAudience.admin,
+            );
           case launchRoute:
           default:
-            return MockLoginScreen(repository: dependencies.authRepository);
+            return _playerEntry();
         }
       },
+    );
+  }
+
+  AppUser? _playerFrom(Object? arguments) {
+    if (arguments case final AppUser user when user.role == UserRole.player) {
+      return user;
+    }
+
+    final AppUser? sessionUser = dependencies.session.currentUser;
+    return sessionUser?.role == UserRole.player ? sessionUser : null;
+  }
+
+  Widget _playerEntry() {
+    final AppUser? player = _playerFrom(null);
+    if (player != null) {
+      return AvailableSlotsScreen(
+        player: player,
+        repository: dependencies.slotRepository,
+      );
+    }
+
+    return MockLoginScreen(
+      repository: dependencies.authRepository,
+      session: dependencies.session,
     );
   }
 }

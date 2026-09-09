@@ -403,3 +403,14 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: this is a mock-only visual release. A future production accessibility review should include device testing, dynamic text scaling, and contrast checks against final brand assets.
 - Source control: committed as `1831d29` (`Refine football booking visual system`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: await approved backend scope before adding persistence, real-time booking updates, or payment/OTP integrations.
+
+### 2026-09-09 09:53 | Player And Admin Access Separation | Status: completed
+
+- Actor: Codex.
+- Intent: prevent players from entering the manager experience through role selection or a direct admin URL.
+- Changed: mock session boundary; application dependencies and router guards; player-only public login; separate admin login route; routing widget tests; `doc/DECISIONS_LOG.md`; `doc/KNOWN_ISSUES.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: the public entry is always player-focused. `/admin-bookings` renders the player entry or player availability unless the active session has the admin role. The admin entry is isolated at `/admin-login` and is deliberately absent from player navigation.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 23 tests, including public-route denial and an admin-session allow case.
+- Blockers/Risks: the session and admin route are mock-only. Google or email/password authentication requires an approved backend, server-side role lookup, and authorization policies before this becomes security rather than user-experience separation.
+- Source control: pending commit and push for this completed change set.
+- Next action: agree the approved backend/authentication scope before connecting Google sign-in or email/password accounts.

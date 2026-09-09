@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../domain/app_session.dart';
 import '../domain/app_user.dart';
 import '../domain/auth_repository.dart';
 
+enum LoginAudience { player, admin }
+
 class MockLoginScreen extends StatefulWidget {
-  const MockLoginScreen({super.key, required this.repository});
+  const MockLoginScreen({
+    super.key,
+    required this.repository,
+    required this.session,
+    this.audience = LoginAudience.player,
+  });
 
   final AuthRepository repository;
+  final AppSession session;
+  final LoginAudience audience;
 
   @override
   State<MockLoginScreen> createState() => _MockLoginScreenState();
@@ -16,8 +26,9 @@ class MockLoginScreen extends StatefulWidget {
 class _MockLoginScreenState extends State<MockLoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _phone = TextEditingController();
-  UserRole _selectedRole = UserRole.player;
   String? _errorMessage;
+
+  bool get _isAdminLogin => widget.audience == LoginAudience.admin;
 
   Future<void> _continue() async {
     if (!_formKey.currentState!.validate()) {
@@ -25,17 +36,22 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
     }
     setState(() => _errorMessage = null);
     try {
-      final AppUser user = await widget.repository.signInAs(_selectedRole);
+      final AppUser user = await widget.repository.signInAs(
+        _isAdminLogin ? UserRole.admin : UserRole.player,
+      );
       if (!mounted) {
         return;
       }
+      widget.session.signIn(user);
 
       if (user.role == UserRole.player) {
-        Navigator.of(context).pushNamed(AppRouter.slotsRoute, arguments: user);
+        Navigator.of(
+          context,
+        ).pushReplacementNamed(AppRouter.slotsRoute, arguments: user);
         return;
       }
 
-      Navigator.of(context).pushNamed(AppRouter.adminBookingsRoute);
+      Navigator.of(context).pushReplacementNamed(AppRouter.adminBookingsRoute);
     } catch (_) {
       if (mounted) {
         setState(() => _errorMessage = 'مش قادرين ندخّلك دلوقتي. جرّب تاني.');
@@ -69,13 +85,15 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'تسجيل الدخول',
+                    _isAdminLogin ? 'دخول فريق الإدارة' : 'تسجيل دخول اللاعب',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.displaySmall,
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'اكتب رقم موبايلك واختار نوع دخولك.',
+                    _isAdminLogin
+                        ? 'الدخول ده مخصص لمدير الملعب والفريق المصرح له.'
+                        : 'اكتب رقم موبايلك علشان تكمل الحجز.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
@@ -101,28 +119,6 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                           : 'اكتب رقم موبايل مصري صحيح.';
                     },
                   ),
-                  const SizedBox(height: 28),
-                  Text(
-                    'هتدخل بصفتك إيه؟',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 12),
-                  _RoleCard(
-                    selected: _selectedRole == UserRole.player,
-                    icon: Icons.sports_soccer_outlined,
-                    title: 'لاعب',
-                    subtitle: 'شوف المواعيد واحجز ماتشك.',
-                    onTap: () =>
-                        setState(() => _selectedRole = UserRole.player),
-                  ),
-                  const SizedBox(height: 12),
-                  _RoleCard(
-                    selected: _selectedRole == UserRole.admin,
-                    icon: Icons.admin_panel_settings_outlined,
-                    title: 'مدير ملعب',
-                    subtitle: 'تابع الحجوزات والملاعب.',
-                    onTap: () => setState(() => _selectedRole = UserRole.admin),
-                  ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 16),
                     Text(
@@ -137,14 +133,14 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                     key: const Key('continue_button'),
                     onPressed: _continue,
                     child: Text(
-                      _selectedRole == UserRole.player
-                          ? 'دخول كلاعب'
-                          : 'دخول كمدير ملعب',
+                      _isAdminLogin ? 'دخول لوحة الإدارة' : 'دخول ومتابعة',
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'نسخة تجريبية: التحقق برمز SMS هيتفعل قريباً.',
+                    _isAdminLogin
+                        ? 'نسخة تجريبية: صلاحيات الأدمن الحقيقية هتتأكد من السيرفر.'
+                        : 'نسخة تجريبية: هتدخل كلاعب بدون اختيار صلاحية إدارية.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
@@ -182,70 +178,4 @@ class _PitchLogo extends StatelessWidget {
       ],
     ),
   );
-}
-
-class _RoleCard extends StatelessWidget {
-  const _RoleCard({
-    required this.selected,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-  final bool selected;
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
-    return Semantics(
-      label: 'اختيار دور $title',
-      button: true,
-      selected: selected,
-      child: Material(
-        color: selected ? colors.primaryContainer : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selected ? colors.primary : colors.outlineVariant,
-                width: selected ? 2 : 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: colors.primary, size: 30),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(subtitle),
-                    ],
-                  ),
-                ),
-                Icon(
-                  selected ? Icons.check_circle : Icons.circle_outlined,
-                  color: selected ? colors.primary : colors.outline,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
