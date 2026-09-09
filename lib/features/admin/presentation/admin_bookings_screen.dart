@@ -5,6 +5,7 @@ import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_repository.dart';
 import '../../bookings/domain/optional_service.dart';
+import 'admin_bottom_navigation.dart';
 
 class AdminBookingsScreen extends StatefulWidget {
   const AdminBookingsScreen({super.key, required this.repository});
@@ -79,6 +80,7 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
               },
         ),
       ),
+      bottomNavigationBar: const AdminBottomNavigation(selectedIndex: 1),
     );
   }
 }

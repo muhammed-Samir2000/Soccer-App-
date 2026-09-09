@@ -130,8 +130,8 @@ void main() {
     expect(find.text('ملعب 1'), findsOneWidget);
     expect(find.text('ملعب 2'), findsOneWidget);
     expect(find.text('ملعب 3'), findsOneWidget);
-    expect(find.text('اختصارات سريعة'), findsOneWidget);
-    expect(find.text('التحليل المالي'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.text('المالية'), findsOneWidget);
   });
 
   testWidgets('shows collected and comparative revenue analytics', (

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../features/admin/presentation/admin_bookings_screen.dart';
 import '../features/admin/presentation/admin_week_screen.dart';
 import '../features/admin/presentation/financial_analytics_screen.dart';
 import '../features/auth/domain/app_user.dart';
@@ -25,6 +26,8 @@ class AppRouter {
   static const paymentPlaceholderRoute = '/payment-placeholder';
   static const bookingConfirmationRoute = '/booking-confirmation';
   static const adminBookingsRoute = '/admin-bookings';
+  static const adminBookingListRoute = '/admin-booking-list';
+  static const adminSettingsRoute = '/admin-settings';
   static const adminLoginRoute = '/admin-login';
   static const adminFinancialAnalyticsRoute = '/admin-financial-analytics';
   static const myBookingsRoute = '/my-bookings';
@@ -75,12 +78,27 @@ class AppRouter {
               session: dependencies.session,
               audience: LoginAudience.admin,
             );
+          case adminBookingListRoute:
+            if (!dependencies.session.isAdmin) {
+              return _playerEntry();
+            }
+            return AdminBookingsScreen(
+              repository: dependencies.bookingRepository,
+            );
           case adminFinancialAnalyticsRoute:
             if (!dependencies.session.isAdmin) {
               return _playerEntry();
             }
             return FinancialAnalyticsScreen(
               repository: dependencies.bookingRepository,
+            );
+          case adminSettingsRoute:
+            if (!dependencies.session.isAdmin) {
+              return _playerEntry();
+            }
+            return VenueSettingsScreen(
+              settingsRepository: dependencies.venueSettingsRepository,
+              bookingRepository: dependencies.bookingRepository,
             );
           case launchRoute:
           default:

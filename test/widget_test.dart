@@ -117,8 +117,36 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('لوحة التحكم'), findsOneWidget);
+    expect(find.text('لوحة التحكم'), findsAtLeastNWidgets(1));
+    expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.text('احجز ملعبك بسهولة'), findsNothing);
+  });
+
+  testWidgets('keeps primary admin destinations in a fixed bottom bar', (
+    WidgetTester tester,
+  ) async {
+    final AppDependencies dependencies = AppDependencies.mock();
+    dependencies.session.signIn(
+      const AppUser(
+        id: 'admin-test',
+        name: 'مدير الاختبار',
+        role: UserRole.admin,
+      ),
+    );
+
+    await tester.pumpWidget(
+      SoccerBookingApp(
+        dependencies: dependencies,
+        initialRoute: AppRouter.adminBookingsRoute,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('المالية'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('التحصيل المالي'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsOneWidget);
   });
 
   testWidgets('shows invitation-only guidance on the admin login screen', (

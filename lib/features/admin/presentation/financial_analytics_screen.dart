@@ -6,6 +6,7 @@ import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_repository.dart';
 import '../domain/financial_report.dart';
+import 'admin_bottom_navigation.dart';
 
 class FinancialAnalyticsScreen extends StatefulWidget {
   const FinancialAnalyticsScreen({super.key, required this.repository});
@@ -109,6 +110,7 @@ class _FinancialAnalyticsScreenState extends State<FinancialAnalyticsScreen> {
         );
       },
     ),
+    bottomNavigationBar: const AdminBottomNavigation(selectedIndex: 2),
   );
 }
 

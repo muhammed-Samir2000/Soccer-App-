@@ -1,5 +1,16 @@
 # Workflow Log
 
+### 2026-09-09 12:10 | Persistent Admin Navigation | Status: completed
+
+- Actor: Codex.
+- Intent: replace scrolling dashboard shortcut cards with a predictable, global-quality mobile navigation pattern for the manager experience.
+- Changed: shared Material 3 bottom navigation; guarded Dashboard, Bookings, Finance, and Settings routes; admin dashboard, booking list, finance, and venue settings screens; navigation widget coverage; `doc/DECISIONS_LOG.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: the four primary manager destinations remain fixed at the bottom of every main manager screen. `حجز سريع أو ثابت` remains an elevated floating action because it is the high-frequency operational action. Permissions and notification preferences stay inside secondary settings actions to avoid an overloaded primary bar.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 28 tests; `flutter build web` completed and refreshed `build/web/main.dart.js` at 12:09.
+- Blockers/Risks: navigation and role guards are mock/client-side only. A real backend must enforce the same authorization on every protected API and data request.
+- Source control: pending commit and push to `origin/main`; the resulting commit will be recorded below.
+- Next action: wait for approved backend scope before connecting persistent roles, payments, or real-time booking state.
+
 ## Purpose
 
 This is the chronological, append-only project memory. Every coding session must read it before work starts and update it as work progresses. It enables another developer or AI model to continue accurately without relying on conversation history.

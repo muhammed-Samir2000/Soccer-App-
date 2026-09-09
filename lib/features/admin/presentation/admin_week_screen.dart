@@ -14,7 +14,7 @@ import '../domain/venue_settings.dart';
 import '../domain/venue_settings_repository.dart';
 import 'admin_dashboard_screen.dart'
     show NotificationSettingsScreen, StaffPermissionsScreen;
-import 'admin_bookings_screen.dart';
+import 'admin_bottom_navigation.dart';
 
 class AdminWeekScreen extends StatefulWidget {
   const AdminWeekScreen({
@@ -61,18 +61,15 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
             tooltip: 'الإعدادات',
             icon: const Icon(Icons.settings_outlined),
             onSelected: (String value) {
-              final Widget page = switch (value) {
-                'venue' => VenueSettingsScreen(
-                  settingsRepository: widget.venueSettingsRepository,
-                  bookingRepository: widget.bookingRepository,
-                ),
-                'staff' => StaffPermissionsScreen(
-                  repository: widget.staffRepository,
-                ),
-                _ => NotificationSettingsScreen(
-                  repository: widget.notificationRepository,
-                ),
-              };
+              if (value == 'venue') {
+                Navigator.of(context).pushNamed(AppRouter.adminSettingsRoute);
+                return;
+              }
+              final Widget page = value == 'staff'
+                  ? StaffPermissionsScreen(repository: widget.staffRepository)
+                  : NotificationSettingsScreen(
+                      repository: widget.notificationRepository,
+                    );
               Navigator.of(
                 context,
               ).push(MaterialPageRoute<void>(builder: (_) => page));
@@ -139,39 +136,6 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
                   week: week,
                   settings: settings.data!,
                 ),
-                const SizedBox(height: 24),
-                _AdminQuickActions(
-                  onFinancialAnalytics: () => Navigator.of(
-                    context,
-                  ).pushNamed(AppRouter.adminFinancialAnalyticsRoute),
-                  onBookings: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => AdminBookingsScreen(
-                        repository: widget.bookingRepository,
-                      ),
-                    ),
-                  ),
-                  onQuickBooking: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => AdminBookingToolsScreen(
-                          repository: widget.bookingRepository,
-                          venueSettingsRepository:
-                              widget.venueSettingsRepository,
-                        ),
-                      ),
-                    );
-                    _reload();
-                  },
-                  onVenueSettings: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => VenueSettingsScreen(
-                        settingsRepository: widget.venueSettingsRepository,
-                        bookingRepository: widget.bookingRepository,
-                      ),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 28),
                 Text(
                   'الأسبوع يبدأ السبت',
@@ -213,125 +177,7 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
         );
       },
     ),
-  );
-}
-
-class _AdminQuickActions extends StatelessWidget {
-  const _AdminQuickActions({
-    required this.onFinancialAnalytics,
-    required this.onBookings,
-    required this.onQuickBooking,
-    required this.onVenueSettings,
-  });
-
-  final VoidCallback onFinancialAnalytics;
-  final VoidCallback onBookings;
-  final VoidCallback onQuickBooking;
-  final VoidCallback onVenueSettings;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text('اختصارات سريعة', style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 12),
-      GridView.count(
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.55,
-        children: [
-          _AdminShortcut(
-            label: 'التحليل المالي',
-            subtitle: 'تحصيل ومقارنة',
-            icon: Icons.insights_outlined,
-            color: Theme.of(context).colorScheme.primary,
-            onTap: onFinancialAnalytics,
-          ),
-          _AdminShortcut(
-            label: 'كل الحجوزات',
-            subtitle: 'متابعة وتفاصيل',
-            icon: Icons.list_alt_outlined,
-            color: Theme.of(context).colorScheme.secondary,
-            onTap: onBookings,
-          ),
-          _AdminShortcut(
-            label: 'إضافة حجز',
-            subtitle: 'سريع أو ثابت',
-            icon: Icons.add_circle_outline,
-            color: const Color(0xFF167D63),
-            onTap: onQuickBooking,
-          ),
-          _AdminShortcut(
-            label: 'إعدادات الملعب',
-            subtitle: 'ملاعب ومواعيد',
-            icon: Icons.tune_outlined,
-            color: const Color(0xFF5D6F65),
-            onTap: onVenueSettings,
-          ),
-        ],
-      ),
-    ],
-  );
-}
-
-class _AdminShortcut extends StatelessWidget {
-  const _AdminShortcut({
-    required this.label,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  final String label;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: label,
-    child: Material(
-      color: color.withValues(alpha: 0.09),
-      borderRadius: BorderRadius.circular(20),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-                child: Icon(icon, color: Colors.white, size: 22),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label, style: Theme.of(context).textTheme.titleSmall),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
+    bottomNavigationBar: const AdminBottomNavigation(selectedIndex: 0),
   );
 }
 
@@ -1252,6 +1098,7 @@ class _VenueSettingsScreenState extends State<VenueSettingsScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const AdminBottomNavigation(selectedIndex: 3),
     );
   }
 }
