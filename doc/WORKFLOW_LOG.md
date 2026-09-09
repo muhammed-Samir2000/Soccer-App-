@@ -445,5 +445,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: the admin entry remains a secondary top-level link, never a player role selector. The finance view treats confirmed and recurring bookings as collected, excludes tentative bookings, supports a from/to calendar range, automatically compares against the equal-length preceding period, and renders trend and comparison charts without a widget-local data source.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues before final test adjustment; `flutter test` passed with 27 tests. Final analyzer and web build follow.
 - Blockers/Risks: totals are mock operational estimates rather than reconciled payment data. Real payment state, refunds, taxes, discounts, recurring-occurrence expansion, and server-side authorization remain backend work.
-- Source control: pending commit and push for this completed change set.
+- Source control: committed as `b4d0569` (`Add admin financial analytics dashboard`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: approve payment and backend scope before treating financial analytics as an accounting or settlement report.
