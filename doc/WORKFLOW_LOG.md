@@ -434,5 +434,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: Google and email/password methods return the authenticated user and its role. The UI compares that returned role with the entry audience, while a production provider and backend remain the authority for role assignment.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 25 tests; local web preview was rebuilt successfully.
 - Blockers/Risks: the mock email identity is demonstration-only. Production authorization still requires verified provider identity, invitation membership, server-side role lookup, and database policies.
-- Source control: pending commit and push for this completed change set.
+- Source control: committed as `cd35bc2` (`Harden authentication role boundary`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: replace the mock identity mapping only after approved backend/authentication scope is available.
