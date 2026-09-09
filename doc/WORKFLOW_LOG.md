@@ -412,5 +412,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: the public entry is always player-focused. `/admin-bookings` renders the player entry or player availability unless the active session has the admin role. The admin entry is isolated at `/admin-login` and is deliberately absent from player navigation.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 23 tests, including public-route denial and an admin-session allow case.
 - Blockers/Risks: the session and admin route are mock-only. Google or email/password authentication requires an approved backend, server-side role lookup, and authorization policies before this becomes security rather than user-experience separation.
-- Source control: pending commit and push for this completed change set.
+- Source control: committed as `db6c65a` (`Separate player and admin access`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: agree the approved backend/authentication scope before connecting Google sign-in or email/password accounts.
