@@ -423,5 +423,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: the player can choose Google or email/password, create an account, and request a reset from the interface. The manager entry has no registration path and states that access requires an invitation. The mock repository never persists, transmits, or validates the entered credentials.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 24 tests, including the player credential journey and invitation-only admin entry.
 - Blockers/Risks: Google button behavior, credentials, account creation, reset delivery, invitation creation, password hashing, MFA, and server-side role authorization are not connected. They require an approved backend/authentication scope and provider credentials.
-- Source control: pending commit and push for this completed change set.
+- Source control: committed as `10f3dd9` (`Add modern player and admin login UI`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: approve a Supabase Auth or comparable backend scope before activating Google sign-in, email/password accounts, invitations, and real admin authorization.
