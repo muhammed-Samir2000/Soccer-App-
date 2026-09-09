@@ -456,5 +456,5 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: chart plotting reserves internal horizontal space so all months and their trend line remain visible and legible on narrow screens.
 - Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 27 tests. Final web build follows.
 - Blockers/Risks: financial values remain mock operational estimates until real payment records are available.
-- Source control: pending commit and push for this completed change set.
+- Source control: committed as `d088d41` (`Polish mobile financial chart`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: connect approved payment records before using this view for reconciliation.
