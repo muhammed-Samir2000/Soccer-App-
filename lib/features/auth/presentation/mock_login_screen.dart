@@ -47,14 +47,12 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
       widget.repository.signInWithEmailPassword(
         email: _email.text.trim(),
         password: _password.text,
-        intendedRole: _intendedRole,
       ),
     );
   }
 
-  Future<void> _continueWithGoogle() => _completeSignIn(
-    widget.repository.signInWithGoogle(intendedRole: _intendedRole),
-  );
+  Future<void> _continueWithGoogle() =>
+      _completeSignIn(widget.repository.signInWithGoogle());
 
   Future<void> _completeSignIn(Future<AppUser> signIn) async {
     setState(() {

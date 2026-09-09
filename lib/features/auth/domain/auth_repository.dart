@@ -4,10 +4,9 @@ abstract interface class AuthRepository {
   Future<AppUser> signInWithEmailPassword({
     required String email,
     required String password,
-    required UserRole intendedRole,
   });
 
-  Future<AppUser> signInWithGoogle({required UserRole intendedRole});
+  Future<AppUser> signInWithGoogle();
 
   Future<void> requestPasswordReset({required String email});
 }

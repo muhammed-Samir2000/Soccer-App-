@@ -4,31 +4,31 @@ import '../domain/auth_repository.dart';
 class MockAuthRepository implements AuthRepository {
   const MockAuthRepository();
 
-  Future<AppUser> _userFor(UserRole intendedRole) async {
-    return switch (intendedRole) {
-      UserRole.player => const AppUser(
-        id: 'player-001',
-        name: 'الكابتن أحمد',
-        role: UserRole.player,
-      ),
-      UserRole.admin => const AppUser(
-        id: 'admin-001',
-        name: 'الكابتن سمير',
-        role: UserRole.admin,
-      ),
-    };
-  }
+  static const String _demoAdminEmail = 'admin@mal3ab.test';
 
   @override
   Future<AppUser> signInWithEmailPassword({
     required String email,
     required String password,
-    required UserRole intendedRole,
-  }) => _userFor(intendedRole);
+  }) async {
+    if (email.trim().toLowerCase() == _demoAdminEmail) {
+      return const AppUser(
+        id: 'admin-001',
+        name: 'الكابتن سمير',
+        role: UserRole.admin,
+      );
+    }
+
+    return const AppUser(
+      id: 'player-001',
+      name: 'الكابتن أحمد',
+      role: UserRole.player,
+    );
+  }
 
   @override
-  Future<AppUser> signInWithGoogle({required UserRole intendedRole}) =>
-      _userFor(intendedRole);
+  Future<AppUser> signInWithGoogle() =>
+      signInWithEmailPassword(email: 'player@mal3ab.test', password: '');
 
   @override
   Future<void> requestPasswordReset({required String email}) async {}

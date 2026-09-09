@@ -425,3 +425,14 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: Google button behavior, credentials, account creation, reset delivery, invitation creation, password hashing, MFA, and server-side role authorization are not connected. They require an approved backend/authentication scope and provider credentials.
 - Source control: committed as `10f3dd9` (`Add modern player and admin login UI`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: approve a Supabase Auth or comparable backend scope before activating Google sign-in, email/password accounts, invitations, and real admin authorization.
+
+### 2026-09-09 10:39 | Authentication Role Boundary Hardening | Status: completed
+
+- Actor: Codex.
+- Intent: ensure the Flutter login interface cannot claim an administrative role while authenticating.
+- Changed: authentication repository contract and mock identity mapping; mock authentication unit test; `doc/DECISIONS_LOG.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: Google and email/password methods return the authenticated user and its role. The UI compares that returned role with the entry audience, while a production provider and backend remain the authority for role assignment.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 25 tests; local web preview was rebuilt successfully.
+- Blockers/Risks: the mock email identity is demonstration-only. Production authorization still requires verified provider identity, invitation membership, server-side role lookup, and database policies.
+- Source control: pending commit and push for this completed change set.
+- Next action: replace the mock identity mapping only after approved backend/authentication scope is available.
