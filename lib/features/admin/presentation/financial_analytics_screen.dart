@@ -420,6 +420,7 @@ class _RevenueTrendPainter extends CustomPainter {
     }
     const double topPadding = 14;
     const double bottomPadding = 16;
+    const double horizontalPadding = 14;
     final double chartHeight = size.height - topPadding - bottomPadding;
     final int maxValue = values.reduce(math.max);
     final Paint grid = Paint()
@@ -427,7 +428,11 @@ class _RevenueTrendPainter extends CustomPainter {
       ..strokeWidth = 1;
     for (int index = 0; index < 4; index++) {
       final double y = topPadding + chartHeight * index / 3;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
+      canvas.drawLine(
+        Offset(horizontalPadding, y),
+        Offset(size.width - horizontalPadding, y),
+        grid,
+      );
     }
 
     final List<Offset> points = List<Offset>.generate(values.length, (
@@ -435,7 +440,10 @@ class _RevenueTrendPainter extends CustomPainter {
     ) {
       final double x = values.length == 1
           ? size.width / 2
-          : size.width * index / (values.length - 1);
+          : horizontalPadding +
+                (size.width - horizontalPadding * 2) *
+                    index /
+                    (values.length - 1);
       final double y =
           topPadding + chartHeight * (1 - values[index] / maxValue);
       return Offset(x, y);

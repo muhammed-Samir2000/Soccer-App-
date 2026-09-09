@@ -447,3 +447,14 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: totals are mock operational estimates rather than reconciled payment data. Real payment state, refunds, taxes, discounts, recurring-occurrence expansion, and server-side authorization remain backend work.
 - Source control: committed as `b4d0569` (`Add admin financial analytics dashboard`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: approve payment and backend scope before treating financial analytics as an accounting or settlement report.
+
+### 2026-09-09 11:46 | Financial Chart Mobile Polish | Status: completed
+
+- Actor: Codex.
+- Intent: prevent the first and last month points from touching the edges of the mobile revenue chart.
+- Changed: financial trend painter; `doc/WORKFLOW_LOG.md`.
+- Decisions: chart plotting reserves internal horizontal space so all months and their trend line remain visible and legible on narrow screens.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test` passed with 27 tests. Final web build follows.
+- Blockers/Risks: financial values remain mock operational estimates until real payment records are available.
+- Source control: pending commit and push for this completed change set.
+- Next action: connect approved payment records before using this view for reconciliation.
