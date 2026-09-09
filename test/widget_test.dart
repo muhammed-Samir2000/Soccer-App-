@@ -11,17 +11,22 @@ void main() {
   ) async {
     await tester.pumpWidget(SoccerBookingApp());
 
-    expect(find.text('تسجيل دخول اللاعب'), findsOneWidget);
+    expect(find.text('احجز ملعبك بسهولة'), findsOneWidget);
+    expect(find.text('المتابعة بحساب Google'), findsOneWidget);
     await tester.enterText(
-      find.byKey(const Key('phone_number_field')),
-      '01012345678',
+      find.byKey(const Key('email_field')),
+      'player@example.com',
     );
-    await tester.scrollUntilVisible(
-      find.byKey(const Key('continue_button')),
-      300,
-      scrollable: find.byType(Scrollable).first,
+    await tester.enterText(
+      find.byKey(const Key('password_field')),
+      'password123',
     );
-    await tester.tap(find.byKey(const Key('continue_button')));
+    final Finder credentialButton = find.byKey(
+      const Key('credential_continue_button'),
+    );
+    await tester.ensureVisible(credentialButton);
+    await tester.pumpAndSettle();
+    await tester.tap(credentialButton);
     await tester.pumpAndSettle();
 
     expect(find.text('المواعيد الفاضية'), findsOneWidget);
@@ -88,7 +93,7 @@ void main() {
       SoccerBookingApp(initialRoute: AppRouter.adminBookingsRoute),
     );
 
-    expect(find.text('تسجيل دخول اللاعب'), findsOneWidget);
+    expect(find.text('احجز ملعبك بسهولة'), findsOneWidget);
     expect(find.text('دخول لوحة الإدارة'), findsNothing);
   });
 
@@ -113,6 +118,22 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('لوحة التحكم'), findsOneWidget);
-    expect(find.text('تسجيل دخول اللاعب'), findsNothing);
+    expect(find.text('احجز ملعبك بسهولة'), findsNothing);
+  });
+
+  testWidgets('shows invitation-only guidance on the admin login screen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      SoccerBookingApp(initialRoute: AppRouter.adminLoginRoute),
+    );
+
+    expect(find.text('دخول فريق الإدارة'), findsOneWidget);
+    expect(
+      find.text('الحسابات دي بتتفعّل بدعوة من مالك الملعب.'),
+      findsOneWidget,
+    );
+    expect(find.text('لن تستطيع إنشاء صلاحية إدارية من هنا.'), findsOneWidget);
+    expect(find.text('إنشاء حساب جديد'), findsNothing);
   });
 }

@@ -4,9 +4,8 @@ import '../domain/auth_repository.dart';
 class MockAuthRepository implements AuthRepository {
   const MockAuthRepository();
 
-  @override
-  Future<AppUser> signInAs(UserRole role) async {
-    return switch (role) {
+  Future<AppUser> _userFor(UserRole intendedRole) async {
+    return switch (intendedRole) {
       UserRole.player => const AppUser(
         id: 'player-001',
         name: 'الكابتن أحمد',
@@ -21,14 +20,16 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> requestOtp(String phoneNumber) async {
-    throw UnsupportedError('OTP غير مفعّل في النسخة التجريبية.');
-  }
+  Future<AppUser> signInWithEmailPassword({
+    required String email,
+    required String password,
+    required UserRole intendedRole,
+  }) => _userFor(intendedRole);
 
   @override
-  Future<AppUser> verifyOtp({
-    required String phoneNumber,
-    required String code,
-    required UserRole role,
-  }) => signInAs(role);
+  Future<AppUser> signInWithGoogle({required UserRole intendedRole}) =>
+      _userFor(intendedRole);
+
+  @override
+  Future<void> requestPasswordReset({required String email}) async {}
 }

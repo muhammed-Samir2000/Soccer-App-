@@ -5,7 +5,7 @@
 - Using mock data initially.
 - No payment integration yet.
 - No notifications yet.
-- OTP contracts are prepared but no phone-number verification or SMS provider is connected.
+- Google and email/password contracts are prepared, but no authentication provider, email sender, account persistence, password hashing, or password-reset delivery is connected.
 - Booking confirmation reserves a QR payload and UI location, but does not render or scan a QR code yet.
 - Notification toggles are stored in mock memory only; no push, SMS, WhatsApp, scheduled reminder, or marketing message is sent.
 - Field allocation, recurring bookings, permissions, and match results are mock in-memory data. A real backend must enforce concurrent booking rules and persist all updates.
