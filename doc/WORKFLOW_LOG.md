@@ -11,6 +11,11 @@
 - Source control: pending commit and push to `origin/main`; the resulting commit will be recorded below.
 - Next action: wait for approved backend scope before connecting persistent roles, payments, or real-time booking state.
 
+### 2026-09-09 12:12 | Persistent Admin Navigation Source Control | Status: completed
+
+- Actor: Codex.
+- Source control: committed as `f302853` (`Add persistent admin bottom navigation`); push to `origin/main` follows with this workflow-log update.
+
 ## Purpose
 
 This is the chronological, append-only project memory. Every coding session must read it before work starts and update it as work progresses. It enables another developer or AI model to continue accurately without relying on conversation history.
