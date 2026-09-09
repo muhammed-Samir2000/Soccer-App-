@@ -25,15 +25,23 @@ class AppDependencies {
     this.backendConfiguration = const BackendConfiguration(),
   });
 
-  factory AppDependencies.mock() => AppDependencies(
-    authRepository: const MockAuthRepository(),
-    session: AppSession(),
-    slotRepository: const MockSlotRepository(),
-    bookingRepository: MockBookingRepository.seeded(),
-    staffRepository: MockStaffRepository(),
-    notificationRepository: MockNotificationRepository(),
-    venueSettingsRepository: MockVenueSettingsRepository(),
-  );
+  factory AppDependencies.mock() {
+    final MockBookingRepository bookingRepository =
+        MockBookingRepository.seeded();
+    const MockSlotRepository slotRepository = MockSlotRepository();
+    return AppDependencies(
+      authRepository: const MockAuthRepository(),
+      session: AppSession(),
+      slotRepository: slotRepository,
+      bookingRepository: bookingRepository,
+      staffRepository: MockStaffRepository(),
+      notificationRepository: MockNotificationRepository(
+        bookingRepository: bookingRepository,
+        slotRepository: slotRepository,
+      ),
+      venueSettingsRepository: MockVenueSettingsRepository(),
+    );
+  }
 
   final AuthRepository authRepository;
   final AppSession session;

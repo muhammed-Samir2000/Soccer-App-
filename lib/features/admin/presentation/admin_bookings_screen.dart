@@ -25,6 +25,114 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
     _bookings = widget.repository.getBookings();
   }
 
+  void _reload() => setState(() => _bookings = widget.repository.getBookings());
+
+  Future<void> _editBooking(Booking booking) async {
+    final TextEditingController name = TextEditingController(
+      text: booking.playerName,
+    );
+    final TextEditingController phone = TextEditingController(
+      text: booking.phoneNumber,
+    );
+    BookingStatus selectedStatus = booking.status;
+    final bool? shouldSave = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => StatefulBuilder(
+        builder: (BuildContext context, StateSetter setDialogState) =>
+            AlertDialog(
+              title: const Text('تعديل الحجز'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: name,
+                      decoration: const InputDecoration(
+                        labelText: 'اسم اللاعب أو المجموعة',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: phone,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: 'رقم الهاتف',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<BookingStatus>(
+                      initialValue: selectedStatus,
+                      decoration: const InputDecoration(
+                        labelText: 'حالة الحجز',
+                      ),
+                      items: BookingStatus.values
+                          .map(
+                            (BookingStatus status) => DropdownMenuItem(
+                              value: status,
+                              child: Text(_statusLabel(status)),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (BookingStatus? status) {
+                        if (status != null) {
+                          setDialogState(() => selectedStatus = status);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('إلغاء'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('حفظ التعديل'),
+                ),
+              ],
+            ),
+      ),
+    );
+    if (shouldSave == true) {
+      await widget.repository.updateBooking(
+        booking.copyWith(
+          playerName: name.text.trim(),
+          phoneNumber: phone.text.trim(),
+          status: selectedStatus,
+        ),
+      );
+      _reload();
+    }
+    name.dispose();
+    phone.dispose();
+  }
+
+  Future<void> _deleteBooking(Booking booking) async {
+    final bool? shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('حذف الحجز'),
+        content: Text('متأكد إنك عايز تلغي حجز ${booking.playerName}؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('رجوع'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('حذف'),
+          ),
+        ],
+      ),
+    );
+    if (shouldDelete == true) {
+      await widget.repository.deleteBooking(booking.reference);
+      _reload();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +182,12 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
                         ],
                       );
                     }
-                    return _BookingCard(booking: snapshot.data![index - 1]);
+                    final Booking booking = snapshot.data![index - 1];
+                    return _BookingCard(
+                      booking: booking,
+                      onEdit: () => _editBooking(booking),
+                      onDelete: () => _deleteBooking(booking),
+                    );
                   },
                 );
               },
@@ -86,9 +199,15 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
 }
 
 class _BookingCard extends StatelessWidget {
-  const _BookingCard({required this.booking});
+  const _BookingCard({
+    required this.booking,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   final Booking booking;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +236,26 @@ class _BookingCard extends StatelessWidget {
             _Detail(label: 'الخدمات', value: _servicesLabel(booking.services)),
             const SizedBox(height: 8),
             _Detail(label: 'الإجمالي', value: '${booking.totalPrice} ج.م'),
+            if (booking.phoneNumber.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              _Detail(label: 'الهاتف', value: booking.phoneNumber),
+            ],
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit_outlined),
+                  label: const Text('تعديل'),
+                ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('حذف'),
+                ),
+              ],
+            ),
           ],
         ),
       ),

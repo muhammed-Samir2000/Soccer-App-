@@ -7,6 +7,20 @@ class MockAuthRepository implements AuthRepository {
   static const String _demoAdminEmail = 'admin@mal3ab.test';
 
   @override
+  Future<AppUser> signInAsDemoPlayer() async => const AppUser(
+    id: 'player-001',
+    name: 'الكابتن أحمد',
+    role: UserRole.player,
+  );
+
+  @override
+  Future<AppUser> signInAsDemoAdmin() async => const AppUser(
+    id: 'admin-001',
+    name: 'الكابتن سمير',
+    role: UserRole.admin,
+  );
+
+  @override
   Future<AppUser> signInWithEmailPassword({
     required String email,
     required String password,
@@ -19,11 +33,7 @@ class MockAuthRepository implements AuthRepository {
       );
     }
 
-    return const AppUser(
-      id: 'player-001',
-      name: 'الكابتن أحمد',
-      role: UserRole.player,
-    );
+    return signInAsDemoPlayer();
   }
 
   @override

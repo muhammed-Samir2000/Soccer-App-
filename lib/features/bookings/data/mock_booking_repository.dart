@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import '../domain/booking.dart';
+import '../domain/booking_activity.dart';
 import '../domain/booking_draft.dart';
 import '../domain/booking_repository.dart';
 import '../domain/match_result.dart';
@@ -116,6 +119,8 @@ class MockBookingRepository implements BookingRepository {
   int _nextReferenceNumber;
   int _fieldCount = 3;
   final List<Booking> _bookings;
+  final StreamController<BookingActivity> _activities =
+      StreamController<BookingActivity>.broadcast();
 
   @override
   Future<Booking> createBooking(BookingDraft draft) async {
@@ -132,6 +137,9 @@ class MockBookingRepository implements BookingRepository {
       List<Booking>.unmodifiable(_bookings);
 
   @override
+  Stream<BookingActivity> watchActivities() => _activities.stream;
+
+  @override
   Future<List<Booking>> getBookingsForPlayer(String playerId) async =>
       List<Booking>.unmodifiable(
         _bookings.where((Booking booking) => booking.playerId == playerId),
@@ -145,6 +153,7 @@ class MockBookingRepository implements BookingRepository {
   }) => _create(
     playerId: 'phone-$phoneNumber',
     playerName: playerName,
+    phoneNumber: phoneNumber,
     draft: draft,
     status: BookingStatus.tentative,
   );
@@ -167,6 +176,7 @@ class MockBookingRepository implements BookingRepository {
     return _create(
       playerId: 'phone-$cleanedPhone',
       playerName: cleanedName,
+      phoneNumber: cleanedPhone,
       draft: draft,
       status: status,
     );
@@ -180,6 +190,7 @@ class MockBookingRepository implements BookingRepository {
   }) => _create(
     playerId: 'phone-$phoneNumber',
     playerName: playerName,
+    phoneNumber: phoneNumber,
     draft: draft,
     status: BookingStatus.recurring,
   );
@@ -195,7 +206,9 @@ class MockBookingRepository implements BookingRepository {
     if (index == -1) {
       throw StateError('Booking not found');
     }
-    _bookings[index] = _bookings[index].copyWith(matchResult: result);
+    final Booking updated = _bookings[index].copyWith(matchResult: result);
+    _bookings[index] = updated;
+    _emit(BookingActivityType.updated, updated);
   }
 
   @override
@@ -222,14 +235,22 @@ class MockBookingRepository implements BookingRepository {
     if (availableFields.isEmpty) {
       throw StateError('كل الملاعب محجوزة في هذا الموعد.');
     }
-    _bookings[index] = booking.copyWith(fieldNumber: availableFields.first);
+    final Booking updated = booking.copyWith(
+      fieldNumber: availableFields.first,
+    );
+    _bookings[index] = updated;
+    _emit(BookingActivityType.updated, updated);
   }
 
   @override
   Future<void> deleteBooking(String bookingReference) async {
-    _bookings.removeWhere(
+    final int index = _bookings.indexWhere(
       (Booking booking) => booking.reference == bookingReference,
     );
+    if (index == -1) {
+      return;
+    }
+    _emit(BookingActivityType.deleted, _bookings.removeAt(index));
   }
 
   @override
@@ -248,6 +269,7 @@ class MockBookingRepository implements BookingRepository {
   Future<Booking> _create({
     required String playerId,
     required String playerName,
+    String phoneNumber = '',
     required BookingDraft draft,
     required BookingStatus status,
   }) async {
@@ -275,9 +297,15 @@ class MockBookingRepository implements BookingRepository {
       totalPrice: draft.totalPrice,
       status: status,
       fieldNumber: availableFields.first,
+      phoneNumber: phoneNumber,
     );
     _nextReferenceNumber++;
     _bookings.add(booking);
+    _emit(BookingActivityType.created, booking);
     return booking;
+  }
+
+  void _emit(BookingActivityType type, Booking booking) {
+    _activities.add(BookingActivity(type: type, booking: booking));
   }
 }

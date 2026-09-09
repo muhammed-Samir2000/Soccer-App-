@@ -1,5 +1,26 @@
 # Workflow Log
 
+### 2026-09-09 12:45 | Trial Entry, Booking Actions, And In-App Notifications | Status: completed
+
+- Actor: Codex.
+- Intent: remove trial credential friction, allow booking maintenance from the admin list, and introduce the agreed player/manager notification journeys.
+- Changed: direct demo authentication; booking phone and activity contracts; mock booking and notification repositories; notification center and routing; player/admin notification entries; booking-list edit/delete controls; focused notification tests; documentation.
+- Decisions: the admin can confirm, edit, or cancel from a manager notification. Player availability notifications are generated from slot repository data and show one `احجز دلوقتي` action per available time. Delivery is in-app only; push/SMS/WhatsApp remains explicitly out of scope until approved backend and notification-provider work.
+- Verification: `dart format --set-exit-if-changed .` passed; `flutter analyze` passed with no issues; `flutter test` is running after passing the newly added notification cases.
+- Blockers/Risks: the mock session and in-app messages reset on a browser refresh. No credentials, account data, phone delivery, or external notification permission is used.
+- Source control: pending commit and push to `origin/main`.
+- Next action: rebuild local web preview and validate the manager/employee notification screens manually.
+
+### 2026-09-09 13:10 | Current-Date Calendar And Player Navigation | Status: completed
+
+- Actor: Codex.
+- Intent: remove stale past booking dates, add player navigation, and support post-match contributions.
+- Changed: dynamic current-date-to-month-end slot calendar with arrows; admin booking date limits; player bottom navigation; post-match result details; one-hour post-match notification prompt; dynamic calendar test update.
+- Verification: `dart format --set-exit-if-changed .` passed; `flutter analyze` passed with no issues; `flutter test` passed with 30 tests.
+- Blockers/Risks: notification scheduling is evaluated when the in-app notification center opens in mock mode; it is not background push delivery.
+- Source control: pending commit and push to `origin/main`.
+- Next action: rebuild the web preview and validate the current-date calendar visually.
+
 ### 2026-09-09 12:10 | Persistent Admin Navigation | Status: completed
 
 - Actor: Codex.

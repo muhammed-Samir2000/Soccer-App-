@@ -12,25 +12,13 @@ void main() {
     await tester.pumpWidget(SoccerBookingApp());
 
     expect(find.text('احجز ملعبك بسهولة'), findsOneWidget);
-    expect(find.text('المتابعة بحساب Google'), findsOneWidget);
-    await tester.enterText(
-      find.byKey(const Key('email_field')),
-      'player@example.com',
-    );
-    await tester.enterText(
-      find.byKey(const Key('password_field')),
-      'password123',
-    );
-    final Finder credentialButton = find.byKey(
-      const Key('credential_continue_button'),
-    );
-    await tester.ensureVisible(credentialButton);
-    await tester.pumpAndSettle();
-    await tester.tap(credentialButton);
+    expect(find.text('ادخل وجرب الحجز'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNothing);
+    await tester.tap(find.byKey(const Key('demo_entry_button')));
     await tester.pumpAndSettle();
 
     expect(find.text('المواعيد الفاضية'), findsOneWidget);
-    expect(find.text('المواعيد المتاحة قدامك لمدة 7 أيام.'), findsOneWidget);
+    expect(find.textContaining('المواعيد المتاحة قدامك لمدة'), findsOneWidget);
     expect(find.text('جاهز للماتش؟'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.byKey(const Key('slot-003')),
@@ -157,11 +145,7 @@ void main() {
     );
 
     expect(find.text('دخول فريق الإدارة'), findsOneWidget);
-    expect(
-      find.text('الحسابات دي بتتفعّل بدعوة من مالك الملعب.'),
-      findsOneWidget,
-    );
-    expect(find.text('لن تستطيع إنشاء صلاحية إدارية من هنا.'), findsOneWidget);
-    expect(find.text('إنشاء حساب جديد'), findsNothing);
+    expect(find.text('ادخل وجرب لوحة الإدارة'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNothing);
   });
 }

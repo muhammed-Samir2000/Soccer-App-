@@ -14,6 +14,7 @@ class Booking {
     required this.totalPrice,
     required this.status,
     required this.fieldNumber,
+    this.phoneNumber = '',
     this.matchResult,
   }) : services = List<OptionalService>.unmodifiable(services);
 
@@ -25,6 +26,7 @@ class Booking {
   final int totalPrice;
   final BookingStatus status;
   final int fieldNumber;
+  final String phoneNumber;
   final MatchResult? matchResult;
 
   /// Stable payload reserved for a future QR renderer and reception scanner.
@@ -36,6 +38,7 @@ class Booking {
     TimeSlot? slot,
     BookingStatus? status,
     int? fieldNumber,
+    String? phoneNumber,
     MatchResult? matchResult,
   }) => Booking(
     reference: reference,
@@ -46,6 +49,7 @@ class Booking {
     totalPrice: totalPrice,
     status: status ?? this.status,
     fieldNumber: fieldNumber ?? this.fieldNumber,
+    phoneNumber: phoneNumber ?? this.phoneNumber,
     matchResult: matchResult ?? this.matchResult,
   );
 }

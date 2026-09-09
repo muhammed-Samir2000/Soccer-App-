@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/admin/presentation/admin_bookings_screen.dart';
+import '../features/admin/presentation/notification_center_screen.dart';
 import '../features/admin/presentation/admin_week_screen.dart';
 import '../features/admin/presentation/financial_analytics_screen.dart';
 import '../features/auth/domain/app_user.dart';
@@ -30,6 +31,7 @@ class AppRouter {
   static const adminSettingsRoute = '/admin-settings';
   static const adminLoginRoute = '/admin-login';
   static const adminFinancialAnalyticsRoute = '/admin-financial-analytics';
+  static const notificationsRoute = '/notifications';
   static const myBookingsRoute = '/my-bookings';
 
   Route<void> onGenerateRoute(RouteSettings settings) {
@@ -99,6 +101,19 @@ class AppRouter {
             return VenueSettingsScreen(
               settingsRepository: dependencies.venueSettingsRepository,
               bookingRepository: dependencies.bookingRepository,
+            );
+          case notificationsRoute:
+            final AppUser? user = settings.arguments is AppUser
+                ? settings.arguments! as AppUser
+                : dependencies.session.currentUser;
+            if (user == null) {
+              return _playerEntry();
+            }
+            return NotificationCenterScreen(
+              user: user,
+              notificationRepository: dependencies.notificationRepository,
+              bookingRepository: dependencies.bookingRepository,
+              slotRepository: dependencies.slotRepository,
             );
           case launchRoute:
           default:

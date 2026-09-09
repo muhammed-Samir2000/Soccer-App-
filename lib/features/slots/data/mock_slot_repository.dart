@@ -4,8 +4,19 @@ import '../domain/time_slot.dart';
 class MockSlotRepository implements SlotRepository {
   const MockSlotRepository();
 
-  static final DateTime weekStart = DateTime(2026, 9, 5);
-  static final DateTime firstDay = weekStart;
+  static DateTime get bookingStart {
+    final DateTime now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  static DateTime get bookingEnd {
+    final DateTime start = bookingStart;
+    return DateTime(start.year, start.month + 1);
+  }
+
+  /// Retained as a compatibility alias for existing mock and dashboard flows.
+  static DateTime get weekStart => bookingStart;
+  static DateTime get firstDay => bookingStart;
 
   @override
   Future<List<TimeSlot>> getSlotsForDay(DateTime day) async {

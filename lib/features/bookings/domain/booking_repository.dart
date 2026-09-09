@@ -1,4 +1,5 @@
 import 'booking.dart';
+import 'booking_activity.dart';
 import 'booking_draft.dart';
 import 'match_result.dart';
 
@@ -6,6 +7,9 @@ abstract interface class BookingRepository {
   Future<Booking> createBooking(BookingDraft draft);
 
   Future<List<Booking>> getBookings();
+
+  /// Emits new, changed, and cancelled bookings for in-app notifications.
+  Stream<BookingActivity> watchActivities();
 
   Future<List<Booking>> getBookingsForPlayer(String playerId);
 

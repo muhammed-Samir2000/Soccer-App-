@@ -4,6 +4,7 @@ import '../../../shared/widgets/app_page_app_bar.dart';
 import '../domain/booking.dart';
 import '../domain/booking_repository.dart';
 import '../domain/match_result.dart';
+import 'player_bottom_navigation.dart';
 
 class MyBookingsScreen extends StatefulWidget {
   const MyBookingsScreen({
@@ -49,16 +50,19 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
+        final DateTime completedThreshold = DateTime.now().subtract(
+          const Duration(hours: 1),
+        );
         final List<Booking> upcoming = snapshot.data!
             .where(
               (Booking booking) =>
-                  booking.slot.startTime.isAfter(DateTime(2026, 9, 8)),
+                  booking.slot.endTime.isAfter(completedThreshold),
             )
             .toList();
         final List<Booking> past = snapshot.data!
             .where(
               (Booking booking) =>
-                  !booking.slot.startTime.isAfter(DateTime(2026, 9, 8)),
+                  !booking.slot.endTime.isAfter(completedThreshold),
             )
             .toList();
         return DefaultTabController(
@@ -93,6 +97,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           ),
         );
       },
+    ),
+    bottomNavigationBar: PlayerBottomNavigation(
+      selectedIndex: 1,
+      playerId: widget.playerId,
     ),
   );
 }
@@ -170,11 +178,23 @@ class _ResultEditorState extends State<_ResultEditor> {
   late final TextEditingController _player = TextEditingController(
     text: widget.booking.matchResult?.manOfTheMatch,
   );
+  late final TextEditingController _playerDescription = TextEditingController(
+    text: widget.booking.matchResult?.manOfTheMatchDescription,
+  );
+  late final TextEditingController _bestGoal = TextEditingController(
+    text: widget.booking.matchResult?.bestGoal,
+  );
+  late final TextEditingController _bestGoalDescription = TextEditingController(
+    text: widget.booking.matchResult?.bestGoalDescription,
+  );
   bool _saving = false;
   @override
   void dispose() {
     _team.dispose();
     _player.dispose();
+    _playerDescription.dispose();
+    _bestGoal.dispose();
+    _bestGoalDescription.dispose();
     super.dispose();
   }
 
@@ -191,6 +211,20 @@ class _ResultEditorState extends State<_ResultEditor> {
         controller: _player,
         decoration: const InputDecoration(labelText: 'رجل المباراة'),
       ),
+      TextField(
+        controller: _playerDescription,
+        maxLines: 2,
+        decoration: const InputDecoration(labelText: 'وصف رجل المباراة'),
+      ),
+      TextField(
+        controller: _bestGoal,
+        decoration: const InputDecoration(labelText: 'أفضل هدف'),
+      ),
+      TextField(
+        controller: _bestGoalDescription,
+        maxLines: 2,
+        decoration: const InputDecoration(labelText: 'وصف أفضل هدف'),
+      ),
       const SizedBox(height: 8),
       TextButton(
         onPressed: _saving
@@ -202,6 +236,9 @@ class _ResultEditorState extends State<_ResultEditor> {
                   result: MatchResult(
                     winningTeam: _team.text,
                     manOfTheMatch: _player.text,
+                    manOfTheMatchDescription: _playerDescription.text,
+                    bestGoal: _bestGoal.text,
+                    bestGoalDescription: _bestGoalDescription.text,
                   ),
                 );
                 widget.onSaved();

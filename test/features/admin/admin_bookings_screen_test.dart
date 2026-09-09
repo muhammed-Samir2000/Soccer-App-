@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/features/admin/presentation/admin_bookings_screen.dart';
 import 'package:soccer_booking_app/features/bookings/data/mock_booking_repository.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking.dart';
+import 'package:soccer_booking_app/features/bookings/domain/booking_activity.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking_draft.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking_repository.dart';
 import 'package:soccer_booking_app/features/bookings/domain/match_result.dart';
@@ -64,6 +65,10 @@ void main() {
 
 class _EmptyBookingRepository implements BookingRepository {
   @override
+  Stream<BookingActivity> watchActivities() =>
+      const Stream<BookingActivity>.empty();
+
+  @override
   Future<Booking> createBooking(BookingDraft draft) =>
       throw UnimplementedError();
 
@@ -113,6 +118,10 @@ class _EmptyBookingRepository implements BookingRepository {
 }
 
 class _FailingBookingRepository implements BookingRepository {
+  @override
+  Stream<BookingActivity> watchActivities() =>
+      const Stream<BookingActivity>.empty();
+
   @override
   Future<Booking> createBooking(BookingDraft draft) =>
       throw UnimplementedError();

@@ -55,6 +55,16 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
       title: 'إدارة الملاعب',
       actions: [
         Semantics(
+          label: 'فتح الإشعارات',
+          button: true,
+          child: IconButton(
+            tooltip: 'الإشعارات',
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRouter.notificationsRoute),
+            icon: const Icon(Icons.notifications_outlined),
+          ),
+        ),
+        Semantics(
           label: 'إعدادات لوحة الأدمن',
           button: true,
           child: PopupMenuButton<String>(
@@ -409,9 +419,9 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
                     const SizedBox(height: 12),
                     BookingDatePickerField(
                       selectedDate: selectedDay,
-                      firstDate: MockSlotRepository.weekStart,
-                      lastDate: MockSlotRepository.weekStart.add(
-                        const Duration(days: 6),
+                      firstDate: MockSlotRepository.bookingStart,
+                      lastDate: MockSlotRepository.bookingEnd.subtract(
+                        const Duration(days: 1),
                       ),
                       onChanged: (DateTime day) {
                         setDialogState(() => selectedDay = day);
@@ -836,8 +846,10 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
           const SizedBox(height: 16),
           BookingDatePickerField(
             selectedDate: _day,
-            firstDate: MockSlotRepository.weekStart,
-            lastDate: MockSlotRepository.weekStart.add(const Duration(days: 6)),
+            firstDate: MockSlotRepository.bookingStart,
+            lastDate: MockSlotRepository.bookingEnd.subtract(
+              const Duration(days: 1),
+            ),
             onChanged: (DateTime day) => setState(() => _day = day),
           ),
           const SizedBox(height: 12),
