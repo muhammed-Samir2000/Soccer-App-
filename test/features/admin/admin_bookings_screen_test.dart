@@ -26,7 +26,7 @@ void main() {
     expect(find.text('حجوزات الأدمن'), findsOneWidget);
     expect(find.text('الكابتن كريم'), findsOneWidget);
     expect(find.textContaining('HAGZ-1000'), findsOneWidget);
-    expect(find.text('مؤكد'), findsOneWidget);
+    expect(find.text('مؤكد'), findsAtLeastNWidgets(1));
     expect(find.textContaining('حكم'), findsOneWidget);
     expect(find.textContaining('1100'), findsOneWidget);
   });

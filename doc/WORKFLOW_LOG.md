@@ -436,3 +436,14 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: the mock email identity is demonstration-only. Production authorization still requires verified provider identity, invitation membership, server-side role lookup, and database policies.
 - Source control: committed as `cd35bc2` (`Harden authentication role boundary`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: replace the mock identity mapping only after approved backend/authentication scope is available.
+
+### 2026-09-09 11:39 | Admin Shortcuts And Financial Analytics | Status: completed
+
+- Actor: Codex.
+- Intent: add an unobtrusive admin-entry affordance for the player login, high-value admin dashboard shortcuts, and a professional month-range financial view.
+- Changed: player entry screen; admin routing and weekly dashboard shortcuts; financial-report domain calculation; financial analytics presentation; shared mock booking history; domain and widget tests; `doc/DECISIONS_LOG.md`; `doc/KNOWN_ISSUES.md`; `doc/WORKFLOW_LOG.md`.
+- Decisions: the admin entry remains a secondary top-level link, never a player role selector. The finance view treats confirmed and recurring bookings as collected, excludes tentative bookings, supports a from/to calendar range, automatically compares against the equal-length preceding period, and renders trend and comparison charts without a widget-local data source.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues before final test adjustment; `flutter test` passed with 27 tests. Final analyzer and web build follow.
+- Blockers/Risks: totals are mock operational estimates rather than reconciled payment data. Real payment state, refunds, taxes, discounts, recurring-occurrence expansion, and server-side authorization remain backend work.
+- Source control: pending commit and push for this completed change set.
+- Next action: approve payment and backend scope before treating financial analytics as an accounting or settlement report.

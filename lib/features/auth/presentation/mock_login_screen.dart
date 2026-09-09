@@ -157,6 +157,18 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
               child: ListView(
                 padding: const EdgeInsetsDirectional.fromSTEB(24, 28, 24, 32),
                 children: [
+                  if (!_isAdminLogin)
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: TextButton.icon(
+                        key: const Key('admin_login_link'),
+                        onPressed: () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRouter.adminLoginRoute),
+                        icon: const Icon(Icons.admin_panel_settings_outlined),
+                        label: const Text('دخول فريق الإدارة'),
+                      ),
+                    ),
                   Center(
                     child: _PitchLogo(
                       color: _isAdminLogin ? colors.secondary : colors.primary,

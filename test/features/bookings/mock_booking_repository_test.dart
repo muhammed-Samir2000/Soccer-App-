@@ -51,7 +51,7 @@ void main() {
       await repository.createBooking(draft);
       final List<Booking> bookings = await repository.getBookings();
 
-      expect(bookings, hasLength(2));
+      expect(bookings, hasLength(7));
       expect(bookings.first.reference, 'HAGZ-1000');
       expect(bookings.last.reference, 'HAGZ-1001');
     },

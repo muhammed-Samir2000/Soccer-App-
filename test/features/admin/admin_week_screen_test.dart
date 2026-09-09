@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/features/admin/presentation/admin_week_screen.dart';
+import 'package:soccer_booking_app/features/admin/presentation/financial_analytics_screen.dart';
 import 'package:soccer_booking_app/features/admin/data/mock_notification_repository.dart';
 import 'package:soccer_booking_app/features/admin/data/mock_staff_repository.dart';
 import 'package:soccer_booking_app/features/admin/data/mock_venue_settings_repository.dart';
@@ -129,5 +130,29 @@ void main() {
     expect(find.text('ملعب 1'), findsOneWidget);
     expect(find.text('ملعب 2'), findsOneWidget);
     expect(find.text('ملعب 3'), findsOneWidget);
+    expect(find.text('اختصارات سريعة'), findsOneWidget);
+    expect(find.text('التحليل المالي'), findsOneWidget);
+  });
+
+  testWidgets('shows collected and comparative revenue analytics', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: FinancialAnalyticsScreen(
+            repository: MockBookingRepository.seeded(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('التحصيل المالي'), findsOneWidget);
+    expect(find.text('المبلغ المحصل'), findsOneWidget);
+    expect(find.text('حركة التحصيل'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('مقارنة بالفترة السابقة'), 300);
+    expect(find.text('مقارنة بالفترة السابقة'), findsOneWidget);
   });
 }

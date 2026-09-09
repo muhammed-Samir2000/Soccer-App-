@@ -4,6 +4,7 @@
 - No real backend yet.
 - Using mock data initially.
 - No payment integration yet.
+- Financial analytics uses mock booking totals and booking statuses, not payment receipts, refunds, taxes, discounts, or cash-reconciliation records.
 - No notifications yet.
 - Google and email/password contracts are prepared, but no authentication provider, email sender, account persistence, password hashing, or password-reset delivery is connected.
 - Booking confirmation reserves a QR payload and UI location, but does not render or scan a QR code yet.

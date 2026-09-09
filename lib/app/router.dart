@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../features/admin/presentation/admin_week_screen.dart';
+import '../features/admin/presentation/financial_analytics_screen.dart';
 import '../features/auth/domain/app_user.dart';
 import '../features/auth/presentation/mock_login_screen.dart';
 import '../features/bookings/domain/booking_draft.dart';
@@ -25,6 +26,7 @@ class AppRouter {
   static const bookingConfirmationRoute = '/booking-confirmation';
   static const adminBookingsRoute = '/admin-bookings';
   static const adminLoginRoute = '/admin-login';
+  static const adminFinancialAnalyticsRoute = '/admin-financial-analytics';
   static const myBookingsRoute = '/my-bookings';
 
   Route<void> onGenerateRoute(RouteSettings settings) {
@@ -72,6 +74,13 @@ class AppRouter {
               repository: dependencies.authRepository,
               session: dependencies.session,
               audience: LoginAudience.admin,
+            );
+          case adminFinancialAnalyticsRoute:
+            if (!dependencies.session.isAdmin) {
+              return _playerEntry();
+            }
+            return FinancialAnalyticsScreen(
+              repository: dependencies.bookingRepository,
             );
           case launchRoute:
           default:
