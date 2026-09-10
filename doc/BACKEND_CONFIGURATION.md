@@ -5,7 +5,14 @@
 The MVP runs entirely with mock repositories. It does not connect to Supabase
 or any other backend.
 
-## Future Supabase Setup
+## Supabase Foundation
+
+The secure staging schema and row-level security foundation are prepared in
+`supabase/migrations/20260910170000_initial_booking_schema.sql`. Apply it only
+to an approved staging project, then follow `supabase/README.md` before adding
+the Supabase Flutter SDK.
+
+## Future Flutter Connection
 
 After backend scope, credentials, and approval are provided, pass these values
 at build time only. Do not commit values in source files, documentation, or
@@ -22,5 +29,5 @@ construct backend repositories directly.
 
 ## Scope Gate
 
-No backend integration, schema, authentication provider, or payment provider
-may be introduced without an approved backend scope.
+No live backend connection, authentication provider, or payment provider may
+be introduced without approved credentials and user approval.

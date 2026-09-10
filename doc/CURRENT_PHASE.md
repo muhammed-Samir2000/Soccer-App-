@@ -4,7 +4,9 @@
 - Extended mock product scope complete; backend work requires approved scope.
 
 ## Current Focus
-- Preserve the mock MVP and await an approved backend scope before starting any further phase.
+- Supabase staging foundation is prepared. Await an approved staging project,
+  authentication choices, and public runtime connection values before replacing
+  mock repositories.
 
 ## Completed
 - Product, scope, and player-flow documentation.
@@ -17,6 +19,10 @@
 - Phase 4: shared booking repository and basic admin bookings list.
 - Phase 5: repository dependency boundaries, secret-free Supabase configuration placeholder, error/empty states, and MVP quality gate.
 - Product extension: full week selector, player bookings and results, field grid, recurring/tentative booking tools, permissions, and notification preferences.
+- Supabase preparation: staging schema, RLS policies, role/membership model,
+  overlap prevention, and security test checklist.
 
 ## Next
-- Do not start a further phase until backend scope, approved Supabase project details, authentication rules, data model, and payment scope are explicitly approved.
+- Create an approved Supabase staging project, apply the checked-in migration,
+  verify RLS, and provide the public URL and anon key through a secure channel.
+- Do not connect a production project, service-role key, or payment provider.
