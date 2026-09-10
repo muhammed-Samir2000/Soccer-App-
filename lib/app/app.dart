@@ -23,7 +23,9 @@ class SoccerBookingApp extends StatelessWidget {
       locale: const Locale('ar', 'EG'),
       supportedLocales: const [Locale('ar', 'EG')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      themeMode: ThemeMode.system,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       initialRoute: initialRoute,
       onGenerateRoute: AppRouter(dependencies).onGenerateRoute,
       builder: (BuildContext context, Widget? child) {

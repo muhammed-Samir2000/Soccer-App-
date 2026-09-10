@@ -1,5 +1,14 @@
 # Workflow Log
 
+### 2026-09-10 12:10 | Visual Accessibility And Responsive Polish | Status: completed
+
+- Actor: Codex.
+- Intent: apply the actionable UI/UX review recommendations to the shared Flutter visual system and key player/admin components.
+- Changed: system-driven dark theme; high-contrast admin logo foreground; semantic status chips with colour, icon, and label; destructive delete treatment; compact navigation labels and calendar cards on narrow screens.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 33 tests.
+- Scope note: an external Arabic font is intentionally not added without an approved font asset or dependency. Responsive NavigationRail and device accessibility acceptance testing remain future enhancement work.
+- Next action: rebuild the web preview, verify the visual update, and record the source-control release.
+
 ### 2026-09-10 11:05 | QA Defect Remediation | Status: completed
 
 - Actor: Codex.

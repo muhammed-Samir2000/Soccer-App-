@@ -3,17 +3,24 @@ import 'package:flutter/material.dart';
 class AppTheme {
   const AppTheme._();
 
-  static ThemeData light() {
+  static ThemeData light() => _build(Brightness.light);
+
+  static ThemeData dark() => _build(Brightness.dark);
+
+  static ThemeData _build(Brightness brightness) {
     const seedColor = Color(0xFF0B6B4F);
     final ColorScheme colorScheme = ColorScheme.fromSeed(
       seedColor: seedColor,
       secondary: const Color(0xFFE6A23C),
-      brightness: Brightness.light,
+      brightness: brightness,
     );
+    final bool isDark = brightness == Brightness.dark;
 
     return ThemeData(
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: const Color(0xFFF4F7F1),
+      scaffoldBackgroundColor: isDark
+          ? const Color(0xFF101A16)
+          : const Color(0xFFF4F7F1),
       useMaterial3: true,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -42,7 +49,7 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: colorScheme.surface,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
@@ -52,7 +59,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: colorScheme.surface,
         contentPadding: const EdgeInsetsDirectional.symmetric(
           horizontal: 16,
           vertical: 18,
@@ -78,10 +85,18 @@ class AppTheme {
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      textTheme: Typography.material2021().black.apply(
-        displayColor: const Color(0xFF14382D),
-        bodyColor: const Color(0xFF40554D),
-      ),
+      textTheme:
+          (isDark
+                  ? Typography.material2021().white
+                  : Typography.material2021().black)
+              .apply(
+                displayColor: isDark
+                    ? const Color(0xFFE1F2E9)
+                    : const Color(0xFF14382D),
+                bodyColor: isDark
+                    ? const Color(0xFFB9CDC2)
+                    : const Color(0xFF40554D),
+              ),
     );
   }
 }

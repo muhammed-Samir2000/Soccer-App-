@@ -273,6 +273,9 @@ class _BookingCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 TextButton.icon(
                   onPressed: onDelete,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('حذف'),
                 ),
@@ -292,12 +295,30 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
+    final (Color background, Color foreground, IconData icon) appearance =
+        switch (status) {
+          BookingStatus.confirmed => (
+            const Color(0xFFD7F5E6),
+            const Color(0xFF075A3C),
+            Icons.check_circle_outline,
+          ),
+          BookingStatus.tentative => (
+            const Color(0xFFFFF0D5),
+            const Color(0xFF8A4B00),
+            Icons.schedule_outlined,
+          ),
+          BookingStatus.recurring => (
+            const Color(0xFFDCEAFF),
+            const Color(0xFF174EA6),
+            Icons.repeat,
+          ),
+        };
     return Chip(
+      avatar: Icon(appearance.$3, size: 18, color: appearance.$2),
       label: Text(_statusLabel(status)),
-      backgroundColor: colors.primaryContainer,
+      backgroundColor: appearance.$1,
       side: BorderSide.none,
-      labelStyle: TextStyle(color: colors.onPrimaryContainer),
+      labelStyle: TextStyle(color: appearance.$2, fontWeight: FontWeight.w700),
     );
   }
 }

@@ -61,6 +61,7 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
       MockSlotRepository.bookingEnd.difference(start).inDays,
       (int index) => start.add(Duration(days: index)),
     );
+    final double dayWidth = MediaQuery.sizeOf(context).width < 360 ? 66 : 74;
 
     return Scaffold(
       appBar: AppPageAppBar(
@@ -162,7 +163,7 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                                       duration: const Duration(
                                         milliseconds: 180,
                                       ),
-                                      width: 74,
+                                      width: dayWidth,
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? Theme.of(

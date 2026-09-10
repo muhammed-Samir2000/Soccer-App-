@@ -86,6 +86,9 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                   Center(
                     child: _PitchLogo(
                       color: _isAdminLogin ? colors.secondary : colors.primary,
+                      foregroundColor: _isAdminLogin
+                          ? colors.onSecondary
+                          : colors.onPrimary,
                       icon: _isAdminLogin
                           ? Icons.admin_panel_settings_outlined
                           : Icons.sports_soccer,
@@ -164,9 +167,14 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
 }
 
 class _PitchLogo extends StatelessWidget {
-  const _PitchLogo({required this.color, required this.icon});
+  const _PitchLogo({
+    required this.color,
+    required this.foregroundColor,
+    required this.icon,
+  });
 
   final Color color;
+  final Color foregroundColor;
   final IconData icon;
 
   @override
@@ -180,6 +188,6 @@ class _PitchLogo extends StatelessWidget {
         BoxShadow(color: color.withValues(alpha: 0.25), blurRadius: 28),
       ],
     ),
-    child: Icon(icon, color: Colors.white, size: 48),
+    child: Icon(icon, color: foregroundColor, size: 48),
   );
 }
