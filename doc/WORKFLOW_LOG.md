@@ -7,7 +7,9 @@
 - Changed: system-driven dark theme; high-contrast admin logo foreground; semantic status chips with colour, icon, and label; destructive delete treatment; compact navigation labels and calendar cards on narrow screens.
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 33 tests.
 - Scope note: an external Arabic font is intentionally not added without an approved font asset or dependency. Responsive NavigationRail and device accessibility acceptance testing remain future enhancement work.
-- Next action: rebuild the web preview, verify the visual update, and record the source-control release.
+- Web preview: `flutter build web` passed; `http://127.0.0.1:7367/` returned HTTP 200 in this desktop session.
+- Source control: UI commit `fa7482b` pushed to `origin/main`.
+- Next action: conduct visual acceptance testing on a physical phone and tablet before release.
 
 ### 2026-09-10 11:05 | QA Defect Remediation | Status: completed
 
