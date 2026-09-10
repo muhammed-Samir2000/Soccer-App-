@@ -1,5 +1,14 @@
 # Workflow Log
 
+### 2026-09-10 10:15 | QA Regression Review | Status: completed
+
+- Actor: Codex.
+- Intent: perform a code-assisted functional and regression review of player, manager, booking, notification, date, and input-validation paths before backend integration.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 30 tests; focused notification tests passed with 2 tests.
+- Findings: booking-day seed data is fixed to 5 September 2026 while the calendar begins at the current day; slots and bookings do not share state; fixed/quick and edit flows permit incomplete or malformed contact data; month names are hard-coded; player notification generation is in-app and lazy rather than scheduled delivery; match-result fields are unvalidated.
+- Blockers/Risks: this was not a device/browser automation run. Responsive breakpoints, real authentication, multi-user booking contention, push delivery, and production performance need backend-backed integration and end-to-end tests.
+- Next action: resolve the reported booking/date/data-validation defects before connecting Supabase or conducting acceptance testing.
+
 ### 2026-09-09 12:45 | Trial Entry, Booking Actions, And In-App Notifications | Status: completed
 
 - Actor: Codex.
