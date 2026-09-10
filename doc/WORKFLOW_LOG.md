@@ -7,6 +7,7 @@
 - Changed: multi-stage Flutter/Nginx `Dockerfile`; SPA-aware Nginx configuration; `compose.yaml`; Docker build environment template; build-context exclusions; deployment documentation.
 - Verification: `docker compose config` passed. Local image build could not run because Docker Desktop Linux Engine returned a local 500 readiness error after startup; this does not indicate a Dockerfile syntax failure.
 - Security: `.env` is ignored; no Supabase URL, public key, or service-role key is stored in Docker or Git. The compose file accepts only optional runtime build inputs.
+- Source control: Docker deployment commit `dac5859` pushed to `origin/main`.
 - Next action: when Docker Desktop is healthy, run `docker compose up --build` and open `http://localhost:8080`; deploy the same compose file to an HTTPS-enabled server for public access.
 
 ### 2026-09-10 18:10 | Supabase Client Initialization | Status: completed
