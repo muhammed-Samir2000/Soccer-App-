@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/arabic_date.dart';
+import '../../../core/utils/booking_input_validators.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
 
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_draft.dart';
 import '../../bookings/domain/booking_repository.dart';
 import '../../slots/domain/time_slot.dart';
+import '../../slots/data/mock_slot_repository.dart';
 import '../domain/notification_repository.dart';
 import '../domain/notification_setting.dart';
 import '../domain/staff_member.dart';
@@ -46,7 +49,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             Text(
-              'جدول ملاعب يوم ٧ سبتمبر',
+              'جدول ملاعب يوم ${arabicDateLabel(MockSlotRepository.bookingStart)}',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
@@ -193,47 +196,61 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
           ),
           TextField(
             controller: _name,
+            maxLength: 80,
             decoration: const InputDecoration(
               labelText: 'اسم اللاعب أو المجموعة',
             ),
           ),
           TextField(
             controller: _phone,
+            maxLength: 11,
+            keyboardType: TextInputType.phone,
             decoration: const InputDecoration(labelText: 'رقم الهاتف'),
           ),
           const SizedBox(height: 12),
-          const Text('موعد تجريبي: الاثنين ٧ سبتمبر، ٥:٠٠ م'),
+          Text(
+            'موعد تجريبي: ${arabicDateLabel(MockSlotRepository.bookingStart)}، ٥:٠٠ م',
+          ),
           const SizedBox(height: 16),
           FilledButton(
             onPressed: () async {
+              final String? nameError = validatePlayerName(_name.text);
+              final String? phoneError = validateEgyptianMobile(_phone.text);
+              if (nameError != null || phoneError != null) {
+                setState(() => _message = nameError ?? phoneError!);
+                return;
+              }
+              final DateTime day = MockSlotRepository.bookingStart;
               final draft = BookingDraft(
                 slot: TimeSlot(
                   id: 'admin-1700',
-                  startTime: DateTime(2026, 9, 7, 17),
-                  endTime: DateTime(2026, 9, 7, 18),
+                  startTime: DateTime(day.year, day.month, day.day, 17),
+                  endTime: DateTime(day.year, day.month, day.day, 18),
                   status: SlotStatus.available,
                 ),
                 basePrice: 800,
               );
-              final booking = _recurring
-                  ? await widget.repository.createRecurringBooking(
-                      playerName: _name.text.isEmpty
-                          ? 'مجموعة ثابتة'
-                          : _name.text,
-                      phoneNumber: _phone.text,
-                      draft: draft,
-                    )
-                  : await widget.repository.createTentativeBooking(
-                      playerName: _name.text.isEmpty
-                          ? 'حجز استقبال'
-                          : _name.text,
-                      phoneNumber: _phone.text,
-                      draft: draft,
-                    );
-              setState(
-                () => _message =
-                    'تم تسجيل ${_recurring ? 'الحجز الثابت' : 'الحجز المبدئي'} في ملعب ${booking.fieldNumber}.',
-              );
+              try {
+                final booking = _recurring
+                    ? await widget.repository.createRecurringBooking(
+                        playerName: _name.text,
+                        phoneNumber: _phone.text,
+                        draft: draft,
+                      )
+                    : await widget.repository.createTentativeBooking(
+                        playerName: _name.text,
+                        phoneNumber: _phone.text,
+                        draft: draft,
+                      );
+                setState(
+                  () => _message =
+                      'تم تسجيل ${_recurring ? 'الحجز الثابت' : 'الحجز المبدئي'} في ملعب ${booking.fieldNumber}.',
+                );
+              } on ArgumentError catch (error) {
+                setState(() => _message = error.message.toString());
+              } on StateError catch (error) {
+                setState(() => _message = error.message.toString());
+              }
             },
             child: Text(
               _recurring ? 'تثبيت الحجز الأسبوعي' : 'تسجيل حجز مبدئي',

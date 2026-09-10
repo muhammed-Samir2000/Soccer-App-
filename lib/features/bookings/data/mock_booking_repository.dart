@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../../core/utils/booking_input_validators.dart';
 import '../domain/booking.dart';
 import '../domain/booking_activity.dart';
 import '../domain/booking_draft.dart';
@@ -122,11 +123,14 @@ class MockBookingRepository implements BookingRepository {
   final StreamController<BookingActivity> _activities =
       StreamController<BookingActivity>.broadcast();
 
+  int get fieldCount => _fieldCount;
+
   @override
   Future<Booking> createBooking(BookingDraft draft) async {
     return _create(
       playerId: 'player-001',
       playerName: 'الكابتن أحمد',
+      phoneNumber: '01012345678',
       draft: draft,
       status: BookingStatus.confirmed,
     );
@@ -150,13 +154,16 @@ class MockBookingRepository implements BookingRepository {
     required String playerName,
     required String phoneNumber,
     required BookingDraft draft,
-  }) => _create(
-    playerId: 'phone-$phoneNumber',
-    playerName: playerName,
-    phoneNumber: phoneNumber,
-    draft: draft,
-    status: BookingStatus.tentative,
-  );
+  }) {
+    _validateContact(playerName, phoneNumber);
+    return _create(
+      playerId: 'phone-${phoneNumber.trim()}',
+      playerName: playerName.trim(),
+      phoneNumber: phoneNumber.trim(),
+      draft: draft,
+      status: BookingStatus.tentative,
+    );
+  }
 
   @override
   Future<Booking> createAdminBooking({
@@ -165,14 +172,9 @@ class MockBookingRepository implements BookingRepository {
     required BookingDraft draft,
     required BookingStatus status,
   }) {
+    _validateContact(playerName, phoneNumber);
     final String cleanedName = playerName.trim();
     final String cleanedPhone = phoneNumber.trim();
-    if (cleanedName.isEmpty) {
-      throw ArgumentError('اكتب اسم اللاعب أو المجموعة.');
-    }
-    if (cleanedPhone.isEmpty) {
-      throw ArgumentError('اكتب رقم هاتف للتواصل.');
-    }
     return _create(
       playerId: 'phone-$cleanedPhone',
       playerName: cleanedName,
@@ -187,19 +189,23 @@ class MockBookingRepository implements BookingRepository {
     required String playerName,
     required String phoneNumber,
     required BookingDraft draft,
-  }) => _create(
-    playerId: 'phone-$phoneNumber',
-    playerName: playerName,
-    phoneNumber: phoneNumber,
-    draft: draft,
-    status: BookingStatus.recurring,
-  );
+  }) {
+    _validateContact(playerName, phoneNumber);
+    return _create(
+      playerId: 'phone-${phoneNumber.trim()}',
+      playerName: playerName.trim(),
+      phoneNumber: phoneNumber.trim(),
+      draft: draft,
+      status: BookingStatus.recurring,
+    );
+  }
 
   @override
   Future<void> saveMatchResult({
     required String bookingReference,
     required MatchResult result,
   }) async {
+    _validateMatchResult(result);
     final int index = _bookings.indexWhere(
       (Booking booking) => booking.reference == bookingReference,
     );
@@ -213,6 +219,7 @@ class MockBookingRepository implements BookingRepository {
 
   @override
   Future<void> updateBooking(Booking booking) async {
+    _validateContact(booking.playerName, booking.phoneNumber);
     final int index = _bookings.indexWhere(
       (Booking item) => item.reference == booking.reference,
     );
@@ -307,5 +314,31 @@ class MockBookingRepository implements BookingRepository {
 
   void _emit(BookingActivityType type, Booking booking) {
     _activities.add(BookingActivity(type: type, booking: booking));
+  }
+
+  void _validateContact(String playerName, String phoneNumber) {
+    final String? nameError = validatePlayerName(playerName);
+    if (nameError != null) {
+      throw ArgumentError(nameError);
+    }
+    final String? phoneError = validateEgyptianMobile(phoneNumber);
+    if (phoneError != null) {
+      throw ArgumentError(phoneError);
+    }
+  }
+
+  void _validateMatchResult(MatchResult result) {
+    final List<String?> errors = <String?>[
+      validateShortText(result.winningTeam, 'الفريق الفائز'),
+      validateShortText(result.manOfTheMatch, 'رجل المباراة'),
+      validateShortText(result.bestGoal, 'أفضل هدف', required: false),
+      validateDescription(result.manOfTheMatchDescription, 'وصف رجل المباراة'),
+      validateDescription(result.bestGoalDescription, 'وصف أفضل هدف'),
+    ];
+    for (final String? error in errors) {
+      if (error != null) {
+        throw ArgumentError(error);
+      }
+    }
   }
 }

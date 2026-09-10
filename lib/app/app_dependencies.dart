@@ -28,7 +28,10 @@ class AppDependencies {
   factory AppDependencies.mock() {
     final MockBookingRepository bookingRepository =
         MockBookingRepository.seeded();
-    const MockSlotRepository slotRepository = MockSlotRepository();
+    final MockSlotRepository slotRepository = MockSlotRepository(
+      bookingRepository,
+      fieldCountProvider: () async => bookingRepository.fieldCount,
+    );
     return AppDependencies(
       authRepository: const MockAuthRepository(),
       session: AppSession(),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/arabic_date.dart';
+import '../../../core/utils/booking_input_validators.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
 
 import '../../bookings/domain/booking.dart';
@@ -47,6 +49,7 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
                   children: [
                     TextField(
                       controller: name,
+                      maxLength: 80,
                       decoration: const InputDecoration(
                         labelText: 'اسم اللاعب أو المجموعة',
                       ),
@@ -54,6 +57,7 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: phone,
+                      maxLength: 11,
                       keyboardType: TextInputType.phone,
                       decoration: const InputDecoration(
                         labelText: 'رقم الهاتف',
@@ -96,14 +100,32 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
       ),
     );
     if (shouldSave == true) {
-      await widget.repository.updateBooking(
-        booking.copyWith(
-          playerName: name.text.trim(),
-          phoneNumber: phone.text.trim(),
-          status: selectedStatus,
-        ),
-      );
-      _reload();
+      final String? nameError = validatePlayerName(name.text);
+      final String? phoneError = validateEgyptianMobile(phone.text);
+      if (nameError != null || phoneError != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(nameError ?? phoneError!)));
+        }
+      } else {
+        try {
+          await widget.repository.updateBooking(
+            booking.copyWith(
+              playerName: name.text.trim(),
+              phoneNumber: phone.text.trim(),
+              status: selectedStatus,
+            ),
+          );
+          _reload();
+        } on ArgumentError catch (error) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(error.message.toString())));
+          }
+        }
+      }
     }
     name.dispose();
     phone.dispose();
@@ -307,7 +329,7 @@ String _statusLabel(BookingStatus status) {
 }
 
 String _slotLabel(Booking booking) {
-  return '${booking.slot.startTime.day} سبتمبر | '
+  return '${arabicDateLabel(booking.slot.startTime)} | '
       '${_formatTime(booking.slot.startTime)} - ${_formatTime(booking.slot.endTime)}';
 }
 

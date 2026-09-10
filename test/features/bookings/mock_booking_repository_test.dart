@@ -130,4 +130,38 @@ void main() {
       4,
     ]);
   });
+
+  test('rejects incomplete or malformed reception contact data', () async {
+    final MockBookingRepository repository = MockBookingRepository();
+    final BookingDraft draft = BookingDraft(slot: slot, basePrice: 800);
+
+    expect(
+      () => repository.createTentativeBooking(
+        playerName: '',
+        phoneNumber: '01012345678',
+        draft: draft,
+      ),
+      throwsArgumentError,
+    );
+    expect(
+      () => repository.createRecurringBooking(
+        playerName: 'كابتن',
+        phoneNumber: 'رقم غلط',
+        draft: draft,
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('rejects invalid changes to existing booking data', () async {
+    final MockBookingRepository repository = MockBookingRepository();
+    final Booking booking = await repository.createBooking(
+      BookingDraft(slot: slot, basePrice: 800),
+    );
+
+    await expectLater(
+      repository.updateBooking(booking.copyWith(playerName: '')),
+      throwsArgumentError,
+    );
+  });
 }

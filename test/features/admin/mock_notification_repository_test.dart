@@ -13,7 +13,7 @@ void main() {
     final MockBookingRepository bookings = MockBookingRepository();
     final MockNotificationRepository notifications = MockNotificationRepository(
       bookingRepository: bookings,
-      slotRepository: const MockSlotRepository(),
+      slotRepository: MockSlotRepository(bookings),
     );
     await bookings.createAdminBooking(
       playerName: 'الكابتن عمر',
@@ -46,9 +46,11 @@ void main() {
   test(
     'provides player availability notifications with booking actions',
     () async {
+      final MockBookingRepository bookings = MockBookingRepository();
       final MockNotificationRepository notifications =
           MockNotificationRepository(
-            slotRepository: const MockSlotRepository(),
+            bookingRepository: bookings,
+            slotRepository: MockSlotRepository(bookings),
           );
 
       final messages = await notifications.getNotificationsFor(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../../../core/utils/arabic_date.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../auth/domain/app_user.dart';
 import '../../bookings/presentation/player_bottom_navigation.dart';
@@ -208,7 +209,7 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                                                 ),
                                           ),
                                           Text(
-                                            'سبتمبر',
+                                            arabicMonthName(day),
                                             style: TextStyle(
                                               fontSize: 11,
                                               color: isSelected
@@ -431,7 +432,7 @@ class _LegendItem extends StatelessWidget {
 }
 
 String _dayLabel(DateTime day) {
-  return '${_weekdayName(day)} ${day.day} سبتمبر';
+  return arabicDateLabel(day, weekday: _weekdayName(day));
 }
 
 String _weekdayName(DateTime day) {

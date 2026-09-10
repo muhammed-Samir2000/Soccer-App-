@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/arabic_date.dart';
+import '../../../core/utils/booking_input_validators.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
 import '../domain/booking.dart';
 import '../domain/booking_repository.dart';
@@ -172,6 +174,7 @@ class _ResultEditor extends StatefulWidget {
 }
 
 class _ResultEditorState extends State<_ResultEditor> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _team = TextEditingController(
     text: widget.booking.matchResult?.winningTeam,
   );
@@ -188,6 +191,7 @@ class _ResultEditorState extends State<_ResultEditor> {
     text: widget.booking.matchResult?.bestGoalDescription,
   );
   bool _saving = false;
+  String? _errorMessage;
   @override
   void dispose() {
     _team.dispose();
@@ -202,46 +206,92 @@ class _ResultEditorState extends State<_ResultEditor> {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Text('نتيجة المباراة'),
-      TextField(
-        controller: _team,
-        decoration: const InputDecoration(labelText: 'الفريق الفائز'),
+      Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            const Text('نتيجة المباراة'),
+            TextFormField(
+              controller: _team,
+              maxLength: 80,
+              validator: (String? value) =>
+                  validateShortText(value ?? '', 'الفريق الفائز'),
+              decoration: const InputDecoration(labelText: 'الفريق الفائز'),
+            ),
+            TextFormField(
+              controller: _player,
+              maxLength: 80,
+              validator: (String? value) =>
+                  validateShortText(value ?? '', 'رجل المباراة'),
+              decoration: const InputDecoration(labelText: 'رجل المباراة'),
+            ),
+            TextFormField(
+              controller: _playerDescription,
+              maxLines: 2,
+              maxLength: 250,
+              validator: (String? value) =>
+                  validateDescription(value ?? '', 'وصف رجل المباراة'),
+              decoration: const InputDecoration(labelText: 'وصف رجل المباراة'),
+            ),
+            TextFormField(
+              controller: _bestGoal,
+              maxLength: 80,
+              validator: (String? value) =>
+                  validateShortText(value ?? '', 'أفضل هدف', required: false),
+              decoration: const InputDecoration(labelText: 'أفضل هدف'),
+            ),
+            TextFormField(
+              controller: _bestGoalDescription,
+              maxLines: 2,
+              maxLength: 250,
+              validator: (String? value) =>
+                  validateDescription(value ?? '', 'وصف أفضل هدف'),
+              decoration: const InputDecoration(labelText: 'وصف أفضل هدف'),
+            ),
+          ],
+        ),
       ),
-      TextField(
-        controller: _player,
-        decoration: const InputDecoration(labelText: 'رجل المباراة'),
-      ),
-      TextField(
-        controller: _playerDescription,
-        maxLines: 2,
-        decoration: const InputDecoration(labelText: 'وصف رجل المباراة'),
-      ),
-      TextField(
-        controller: _bestGoal,
-        decoration: const InputDecoration(labelText: 'أفضل هدف'),
-      ),
-      TextField(
-        controller: _bestGoalDescription,
-        maxLines: 2,
-        decoration: const InputDecoration(labelText: 'وصف أفضل هدف'),
-      ),
+      if (_errorMessage != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text(
+            _errorMessage!,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
       const SizedBox(height: 8),
       TextButton(
         onPressed: _saving
             ? null
             : () async {
+                if (!(_formKey.currentState?.validate() ?? false)) {
+                  return;
+                }
                 setState(() => _saving = true);
-                await widget.repository.saveMatchResult(
-                  bookingReference: widget.booking.reference,
-                  result: MatchResult(
-                    winningTeam: _team.text,
-                    manOfTheMatch: _player.text,
-                    manOfTheMatchDescription: _playerDescription.text,
-                    bestGoal: _bestGoal.text,
-                    bestGoalDescription: _bestGoalDescription.text,
-                  ),
-                );
-                widget.onSaved();
+                try {
+                  await widget.repository.saveMatchResult(
+                    bookingReference: widget.booking.reference,
+                    result: MatchResult(
+                      winningTeam: _team.text,
+                      manOfTheMatch: _player.text,
+                      manOfTheMatchDescription: _playerDescription.text,
+                      bestGoal: _bestGoal.text,
+                      bestGoalDescription: _bestGoalDescription.text,
+                    ),
+                  );
+                  if (!mounted) {
+                    return;
+                  }
+                  setState(() => _saving = false);
+                  widget.onSaved();
+                } on ArgumentError catch (error) {
+                  if (mounted) {
+                    setState(() {
+                      _saving = false;
+                      _errorMessage = error.message.toString();
+                    });
+                  }
+                }
               },
         child: Text(_saving ? 'بيتحفظ...' : 'حفظ بيانات المباراة'),
       ),
@@ -250,4 +300,4 @@ class _ResultEditorState extends State<_ResultEditor> {
 }
 
 String _bookingTime(Booking booking) =>
-    '${booking.slot.startTime.day} سبتمبر | ${booking.slot.startTime.hour}:00 - ${booking.slot.endTime.hour}:00';
+    '${arabicDateLabel(booking.slot.startTime)} | ${booking.slot.startTime.hour}:00 - ${booking.slot.endTime.hour}:00';

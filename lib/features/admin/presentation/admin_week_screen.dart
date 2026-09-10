@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../../../core/utils/arabic_date.dart';
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_draft.dart';
 import '../../bookings/domain/booking_repository.dart';
@@ -834,6 +835,7 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
           ),
           TextField(
             controller: _name,
+            maxLength: 80,
             decoration: const InputDecoration(
               labelText: 'اسم اللاعب أو المجموعة',
             ),
@@ -841,6 +843,7 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
           TextField(
             controller: _phone,
             keyboardType: TextInputType.phone,
+            maxLength: 11,
             decoration: const InputDecoration(labelText: 'رقم الهاتف'),
           ),
           const SizedBox(height: 16),
@@ -904,16 +907,18 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
     try {
       final Booking booking = _recurring
           ? await widget.repository.createRecurringBooking(
-              playerName: _name.text.isEmpty ? 'مجموعة ثابتة' : _name.text,
+              playerName: _name.text,
               phoneNumber: _phone.text,
               draft: draft,
             )
           : await widget.repository.createTentativeBooking(
-              playerName: _name.text.isEmpty ? 'حجز استقبال' : _name.text,
+              playerName: _name.text,
               phoneNumber: _phone.text,
               draft: draft,
             );
       setState(() => _message = 'اتسجل الحجز في ملعب ${booking.fieldNumber}.');
+    } on ArgumentError catch (error) {
+      setState(() => _message = error.message.toString());
     } on StateError catch (error) {
       setState(() => _message = error.message.toString());
     }
@@ -1314,7 +1319,7 @@ String _dayLabel(DateTime day) {
     'الخميس',
     'الجمعة',
   ];
-  return '${days[(day.weekday + 1) % 7]} ${day.day} سبتمبر';
+  return arabicDateLabel(day, weekday: days[(day.weekday + 1) % 7]);
 }
 
 String _formatHour(int hour) {
