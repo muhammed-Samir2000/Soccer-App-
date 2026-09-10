@@ -1,17 +1,43 @@
-# soccer_booking_app
+# Soccer Booking App
 
-A new Flutter project.
+Flutter application for football playground booking, with player and manager
+experiences in Egyptian Arabic.
 
-## Getting Started
+## Run With Docker
 
-This project is a starting point for a Flutter application.
+Docker builds the Flutter Web application and serves it through Nginx. It lets
+the same release run on any computer or server with Docker installed.
 
-A few resources to get you started if this is your first Flutter project:
+```text
+docker compose up --build
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Open `http://localhost:8080`.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+To use another port, create a local `.env` from `.env.example` and set:
+
+```text
+APP_PORT=8080
+SUPABASE_URL=<project-url>
+SUPABASE_ANON_KEY=<public-anon-or-publishable-key>
+```
+
+Do not commit `.env`, and never use a Supabase `service_role` key in Flutter,
+Docker build arguments, browser bundles, or Git.
+
+## Open From Anywhere
+
+Docker makes the release portable but does not publish it to the internet by
+itself. To make it publicly available, run the same `docker compose up -d
+--build` command on a VPS or cloud host, then configure a domain, HTTPS reverse
+proxy, and firewall for port 443. Keep the host's `.env` outside Git.
+
+## Quality Checks
+
+```text
+dart format --set-exit-if-changed .
+flutter analyze
+flutter test
+```
+
+The Supabase schema and security setup are documented in `supabase/README.md`.
