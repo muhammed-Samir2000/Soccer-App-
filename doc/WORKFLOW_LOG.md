@@ -7,7 +7,9 @@
 - Changed: dynamic slot dates; booking-backed mock slot availability and update stream; Arabic month formatting; contact and result input validation; safe booking-edit error handling; dynamic legacy dashboard preview data; focused regression tests.
 - Verification: `dart format --set-exit-if-changed lib test` passed with zero changes; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 33 tests.
 - Decisions: a locally created booking now supplies a demo phone number solely to make the manager notification payload complete. Push, SMS, WhatsApp, background scheduling, and cross-device concurrency remain backend scope and are documented as limitations rather than simulated as production features.
-- Next action: rebuild the web preview, perform browser acceptance checks, and record the source-control commit.
+- Web preview: `flutter build web` passed and the local build is served at `http://127.0.0.1:7366/` for this desktop session.
+- Source control: remediation commit `be4bef5` pushed to `origin/main`.
+- Next action: perform browser acceptance checks for the fixed booking and validation paths before backend work is approved.
 
 ### 2026-09-10 10:15 | QA Regression Review | Status: completed
 
