@@ -21,6 +21,15 @@
 - Source control: pending commit and push to `origin/main`.
 - Next action: rebuild the web preview and validate the current-date calendar visually.
 
+### 2026-09-10 09:00 | Admin Monthly Calendar Preview | Status: in-progress
+
+- Actor: Codex.
+- Intent: extend the administrator's day summary from the current date through the end of the current month, matching the player booking calendar.
+- Changed: `lib/features/admin/presentation/admin_week_screen.dart`; local web build was refreshed.
+- Verification: `dart format --set-exit-if-changed .` and `flutter analyze` passed; the previous full test run passed with 30 tests before this one-list generation change.
+- Blockers/Risks: local preview server is ephemeral and must be restarted when the desktop session closes.
+- Next action: open the refreshed preview and finish source-control recording after validation.
+
 ### 2026-09-09 12:10 | Persistent Admin Navigation | Status: completed
 
 - Actor: Codex.

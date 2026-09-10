@@ -124,10 +124,10 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
+            final DateTime start = MockSlotRepository.bookingStart;
             final List<DateTime> week = List<DateTime>.generate(
-              7,
-              (int index) =>
-                  MockSlotRepository.weekStart.add(Duration(days: index)),
+              MockSlotRepository.bookingEnd.difference(start).inDays,
+              (int index) => start.add(Duration(days: index)),
             );
             return ListView(
               padding: const EdgeInsets.all(20),
@@ -148,12 +148,12 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'الأسبوع يبدأ السبت',
+                  'مواعيد الشهر من النهارده',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'اختار يوم علشان تشوف الساعات المتاحة وتدير حجوزاته.',
+                  'اختار أي يوم متاح لآخر الشهر علشان تشوف الساعات وتدير حجوزاته.',
                 ),
                 const SizedBox(height: 16),
                 ...week.map(
