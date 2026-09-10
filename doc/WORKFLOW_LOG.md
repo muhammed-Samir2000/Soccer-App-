@@ -1,5 +1,14 @@
 # Workflow Log
 
+### 2026-09-10 18:10 | Supabase Client Initialization | Status: completed
+
+- Actor: Codex.
+- Intent: initialize the approved Supabase client safely without persisting public runtime values in source control or replacing unverified mock repositories.
+- Changed: added `supabase_flutter`; `main.dart` initializes Supabase only when `SUPABASE_URL` and `SUPABASE_ANON_KEY` are supplied through `--dart-define`; connection and configuration documentation updated.
+- Verification: Supabase Auth settings endpoint returned HTTP 200 with the approved public key; `dart format --set-exit-if-changed .` passed; `flutter analyze` passed with no issues; prior full `flutter test` passed with 33 tests after dependency installation; web build with runtime-only Supabase values completed successfully.
+- Security: no project URL or key was committed. The application remains on mock repositories, so no player/admin data is read or written to Supabase yet.
+- Next action: add authenticated Supabase repository adapters and server-side booking RPC only after creating test identities, venue data, and completing the RLS checklist.
+
 ### 2026-09-10 17:15 | Supabase Secure Foundation | Status: completed
 
 - Actor: Codex.

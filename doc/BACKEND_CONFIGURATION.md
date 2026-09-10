@@ -2,8 +2,9 @@
 
 ## Current State
 
-The MVP runs entirely with mock repositories. It does not connect to Supabase
-or any other backend.
+The Flutter runtime now initializes the official Supabase client when both
+runtime values are supplied. Repository implementations remain mock-only until
+the approved authenticated data phase is complete.
 
 ## Supabase Foundation
 
@@ -22,10 +23,11 @@ version control.
 flutter run --dart-define=SUPABASE_URL=<approved-project-url> --dart-define=SUPABASE_ANON_KEY=<approved-anon-key>
 ```
 
-`BackendConfiguration` reads those two runtime values. A future Supabase
-repository should implement the existing domain repository interfaces and be
-provided through `AppDependencies`; screens must not import a Supabase SDK or
-construct backend repositories directly.
+`BackendConfiguration` reads those two runtime values and `main.dart`
+initializes the SDK once. A future Supabase repository should implement the
+existing domain repository interfaces and be provided through
+`AppDependencies`; screens must not import a Supabase SDK or construct backend
+repositories directly.
 
 ## Scope Gate
 

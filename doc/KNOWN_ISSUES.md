@@ -1,8 +1,9 @@
 # Known Issues
 
 ## Current Limitations
-- No real backend connection yet. A staging Supabase schema and RLS foundation
-  are prepared, but no project, credentials, SDK, or persistent repository is connected.
+- The Supabase SDK can initialize from runtime-only values, but the app still
+  uses mock repositories. Authenticated Supabase repositories, RLS acceptance
+  testing, and persistent data are not connected yet.
 - Using mock data initially.
 - No payment integration yet.
 - Financial analytics uses mock booking totals and booking statuses, not payment receipts, refunds, taxes, discounts, or cash-reconciliation records.

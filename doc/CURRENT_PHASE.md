@@ -21,6 +21,8 @@
 - Product extension: full week selector, player bookings and results, field grid, recurring/tentative booking tools, permissions, and notification preferences.
 - Supabase preparation: staging schema, RLS policies, role/membership model,
   overlap prevention, and security test checklist.
+- Supabase client initialization through runtime-only Dart defines; mock
+  repositories remain active until authenticated adapters are verified.
 
 ## Next
 - Create an approved Supabase staging project, apply the checked-in migration,

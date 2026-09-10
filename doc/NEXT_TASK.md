@@ -2,7 +2,7 @@
 
 ## Task
 - Apply the approved Supabase staging migration and validate RLS before adding
-  the Supabase Flutter SDK or replacing mock repositories.
+  authenticated Supabase repository adapters or replacing mock repositories.
 
 ## Requirements
 - Read `SPECKIT.md`, `WORKFLOW_LOG.md`, and `DECISIONS_LOG.md` before any future work.
