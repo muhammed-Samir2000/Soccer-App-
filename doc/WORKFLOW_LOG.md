@@ -6,8 +6,9 @@
 - Intent: prepare an approved staging backend path without connecting a live project or introducing credentials.
 - Changed: checked-in Supabase schema migration; profiles, venue memberships, fields, services, bookings, role model, RLS policies, overlap constraint, and security checklist; backend/configuration handoff documentation.
 - Security decisions: no service-role key, project URL, anon key, account identifier, or secret is committed. Players have no direct insert permission on bookings; a future server-side RPC must own booking creation and validation. Profile role elevation is blocked from the client.
-- Verification: Flutter application remains mock-only pending the next approved connection phase; `dart format`, `flutter analyze`, and `flutter test` are required before source-control release.
-- Next action: run Flutter quality gate, then apply the migration only to an approved Supabase staging project and execute the RLS checklist.
+- Verification: `dart format --set-exit-if-changed .` passed with zero changes; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 33 tests. The SQL was not applied because no staging project was provided.
+- Source control: secure foundation commit `a441381` pushed to `origin/main` after one transient DNS retry.
+- Next action: apply the migration only to an approved Supabase staging project and execute the RLS checklist.
 
 ### 2026-09-10 12:10 | Visual Accessibility And Responsive Polish | Status: completed
 
