@@ -8,7 +8,7 @@
 - Product decisions: the organizer is automatically `جاي`; default capacity is 10 but is configurable from 2 to 30; a booking remains valid even if the team is not full; the mock UI labels its direct Google entry as demo-only.
 - Security: roster UI never displays phone numbers or e-mail. The migration stores only SHA-256 invitation-token hashes, offers an anonymous no-PII invite summary, and requires authenticated RSVP through a serialized RPC to prevent capacity races. No Supabase schema was applied because the available project is labelled Production and needs staging rehearsal/backup first.
 - Verification: `dart format --set-exit-if-changed lib test` passed with zero changes; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 37 tests.
-- Source control: feature branch `codex/group-booking-rsvp` created and pushed before implementation. Commit and merge/push outcome follow after this documentation update.
+- Source control: feature branch `codex/group-booking-rsvp` created and pushed before implementation. Commit `5b9e672` (`Add group match invitation RSVP`) was fast-forward merged into `main` and pushed to `origin/main`.
 - Next action: configure Google OAuth and staging Supabase, apply both migrations in staging, execute the RLS/RPC checklist, then replace mock RSVP storage with authenticated adapters.
 
 ### 2026-09-10 19:00 | Portable Docker Web Deployment | Status: completed
