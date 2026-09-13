@@ -7,7 +7,7 @@
 - Security: added a separate Staging migration for a row-level-secured e-mail allowlist. Only a signed-in account whose normalized Google JWT e-mail matches a pending invite can receive an `admin` profile role and venue membership through `accept_admin_email_invitation()`. The Flutter client cannot create a super-admin or use a service-role key.
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 41 tests.
 - Backend status: the initial and group-match migrations, RLS inventory, and Google OAuth configuration were reported verified in Staging. The new admin invitation migration is checked in but must be reviewed and applied once before using real invitations.
-- Source control: commit and push outcome follows after this workflow update.
+- Source control: commit `a38857f` (`Polish Google sign-in and add admin invitations`) pushed to `origin/main`.
 
 ### 2026-09-13 13:45 | Google Entry Actions And Admin Role Gate | Status: completed
 
