@@ -48,7 +48,39 @@ class MockMatchRepository implements MatchRepository {
         return match;
       }
     }
-    return null;
+    return _restoreDemoInvite(inviteToken);
+  }
+
+  /// Lets a copied demo link open in a fresh browser tab. Production never
+  /// reconstructs invitations from a token; it resolves a hashed token by RPC.
+  BookingMatch? _restoreDemoInvite(String inviteToken) {
+    final RegExpMatch? tokenMatch = RegExp(
+      r'^demo-\d+-(HAGZ-[A-Z0-9-]+)$',
+    ).firstMatch(inviteToken);
+    if (tokenMatch == null) {
+      return null;
+    }
+    final String bookingReference = tokenMatch.group(1)!;
+    final BookingMatch? existing = _matchesByBooking[bookingReference];
+    if (existing != null) {
+      return existing;
+    }
+    final BookingMatch match = BookingMatch(
+      bookingReference: bookingReference,
+      organizerId: 'demo-organizer',
+      capacity: 10,
+      inviteToken: inviteToken,
+      participants: const <MatchParticipant>[
+        MatchParticipant(
+          playerId: 'demo-organizer',
+          displayName: 'الكابتن أحمد',
+          status: MatchParticipationStatus.going,
+          isOrganizer: true,
+        ),
+      ],
+    );
+    _matchesByBooking[bookingReference] = match;
+    return match;
   }
 
   @override

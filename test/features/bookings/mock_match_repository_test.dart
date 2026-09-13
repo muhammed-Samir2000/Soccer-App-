@@ -80,4 +80,16 @@ void main() {
       throwsStateError,
     );
   });
+
+  test('opens a copied demo invite in a fresh repository', () async {
+    final MockMatchRepository repository = MockMatchRepository();
+
+    final BookingMatch? match = await repository.getByInviteToken(
+      'demo-1-HAGZ-1001',
+    );
+
+    expect(match, isNotNull);
+    expect(match!.bookingReference, 'HAGZ-1001');
+    expect(match.goingCount, 1);
+  });
 }
