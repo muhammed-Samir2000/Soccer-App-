@@ -62,7 +62,12 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
           when user.role == UserRole.player) {
         player = user;
       } else {
-        player = await widget.authRepository.signInWithGoogle();
+        final AppUser? signedIn = await widget.authRepository
+            .signInWithGoogle();
+        if (signedIn == null) {
+          throw StateError('كمّل تسجيل Google ثم افتح رابط الدعوة تاني.');
+        }
+        player = signedIn;
         widget.session.signIn(player);
       }
       final BookingMatch updated = await widget.matchRepository.respondToInvite(

@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/app.dart';
+import 'app/app_dependencies.dart';
 import 'core/config/backend_configuration.dart';
 
 Future<void> main() async {
@@ -13,5 +14,8 @@ Future<void> main() async {
       publishableKey: configuration.supabaseAnonKey,
     );
   }
-  runApp(SoccerBookingApp());
+  final AppDependencies dependencies = await AppDependencies.fromBackend(
+    configuration,
+  );
+  runApp(SoccerBookingApp(dependencies: dependencies));
 }

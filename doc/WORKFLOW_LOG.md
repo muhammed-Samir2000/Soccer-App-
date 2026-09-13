@@ -1,5 +1,13 @@
 # Workflow Log
 
+### 2026-09-13 13:15 | Supabase Google OAuth Client Integration | Status: completed
+
+- Actor: Codex.
+- Changed: added a Supabase-backed authentication repository, Google OAuth launch, authenticated-session restoration, profile-to-player/admin role mapping, and live-auth login behaviour when runtime Staging configuration is supplied.
+- Security: Project URL and publishable key remain runtime-only `--dart-define` values and are not committed. No Google Client Secret, service-role key, database password, booking repository, or invitation repository was added to the Flutter client.
+- Verification: `flutter analyze` passed with no issues; full test run started after the interface adjustment.
+- Next action: run the web app with Staging runtime defines, manually complete Google sign-in, then confirm the generated profile and session. Authenticated booking and invite repository adapters remain the next scoped change.
+
 ### 2026-09-13 12:45 | Invite Details And Web Hash Routing | Status: completed
 
 - Actor: Codex.

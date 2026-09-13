@@ -6,8 +6,11 @@ import '../features/admin/domain/notification_repository.dart';
 import '../features/admin/domain/staff_repository.dart';
 import '../features/admin/domain/venue_settings_repository.dart';
 import '../features/auth/data/mock_auth_repository.dart';
+import '../features/auth/data/supabase_auth_repository.dart';
 import '../features/auth/domain/app_session.dart';
+import '../features/auth/domain/app_user.dart';
 import '../features/auth/domain/auth_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/bookings/data/mock_booking_repository.dart';
 import '../features/bookings/data/mock_match_repository.dart';
 import '../features/bookings/domain/booking_repository.dart';
@@ -48,6 +51,34 @@ class AppDependencies {
       ),
       venueSettingsRepository: MockVenueSettingsRepository(),
     );
+  }
+
+  static Future<AppDependencies> fromBackend(
+    BackendConfiguration configuration,
+  ) async {
+    final AppDependencies dependencies = AppDependencies.mock();
+    if (!configuration.isSupabaseConfigured) {
+      return dependencies;
+    }
+    final SupabaseAuthRepository authRepository = SupabaseAuthRepository(
+      Supabase.instance.client,
+    );
+    final AppDependencies configured = AppDependencies(
+      authRepository: authRepository,
+      session: dependencies.session,
+      slotRepository: dependencies.slotRepository,
+      bookingRepository: dependencies.bookingRepository,
+      matchRepository: dependencies.matchRepository,
+      staffRepository: dependencies.staffRepository,
+      notificationRepository: dependencies.notificationRepository,
+      venueSettingsRepository: dependencies.venueSettingsRepository,
+      backendConfiguration: configuration,
+    );
+    final AppUser? user = await authRepository.restoreSession();
+    if (user != null) {
+      configured.session.signIn(user);
+    }
+    return configured;
   }
 
   final AuthRepository authRepository;

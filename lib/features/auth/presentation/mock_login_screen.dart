@@ -25,6 +25,7 @@ class MockLoginScreen extends StatefulWidget {
 
 class _MockLoginScreenState extends State<MockLoginScreen> {
   bool _isSubmitting = false;
+  String? _errorMessage;
 
   bool get _isAdminLogin => widget.audience == LoginAudience.admin;
 
@@ -43,6 +44,37 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
           : AppRouter.slotsRoute,
       arguments: user.role == UserRole.player ? user : null,
     );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isSubmitting = true;
+      _errorMessage = null;
+    });
+    try {
+      final AppUser? user = await widget.repository.signInWithGoogle();
+      if (user == null) {
+        if (mounted) {
+          setState(() => _isSubmitting = false);
+        }
+        return;
+      }
+      if (!mounted) return;
+      widget.session.signIn(user);
+      Navigator.of(context).pushReplacementNamed(
+        user.role == UserRole.admin
+            ? AppRouter.adminBookingsRoute
+            : AppRouter.slotsRoute,
+        arguments: user.role == UserRole.player ? user : null,
+      );
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _errorMessage = 'حصلت مشكلة في تسجيل Google. جرّب تاني.';
+        });
+      }
+    }
   }
 
   @override
@@ -134,7 +166,12 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     key: const Key('demo_entry_button'),
-                    onPressed: _isSubmitting ? null : _enterDemo,
+                    onPressed: _isSubmitting
+                        ? null
+                        : widget.repository.usesLiveAuthentication &&
+                              !_isAdminLogin
+                        ? _signInWithGoogle
+                        : _enterDemo,
                     icon: Icon(
                       _isAdminLogin
                           ? Icons.dashboard_outlined
@@ -145,9 +182,19 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                           ? 'ثانية واحدة...'
                           : _isAdminLogin
                           ? 'ادخل وجرب لوحة الإدارة'
+                          : widget.repository.usesLiveAuthentication
+                          ? 'الدخول بحساب Google'
                           : 'ادخل وجرب الحجز',
                     ),
                   ),
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colors.error),
+                    ),
+                  ],
                   const SizedBox(height: 18),
                   Text(
                     _isAdminLogin

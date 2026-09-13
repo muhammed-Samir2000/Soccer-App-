@@ -7,6 +7,12 @@ class MockAuthRepository implements AuthRepository {
   static const String _demoAdminEmail = 'admin@mal3ab.test';
 
   @override
+  bool get usesLiveAuthentication => false;
+
+  @override
+  Future<AppUser?> restoreSession() async => null;
+
+  @override
   Future<AppUser> signInAsDemoPlayer() async => const AppUser(
     id: 'player-001',
     name: 'الكابتن أحمد',
@@ -37,7 +43,7 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<AppUser> signInWithGoogle() =>
+  Future<AppUser?> signInWithGoogle() =>
       signInWithEmailPassword(email: 'player@mal3ab.test', password: '');
 
   @override

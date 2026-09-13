@@ -1,6 +1,10 @@
 import 'app_user.dart';
 
 abstract interface class AuthRepository {
+  bool get usesLiveAuthentication;
+
+  Future<AppUser?> restoreSession();
+
   /// Development-only entry points. Production authentication replaces these.
   Future<AppUser> signInAsDemoPlayer();
 
@@ -11,7 +15,8 @@ abstract interface class AuthRepository {
     required String password,
   });
 
-  Future<AppUser> signInWithGoogle();
+  /// Starts OAuth. A browser redirect can complete the session after reload.
+  Future<AppUser?> signInWithGoogle();
 
   Future<void> requestPasswordReset({required String email});
 }
