@@ -22,6 +22,10 @@ class MockMatchRepository implements MatchRepository {
     final BookingMatch match = BookingMatch(
       bookingReference: booking.reference,
       organizerId: booking.playerId,
+      organizerName: booking.playerName,
+      startsAt: booking.slot.startTime,
+      endsAt: booking.slot.endTime,
+      fieldNumber: booking.fieldNumber,
       capacity: capacity,
       inviteToken: 'demo-${_nextTokenNumber++}-${booking.reference}',
       participants: <MatchParticipant>[
@@ -68,6 +72,10 @@ class MockMatchRepository implements MatchRepository {
     final BookingMatch match = BookingMatch(
       bookingReference: bookingReference,
       organizerId: 'demo-organizer',
+      organizerName: 'الكابتن أحمد',
+      startsAt: DateTime(2026, 9, 15, 19),
+      endsAt: DateTime(2026, 9, 15, 20),
+      fieldNumber: 1,
       capacity: 10,
       inviteToken: inviteToken,
       participants: const <MatchParticipant>[

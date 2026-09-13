@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/app_page_app_bar.dart';
+import '../../../core/utils/arabic_date.dart';
+import '../../../core/utils/booking_input_validators.dart';
 import '../../auth/domain/app_session.dart';
 import '../../auth/domain/auth_repository.dart';
 import '../../auth/domain/app_user.dart';
@@ -27,9 +29,17 @@ class MatchInviteScreen extends StatefulWidget {
 }
 
 class _MatchInviteScreenState extends State<MatchInviteScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
   late Future<BookingMatch?> _match;
   bool _submitting = false;
   String? _error;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -38,6 +48,9 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
   }
 
   Future<void> _respond(MatchParticipationStatus status) async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
     setState(() {
       _submitting = true;
       _error = null;
@@ -55,7 +68,7 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
       final BookingMatch updated = await widget.matchRepository.respondToInvite(
         inviteToken: widget.inviteToken,
         playerId: player.id,
-        playerName: player.name,
+        playerName: _nameController.text.trim(),
         status: status,
       );
       if (!mounted) {
@@ -81,7 +94,7 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
     body: FutureBuilder<BookingMatch?>(
       future: _match,
       builder: (BuildContext context, AsyncSnapshot<BookingMatch?> snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return const Center(child: CircularProgressIndicator());
         }
         final BookingMatch? match = snapshot.data;
@@ -96,7 +109,7 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
         return Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -109,6 +122,24 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text('${match.goingCount} من ${match.capacity} أكدوا حضورهم'),
+                  const SizedBox(height: 16),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('منظّم الماتش: ${match.organizerName}'),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${arabicDateLabel(match.startsAt)} | ${_time(match.startsAt)} - ${_time(match.endsAt)}',
+                          ),
+                          const SizedBox(height: 6),
+                          Text('ملعب ${match.fieldNumber}'),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   const Text(
                     'هتدخل بجوجل الأول عشان ردك يتسجل باسمك. في النسخة التجريبية الدخول مباشر، وبعد الربط هيكون Google OAuth حقيقي.',
@@ -123,7 +154,21 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      controller: _nameController,
+                      maxLength: 80,
+                      validator: (String? value) =>
+                          validatePlayerName(value ?? ''),
+                      decoration: const InputDecoration(
+                        labelText: 'اكتب اسمك عشان الكابتن يعرف مين جاي',
+                        prefixIcon: Icon(Icons.person_outline),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   FilledButton.icon(
                     key: const Key('match_invite_going_button'),
                     onPressed: _submitting || match.isFull
@@ -149,4 +194,9 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
       },
     ),
   );
+}
+
+String _time(DateTime value) {
+  final int hour = value.hour % 12 == 0 ? 12 : value.hour % 12;
+  return '$hour:00 ${value.hour >= 12 ? 'م' : 'ص'}';
 }

@@ -169,6 +169,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('مطلوب لاعب للماتش'), findsOneWidget);
+    await tester.enterText(find.byType(TextFormField), 'الكابتن علي');
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('match_invite_going_button')),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
     await tester.tap(find.byKey(const Key('match_invite_going_button')));
     await tester.pumpAndSettle();
 

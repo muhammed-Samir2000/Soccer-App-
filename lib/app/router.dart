@@ -76,9 +76,7 @@ class AppRouter {
               repository: dependencies.matchRepository,
             );
           case matchInviteRoute:
-            final String? inviteToken = Uri.tryParse(
-              settings.name ?? '',
-            )?.queryParameters['token'];
+            final String? inviteToken = _inviteToken(settings.name);
             if (inviteToken == null || inviteToken.isEmpty) {
               return const Scaffold(
                 body: Center(child: Text('رابط الدعوة غير صالح.')),
@@ -156,6 +154,17 @@ class AppRouter {
 
     final AppUser? sessionUser = dependencies.session.currentUser;
     return sessionUser?.role == UserRole.player ? sessionUser : null;
+  }
+
+  String? _inviteToken(String? routeName) {
+    final String? routeToken = Uri.tryParse(
+      routeName ?? '',
+    )?.queryParameters['token'];
+    if (routeToken != null && routeToken.isNotEmpty) {
+      return routeToken;
+    }
+    // Flutter Web hash routing can expose the query only in Uri.base.
+    return Uri.tryParse(Uri.base.fragment)?.queryParameters['token'];
   }
 
   Widget _playerEntry() {

@@ -4,6 +4,10 @@ class BookingMatch {
   BookingMatch({
     required this.bookingReference,
     required this.organizerId,
+    required this.organizerName,
+    required this.startsAt,
+    required this.endsAt,
+    required this.fieldNumber,
     required this.capacity,
     required this.inviteToken,
     required List<MatchParticipant> participants,
@@ -11,6 +15,10 @@ class BookingMatch {
 
   final String bookingReference;
   final String organizerId;
+  final String organizerName;
+  final DateTime startsAt;
+  final DateTime endsAt;
+  final int fieldNumber;
   final int capacity;
 
   /// Mock-only value. Production stores only a token hash and resolves it by RPC.
@@ -31,6 +39,10 @@ class BookingMatch {
   BookingMatch copyWith({List<MatchParticipant>? participants}) => BookingMatch(
     bookingReference: bookingReference,
     organizerId: organizerId,
+    organizerName: organizerName,
+    startsAt: startsAt,
+    endsAt: endsAt,
+    fieldNumber: fieldNumber,
     capacity: capacity,
     inviteToken: inviteToken,
     participants: participants ?? this.participants,

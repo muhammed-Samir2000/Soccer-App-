@@ -1,5 +1,12 @@
 # Workflow Log
 
+### 2026-09-13 12:45 | Invite Details And Web Hash Routing | Status: completed
+
+- Actor: Codex.
+- Changed: invitation now displays the booking captain, date, time range, and field; invited players enter a display name before responding `جاي` or `مش جاي`; small screens scroll safely. Flutter Web routing now reads the invitation token from the hash fragment, avoiding a permanent loading state on copied links.
+- Verification: `flutter analyze` passed with no issues; focused invitation widget and domain tests passed.
+- Source control: commit and push outcome follow after this workflow update.
+
 ### 2026-09-13 12:10 | Direct Demo Invitation Link | Status: completed
 
 - Actor: Codex.
