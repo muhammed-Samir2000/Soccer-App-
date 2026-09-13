@@ -13,6 +13,9 @@ class MockAuthRepository implements AuthRepository {
   Future<AppUser?> restoreSession() async => null;
 
   @override
+  Future<void> signOut() async {}
+
+  @override
   Future<AppUser> signInAsDemoPlayer() async => const AppUser(
     id: 'player-001',
     name: 'الكابتن أحمد',

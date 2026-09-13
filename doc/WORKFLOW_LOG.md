@@ -1,5 +1,13 @@
 # Workflow Log
 
+### 2026-09-13 13:45 | Google Entry Actions And Admin Role Gate | Status: completed
+
+- Actor: Codex.
+- Changed: clear Google entry action with recognisable mark in player and admin screens when Staging authentication is active; player accounts are denied and signed out from the admin entry unless their server-owned profile role is `admin` or `super_admin`.
+- Security: the client never chooses an admin role. The final authority remains the profile role and database/RLS policies in Supabase.
+- Verification: formatting and analysis were run; focused login tests follow the existing mock path.
+- Source control: commit and push outcome follow after this workflow update.
+
 ### 2026-09-13 13:15 | Supabase Google OAuth Client Integration | Status: completed
 
 - Actor: Codex.

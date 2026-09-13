@@ -39,6 +39,9 @@ class SupabaseAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> signOut() => _client.auth.signOut();
+
+  @override
   Future<AppUser> signInAsDemoPlayer() =>
       Future<AppUser>.error(UnsupportedError('الدخول التجريبي غير متاح.'));
 

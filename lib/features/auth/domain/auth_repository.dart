@@ -5,6 +5,8 @@ abstract interface class AuthRepository {
 
   Future<AppUser?> restoreSession();
 
+  Future<void> signOut();
+
   /// Development-only entry points. Production authentication replaces these.
   Future<AppUser> signInAsDemoPlayer();
 

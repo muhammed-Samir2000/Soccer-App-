@@ -59,6 +59,16 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
         }
         return;
       }
+      if (_isAdminLogin && user.role != UserRole.admin) {
+        await widget.repository.signOut();
+        if (mounted) {
+          setState(() {
+            _isSubmitting = false;
+            _errorMessage = 'الحساب ده مش مدعو لفريق الإدارة.';
+          });
+        }
+        return;
+      }
       if (!mounted) return;
       widget.session.signIn(user);
       Navigator.of(context).pushReplacementNamed(
@@ -164,29 +174,36 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  FilledButton.icon(
-                    key: const Key('demo_entry_button'),
-                    onPressed: _isSubmitting
-                        ? null
-                        : widget.repository.usesLiveAuthentication &&
-                              !_isAdminLogin
-                        ? _signInWithGoogle
-                        : _enterDemo,
-                    icon: Icon(
-                      _isAdminLogin
-                          ? Icons.dashboard_outlined
-                          : Icons.sports_soccer_outlined,
+                  if (widget.repository.usesLiveAuthentication)
+                    FilledButton.icon(
+                      key: const Key('google_sign_in_button'),
+                      onPressed: _isSubmitting ? null : _signInWithGoogle,
+                      icon: const _GoogleMark(),
+                      label: Text(
+                        _isSubmitting
+                            ? 'ثانية واحدة...'
+                            : _isAdminLogin
+                            ? 'دخول الإدارة بحساب Google'
+                            : 'المتابعة بحساب Google',
+                      ),
+                    )
+                  else
+                    FilledButton.icon(
+                      key: const Key('demo_entry_button'),
+                      onPressed: _isSubmitting ? null : _enterDemo,
+                      icon: Icon(
+                        _isAdminLogin
+                            ? Icons.dashboard_outlined
+                            : Icons.sports_soccer_outlined,
+                      ),
+                      label: Text(
+                        _isSubmitting
+                            ? 'ثانية واحدة...'
+                            : _isAdminLogin
+                            ? 'ادخل وجرب لوحة الإدارة'
+                            : 'ادخل وجرب الحجز',
+                      ),
                     ),
-                    label: Text(
-                      _isSubmitting
-                          ? 'ثانية واحدة...'
-                          : _isAdminLogin
-                          ? 'ادخل وجرب لوحة الإدارة'
-                          : widget.repository.usesLiveAuthentication
-                          ? 'الدخول بحساب Google'
-                          : 'ادخل وجرب الحجز',
-                    ),
-                  ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -198,7 +215,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                   const SizedBox(height: 18),
                   Text(
                     _isAdminLogin
-                        ? 'في النسخة الفعلية، دخول الإدارة هيكون بدعوة وصلاحية موثقة.'
+                        ? 'دخول الإدارة متاح للحسابات المدعوة والمصرح لها فقط.'
                         : 'في النسخة الفعلية، هتختار طريقة دخول آمنة مناسبة ليك.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall,
@@ -211,6 +228,29 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
       ),
     );
   }
+}
+
+class _GoogleMark extends StatelessWidget {
+  const _GoogleMark();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 24,
+    height: 24,
+    alignment: Alignment.center,
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      shape: BoxShape.circle,
+    ),
+    child: const Text(
+      'G',
+      style: TextStyle(
+        color: Color(0xff4285F4),
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
 }
 
 class _PitchLogo extends StatelessWidget {
