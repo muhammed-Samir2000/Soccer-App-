@@ -7,7 +7,7 @@
 - Changed: `MockMatchRepository` restores a valid demo match from a correctly shaped demo invitation token; added regression coverage for a fresh repository opening the copied link.
 - Scope and security: this reconstruction is strictly a local demo affordance. It accepts only the explicit `demo-<number>-HAGZ-...` token shape and exposes no phone, e-mail, or persistent data. Production continues to resolve a random hashed token in Supabase RPCs.
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 38 tests.
-- Source control: commit and push outcome follow after this workflow update.
+- Source control: commit `da81d03` (`Make demo match invitations directly testable`) pushed to `origin/main`.
 
 ### 2026-09-13 11:45 | Group Match Invitations And RSVP | Status: completed (mock and backend-ready)
 
