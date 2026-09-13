@@ -4,6 +4,10 @@ import 'package:soccer_booking_app/app/app.dart';
 import 'package:soccer_booking_app/app/app_dependencies.dart';
 import 'package:soccer_booking_app/app/router.dart';
 import 'package:soccer_booking_app/features/auth/domain/app_user.dart';
+import 'package:soccer_booking_app/features/bookings/domain/booking.dart';
+import 'package:soccer_booking_app/features/bookings/domain/booking_match.dart';
+import 'package:soccer_booking_app/features/bookings/domain/match_repository.dart';
+import 'package:soccer_booking_app/features/slots/domain/time_slot.dart';
 
 void main() {
   testWidgets('only an available slot opens the booking summary route', (
@@ -148,4 +152,53 @@ void main() {
     expect(find.text('ادخل وجرب لوحة الإدارة'), findsOneWidget);
     expect(find.byType(TextFormField), findsNothing);
   });
+
+  testWidgets('lets an invited player confirm attendance from a secure route', (
+    WidgetTester tester,
+  ) async {
+    final AppDependencies dependencies = AppDependencies.mock();
+    final MatchRepository repository = dependencies.matchRepository;
+    final BookingMatchFixture fixture = await _createInviteFixture(repository);
+
+    await tester.pumpWidget(
+      SoccerBookingApp(
+        dependencies: dependencies,
+        initialRoute: '${AppRouter.matchInviteRoute}?token=${fixture.token}',
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('مطلوب لاعب للماتش'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('match_invite_going_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('2 من 10 أكدوا حضورهم'), findsOneWidget);
+  });
+}
+
+class BookingMatchFixture {
+  const BookingMatchFixture(this.token);
+  final String token;
+}
+
+Future<BookingMatchFixture> _createInviteFixture(
+  MatchRepository repository,
+) async {
+  final Booking booking = Booking(
+    reference: 'HAGZ-INVITE-1',
+    playerId: 'organizer-1',
+    playerName: 'الكابتن أحمد',
+    slot: TimeSlot(
+      id: 'invite-slot',
+      startTime: DateTime(2026, 9, 15, 19),
+      endTime: DateTime(2026, 9, 15, 20),
+      status: SlotStatus.booked,
+    ),
+    services: const [],
+    totalPrice: 800,
+    status: BookingStatus.confirmed,
+    fieldNumber: 1,
+  );
+  final BookingMatch match = await repository.getOrCreateForBooking(booking);
+  return BookingMatchFixture(match.inviteToken);
 }

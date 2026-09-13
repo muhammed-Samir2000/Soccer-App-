@@ -73,6 +73,14 @@ class BookingConfirmationScreen extends StatelessWidget {
               label: const Text('الانتقال إلى حجوزاتي'),
             ),
             const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamed(AppRouter.matchHubRoute, arguments: booking),
+              icon: const Icon(Icons.group_add_outlined),
+              label: const Text('لمّ فريقك وابعث الدعوة'),
+            ),
+            const SizedBox(height: 12),
             const Text(
               'رمز QR هيظهر هنا بعد ربط خدمة التحقق في مرحلة لاحقة.',
               textAlign: TextAlign.center,

@@ -1,12 +1,15 @@
 # Current Phase
 
 ## Phase
-- Extended mock product scope complete; backend work requires approved scope.
+- Group-match RSVP slice complete in mock mode; authenticated backend delivery is pending.
 
 ## Current Focus
 - Supabase staging foundation is prepared. Await an approved staging project,
   authentication choices, and public runtime connection values before replacing
   mock repositories.
+- Group match invitations and attendance are ready behind a repository
+  boundary. The checked-in migration is intentionally not applied to the
+  Production-labelled Supabase project without a staging rehearsal and backup.
 
 ## Completed
 - Product, scope, and player-flow documentation.
@@ -23,8 +26,12 @@
   overlap prevention, and security test checklist.
 - Supabase client initialization through runtime-only Dart defines; mock
   repositories remain active until authenticated adapters are verified.
+- Group match flow: organizer creates a shareable invitation from a confirmed
+  booking; teammates respond `جاي` or `مش جاي`; capacity is configurable and
+  never changes the validity of the original booking.
 
 ## Next
-- Create an approved Supabase staging project, apply the checked-in migration,
-  verify RLS, and provide the public URL and anon key through a secure channel.
-- Do not connect a production project, service-role key, or payment provider.
+- Configure Supabase Auth Google OAuth and an approved staging project, then
+  apply and verify both checked-in migrations before replacing mock RSVP data.
+- Do not apply unreviewed migrations to the Production-labelled project, use a
+  service-role key in Flutter, or add a payment provider.

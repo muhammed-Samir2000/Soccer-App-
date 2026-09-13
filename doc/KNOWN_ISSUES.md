@@ -18,3 +18,9 @@
 - Flutter SDK is available at `F:\Apps\flutter-sdk`, but its `bin` folder is not in `PATH`; the project currently invokes it by absolute path.
 - Android emulators are listed by Flutter, but the attempted `Pixel_7` launch remained `offline`; a manual Android app run could not be completed. Resolve emulator boot/ADB readiness before Android release validation.
 - The supported Chrome launch reached the Flutter debug-service connection wait during this session, but the tool session did not receive a completed connection confirmation; repeat an interactive Chrome run before release validation.
+- Group-match invitations, attendance, and copied links are mock/in-memory. A
+  refresh, another browser, or another device cannot see the RSVP data until
+  authenticated Supabase repositories replace `MockMatchRepository`.
+- The production group-invite migration is checked in but not applied. Google
+  OAuth, real invitation-token issuance, token revocation, waitlist behavior,
+  push reminders, and notification-consent enforcement remain backend work.

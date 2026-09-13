@@ -1,5 +1,16 @@
 # Workflow Log
 
+### 2026-09-13 11:45 | Group Match Invitations And RSVP | Status: completed (mock and backend-ready)
+
+- Actor: Codex.
+- Intent: allow a booking organizer to build a 10-player team, copy a share link, and let authenticated players declare `جاي` or `مش جاي` without exposing contact data.
+- Changed: immutable group-match and participant domain models; repository contract and in-memory implementation; organizer team hub; invitation route and attendee response screen; booking-confirmation and My Bookings entry points; focused unit/widget tests; secure Supabase group-match migration.
+- Product decisions: the organizer is automatically `جاي`; default capacity is 10 but is configurable from 2 to 30; a booking remains valid even if the team is not full; the mock UI labels its direct Google entry as demo-only.
+- Security: roster UI never displays phone numbers or e-mail. The migration stores only SHA-256 invitation-token hashes, offers an anonymous no-PII invite summary, and requires authenticated RSVP through a serialized RPC to prevent capacity races. No Supabase schema was applied because the available project is labelled Production and needs staging rehearsal/backup first.
+- Verification: `dart format --set-exit-if-changed lib test` passed with zero changes; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 37 tests.
+- Source control: feature branch `codex/group-booking-rsvp` created and pushed before implementation. Commit and merge/push outcome follow after this documentation update.
+- Next action: configure Google OAuth and staging Supabase, apply both migrations in staging, execute the RLS/RPC checklist, then replace mock RSVP storage with authenticated adapters.
+
 ### 2026-09-10 19:00 | Portable Docker Web Deployment | Status: completed
 
 - Actor: Codex.

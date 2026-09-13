@@ -11,6 +11,8 @@ import '../features/bookings/domain/booking.dart';
 import '../features/bookings/presentation/booking_confirmation_screen.dart';
 import '../features/bookings/presentation/booking_summary_screen.dart';
 import '../features/bookings/presentation/my_bookings_screen.dart';
+import '../features/bookings/presentation/match_hub_screen.dart';
+import '../features/bookings/presentation/match_invite_screen.dart';
 import '../features/bookings/presentation/payment_placeholder_screen.dart';
 import '../features/slots/domain/time_slot.dart';
 import '../features/slots/presentation/available_slots_screen.dart';
@@ -33,12 +35,16 @@ class AppRouter {
   static const adminFinancialAnalyticsRoute = '/admin-financial-analytics';
   static const notificationsRoute = '/notifications';
   static const myBookingsRoute = '/my-bookings';
+  static const matchHubRoute = '/match-hub';
+  static const matchInviteRoute = '/match-invite';
 
   Route<void> onGenerateRoute(RouteSettings settings) {
     return MaterialPageRoute<void>(
       settings: settings,
       builder: (BuildContext context) {
-        switch (settings.name) {
+        final String routeName =
+            Uri.tryParse(settings.name ?? launchRoute)?.path ?? launchRoute;
+        switch (routeName) {
           case slotsRoute:
             final AppUser? player = _playerFrom(settings.arguments);
             if (player == null) {
@@ -63,6 +69,26 @@ class AppRouter {
             return MyBookingsScreen(
               playerId: settings.arguments! as String,
               repository: dependencies.bookingRepository,
+            );
+          case matchHubRoute:
+            return MatchHubScreen(
+              booking: settings.arguments! as Booking,
+              repository: dependencies.matchRepository,
+            );
+          case matchInviteRoute:
+            final String? inviteToken = Uri.tryParse(
+              settings.name ?? '',
+            )?.queryParameters['token'];
+            if (inviteToken == null || inviteToken.isEmpty) {
+              return const Scaffold(
+                body: Center(child: Text('رابط الدعوة غير صالح.')),
+              );
+            }
+            return MatchInviteScreen(
+              inviteToken: inviteToken,
+              matchRepository: dependencies.matchRepository,
+              authRepository: dependencies.authRepository,
+              session: dependencies.session,
             );
           case adminBookingsRoute:
             if (!dependencies.session.isAdmin) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/router.dart';
 import '../../../core/utils/arabic_date.dart';
 import '../../../core/utils/booking_input_validators.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
@@ -144,6 +145,17 @@ class _BookingsList extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(_bookingTime(bookings[index])),
+              if (!isPast) ...[
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  onPressed: () => Navigator.of(context).pushNamed(
+                    AppRouter.matchHubRoute,
+                    arguments: bookings[index],
+                  ),
+                  icon: const Icon(Icons.groups_outlined),
+                  label: const Text('إدارة فريق الماتش'),
+                ),
+              ],
               if (isPast) ...[
                 const Divider(height: 24),
                 _ResultEditor(
