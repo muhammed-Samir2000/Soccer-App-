@@ -3,7 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/app/app.dart';
 import 'package:soccer_booking_app/app/app_dependencies.dart';
 import 'package:soccer_booking_app/app/router.dart';
+import 'package:soccer_booking_app/features/auth/data/mock_auth_repository.dart';
+import 'package:soccer_booking_app/features/auth/domain/app_session.dart';
 import 'package:soccer_booking_app/features/auth/domain/app_user.dart';
+import 'package:soccer_booking_app/features/auth/presentation/mock_login_screen.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking_match.dart';
 import 'package:soccer_booking_app/features/bookings/domain/match_repository.dart';
@@ -153,6 +156,24 @@ void main() {
     expect(find.byType(TextFormField), findsNothing);
   });
 
+  testWidgets('uses the outlined Google entry for live authentication', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MockLoginScreen(
+          repository: const _LiveAuthRepository(),
+          session: AppSession(),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const Key('google_sign_in_button')), findsOneWidget);
+    expect(find.byType(OutlinedButton), findsOneWidget);
+    expect(find.text('المتابعة بحساب Google'), findsOneWidget);
+    expect(find.byKey(const Key('demo_entry_button')), findsNothing);
+  });
+
   testWidgets('lets an invited player confirm attendance from a secure route', (
     WidgetTester tester,
   ) async {
@@ -180,6 +201,13 @@ void main() {
 
     expect(find.text('2 من 10 أكدوا حضورهم'), findsOneWidget);
   });
+}
+
+class _LiveAuthRepository extends MockAuthRepository {
+  const _LiveAuthRepository();
+
+  @override
+  bool get usesLiveAuthentication => true;
 }
 
 class BookingMatchFixture {

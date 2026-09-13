@@ -18,6 +18,13 @@ class SupabaseAuthRepository implements AuthRepository {
     if (user == null) {
       return null;
     }
+    try {
+      // The migration is deliberately optional during the staged rollout.
+      // Once deployed, it turns a matching manager invitation into a role.
+      await _client.rpc('accept_admin_email_invitation');
+    } on PostgrestException {
+      // Existing staging environments can authenticate before this migration.
+    }
     final Map<String, dynamic>? profile = await _client
         .from('profiles')
         .select('full_name, platform_role')

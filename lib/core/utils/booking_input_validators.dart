@@ -20,6 +20,15 @@ String? validateEgyptianMobile(String value) {
   return null;
 }
 
+String? validateEmailAddress(String? value) {
+  final String email = (value ?? '').trim().toLowerCase();
+  if (email.length > 254 ||
+      !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
+    return 'اكتب بريد إلكتروني صحيح.';
+  }
+  return null;
+}
+
 String? validateShortText(String value, String label, {bool required = true}) {
   final String text = value.trim();
   if (required && text.isEmpty) {

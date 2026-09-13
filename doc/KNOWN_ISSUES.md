@@ -1,14 +1,17 @@
 # Known Issues
 
 ## Current Limitations
-- The Supabase SDK can initialize from runtime-only values, but the app still
-  uses mock repositories. Authenticated Supabase repositories, RLS acceptance
-  testing, and persistent data are not connected yet.
+- Google OAuth is configured for Staging and its client adapter exists, but a
+  complete manual Google sign-in and profile/session verification still needs
+  to be recorded. Booking, RSVP, settings, notification, and staff data still
+  use mock repositories.
 - Using mock data initially.
 - No payment integration yet.
 - Financial analytics uses mock booking totals and booking statuses, not payment receipts, refunds, taxes, discounts, or cash-reconciliation records.
 - In-app mock notifications are available, but no push, SMS, WhatsApp, or scheduled background delivery is connected.
-- Google and email/password contracts are prepared, but no authentication provider, email sender, account persistence, password hashing, or password-reset delivery is connected.
+- Google authentication is available only when runtime Staging configuration is
+  supplied. Email/password registration, password reset, and all notification
+  delivery remain intentionally unimplemented.
 - Booking confirmation reserves a QR payload and UI location, but does not render or scan a QR code yet.
 - Notification toggles are stored in mock memory only; no push, SMS, WhatsApp, scheduled reminder, or marketing message is sent.
 - Field allocation, recurring bookings, permissions, and match results are mock in-memory data. A real backend must enforce concurrent booking rules and persist all updates.
@@ -25,3 +28,7 @@
 - The production group-invite migration is checked in but not applied. Google
   OAuth, real invitation-token issuance, token revocation, waitlist behavior,
   push reminders, and notification-consent enforcement remain backend work.
+- The admin-team UI records e-mail invitations in mock memory for the current
+  release. `20260913143000_admin_email_invitations.sql` is not yet reported as
+  applied; until it is and a Supabase staff repository is connected, inviting a
+  real e-mail will not grant production access.

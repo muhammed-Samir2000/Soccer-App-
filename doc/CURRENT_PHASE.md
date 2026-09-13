@@ -1,15 +1,16 @@
 # Current Phase
 
 ## Phase
-- Group-match RSVP slice complete in mock mode; authenticated backend delivery is pending.
+- Google authentication and the first two Supabase staging migrations are in place; authenticated booking, RSVP, and staff repositories remain pending.
 
 ## Current Focus
-- Supabase staging foundation is prepared. Await an approved staging project,
-  authentication choices, and public runtime connection values before replacing
-  mock repositories.
-- Group match invitations and attendance are ready behind a repository
-  boundary. The checked-in migration is intentionally not applied to the
-  Production-labelled Supabase project without a staging rehearsal and backup.
+- The approved Supabase staging project has the booking and group-match schema,
+  RLS verification, Google provider, and local redirect URLs configured.
+- The Flutter client can start Google OAuth from runtime-only configuration.
+  Complete one manual sign-in before relying on it operationally.
+- Staff invitations are implemented in mock UI and a new backend migration is
+  checked in. The migration must be applied before a real manager can grant an
+  invited Google account venue access.
 
 ## Completed
 - Product, scope, and player-flow documentation.
@@ -29,9 +30,15 @@
 - Group match flow: organizer creates a shareable invitation from a confirmed
   booking; teammates respond `جاي` or `مش جاي`; capacity is configurable and
   never changes the validity of the original booking.
+- Google entry uses the standard outlined, multi-colour Google treatment and
+  explains that the password is entered only on Google's official page.
+- Admin team management now records an e-mail invitation, venue role, three
+  permissions, and pending/active invitation state in mock mode.
 
 ## Next
-- Configure Supabase Auth Google OAuth and an approved staging project, then
-  apply and verify both checked-in migrations before replacing mock RSVP data.
-- Do not apply unreviewed migrations to the Production-labelled project, use a
-  service-role key in Flutter, or add a payment provider.
+- Review and apply `20260913143000_admin_email_invitations.sql` to Staging;
+  create one real venue and manager membership, then manually verify that a
+  matching Google account is promoted only after accepting its invitation.
+- Replace mock staff, booking, slot, and match repositories incrementally only
+  after the RLS/RPC acceptance checks pass. Do not use a service-role key in
+  Flutter or add a payment provider.

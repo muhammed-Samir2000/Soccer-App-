@@ -276,67 +276,427 @@ class StaffPermissionsScreen extends StatefulWidget {
 
 class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
   late Future<List<StaffMember>> _staff;
+
   @override
   void initState() {
     super.initState();
     _staff = widget.repository.getStaff();
   }
 
+  void _reload() {
+    setState(() {
+      _staff = widget.repository.getStaff();
+    });
+  }
+
+  Future<void> _openInviteSheet() async {
+    final StaffMember? invitation = await showModalBottomSheet<StaffMember>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) => const _StaffInviteSheet(),
+    );
+    if (invitation == null || !mounted) {
+      return;
+    }
+    try {
+      await widget.repository.inviteStaff(invitation);
+      _reload();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('اتسجلت دعوة ${invitation.email} بصلاحياتها.'),
+          ),
+        );
+      }
+    } on ArgumentError catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.message.toString())));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: const AppPageAppBar(title: 'صلاحيات الموظفين'),
+    appBar: AppPageAppBar(
+      title: 'فريق الإدارة',
+      actions: [
+        IconButton(
+          key: const Key('staff_invite_action'),
+          tooltip: 'دعوة عضو',
+          onPressed: _openInviteSheet,
+          icon: const Icon(Icons.person_add_alt_1_outlined),
+        ),
+      ],
+    ),
+    floatingActionButton: FloatingActionButton.extended(
+      onPressed: _openInviteSheet,
+      icon: const Icon(Icons.person_add_alt_1_outlined),
+      label: const Text('دعوة عضو'),
+    ),
     body: FutureBuilder<List<StaffMember>>(
       future: _staff,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return ListView(
-          children: snapshot.data!
-              .map(
-                (StaffMember member) => ExpansionTile(
-                  title: Text(member.name),
-                  children: [
-                    _permission(
-                      member,
-                      'إضافة حجز',
-                      member.canCreateBookings,
-                      (value) => member.copyWith(canCreateBookings: value),
-                    ),
-                    _permission(
-                      member,
-                      'تعديل أو إلغاء',
-                      member.canEditBookings,
-                      (value) => member.copyWith(canEditBookings: value),
-                    ),
-                    _permission(
-                      member,
-                      'التقارير المالية',
-                      member.canViewFinancialReports,
-                      (value) =>
-                          member.copyWith(canViewFinancialReports: value),
-                    ),
-                  ],
+      builder:
+          (BuildContext context, AsyncSnapshot<List<StaffMember>> snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+              children: [
+                const _InvitationGuidanceCard(),
+                const SizedBox(height: 20),
+                Text(
+                  'الأعضاء والصلاحيات',
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-              )
-              .toList(),
-        );
-      },
+                const SizedBox(height: 8),
+                ...snapshot.data!.map(
+                  (StaffMember member) => _StaffPermissionCard(
+                    member: member,
+                    onPermissionChanged: (StaffMember updated) async {
+                      await widget.repository.updateStaff(updated);
+                      _reload();
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
     ),
   );
-  Widget _permission(
-    StaffMember member,
-    String label,
-    bool value,
-    StaffMember Function(bool) update,
-  ) => SwitchListTile(
+}
+
+class _InvitationGuidanceCard extends StatelessWidget {
+  const _InvitationGuidanceCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    return Card(
+      color: colors.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.admin_panel_settings_outlined,
+              color: colors.onPrimaryContainer,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ادعُ فريقك بالبريد',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: colors.onPrimaryContainer,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'العضو بيدخل بنفس حساب Google المدعو. مش ممكن تعيين Super Admin من هنا.',
+                    style: TextStyle(color: colors.onPrimaryContainer),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StaffPermissionCard extends StatelessWidget {
+  const _StaffPermissionCard({
+    required this.member,
+    required this.onPermissionChanged,
+  });
+
+  final StaffMember member;
+  final ValueChanged<StaffMember> onPermissionChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    final bool pending =
+        member.invitationStatus == StaffInvitationStatus.pending;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ExpansionTile(
+        leading: CircleAvatar(
+          backgroundColor: pending
+              ? colors.secondaryContainer
+              : colors.primaryContainer,
+          foregroundColor: pending
+              ? colors.onSecondaryContainer
+              : colors.onPrimaryContainer,
+          child: Icon(
+            pending ? Icons.schedule_outlined : Icons.verified_user_outlined,
+          ),
+        ),
+        title: Text(member.name),
+        subtitle: Text('${member.email}\n${member.role.label}'),
+        trailing: _InvitationStatusChip(status: member.invitationStatus),
+        children: [
+          const Divider(height: 1),
+          _PermissionSwitch(
+            member: member,
+            label: 'إضافة حجز',
+            value: member.canCreateBookings,
+            update: (bool value) => member.copyWith(canCreateBookings: value),
+            onChanged: onPermissionChanged,
+          ),
+          _PermissionSwitch(
+            member: member,
+            label: 'تعديل أو إلغاء الحجز',
+            value: member.canEditBookings,
+            update: (bool value) => member.copyWith(canEditBookings: value),
+            onChanged: onPermissionChanged,
+          ),
+          _PermissionSwitch(
+            member: member,
+            label: 'عرض التحليل المالي',
+            value: member.canViewFinancialReports,
+            update: (bool value) =>
+                member.copyWith(canViewFinancialReports: value),
+            onChanged: onPermissionChanged,
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _InvitationStatusChip extends StatelessWidget {
+  const _InvitationStatusChip({required this.status});
+
+  final StaffInvitationStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    final bool pending = status == StaffInvitationStatus.pending;
+    return Chip(
+      avatar: Icon(
+        pending ? Icons.schedule_outlined : Icons.check_circle_outline,
+        size: 18,
+      ),
+      label: Text(status.label),
+      backgroundColor: pending
+          ? colors.secondaryContainer
+          : colors.primaryContainer,
+      side: BorderSide.none,
+      labelStyle: TextStyle(
+        color: pending
+            ? colors.onSecondaryContainer
+            : colors.onPrimaryContainer,
+      ),
+    );
+  }
+}
+
+class _PermissionSwitch extends StatelessWidget {
+  const _PermissionSwitch({
+    required this.member,
+    required this.label,
+    required this.value,
+    required this.update,
+    required this.onChanged,
+  });
+
+  final StaffMember member;
+  final String label;
+  final bool value;
+  final StaffMember Function(bool) update;
+  final ValueChanged<StaffMember> onChanged;
+
+  @override
+  Widget build(BuildContext context) => SwitchListTile(
     title: Text(label),
     value: value,
-    onChanged: (bool enabled) async {
-      await widget.repository.updateStaff(update(enabled));
-      setState(() => _staff = widget.repository.getStaff());
-    },
+    onChanged: (bool enabled) => onChanged(update(enabled)),
   );
+}
+
+class _StaffInviteSheet extends StatefulWidget {
+  const _StaffInviteSheet();
+
+  @override
+  State<_StaffInviteSheet> createState() => _StaffInviteSheetState();
+}
+
+class _StaffInviteSheetState extends State<_StaffInviteSheet> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  StaffRole _role = StaffRole.reception;
+  bool _canCreateBookings = true;
+  bool _canEditBookings = true;
+  bool _canViewFinancialReports = false;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    super.dispose();
+  }
+
+  void _setRole(StaffRole role) {
+    setState(() {
+      _role = role;
+      if (role == StaffRole.manager) {
+        _canCreateBookings = true;
+        _canEditBookings = true;
+        _canViewFinancialReports = true;
+      }
+    });
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    final String email = _email.text.trim().toLowerCase();
+    final String name = _name.text.trim();
+    Navigator.of(context).pop(
+      StaffMember(
+        id: '',
+        name: name.isEmpty ? email.split('@').first : name,
+        email: email,
+        role: _role,
+        invitationStatus: StaffInvitationStatus.pending,
+        canCreateBookings: _canCreateBookings,
+        canEditBookings: _canEditBookings,
+        canViewFinancialReports: _canViewFinancialReports,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final EdgeInsets viewInsets = MediaQuery.viewInsetsOf(context);
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20, 12, 20, viewInsets.bottom + 24),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'دعوة عضو لفريق الإدارة',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'حدد البريد والصلاحيات قبل ما يدخل العضو بحسابه على Google.',
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _email,
+                  key: const Key('staff_invite_email'),
+                  autocorrect: false,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'البريد الإلكتروني',
+                    hintText: 'name@gmail.com',
+                    prefixIcon: Icon(Icons.alternate_email_outlined),
+                  ),
+                  validator: validateEmailAddress,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _name,
+                  key: const Key('staff_invite_name'),
+                  maxLength: 80,
+                  textInputAction: TextInputAction.done,
+                  decoration: const InputDecoration(
+                    labelText: 'اسم للعرض (اختياري)',
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  validator: (String? value) =>
+                      validateShortText(value ?? '', 'الاسم', required: false),
+                ),
+                const SizedBox(height: 8),
+                Text('الدور', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                SegmentedButton<StaffRole>(
+                  segments: const [
+                    ButtonSegment<StaffRole>(
+                      value: StaffRole.reception,
+                      icon: Icon(Icons.support_agent_outlined),
+                      label: Text('استقبال'),
+                    ),
+                    ButtonSegment<StaffRole>(
+                      value: StaffRole.manager,
+                      icon: Icon(Icons.manage_accounts_outlined),
+                      label: Text('مدير'),
+                    ),
+                  ],
+                  selected: <StaffRole>{_role},
+                  onSelectionChanged: (Set<StaffRole> value) =>
+                      _setRole(value.first),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'الصلاحيات',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('إضافة حجز'),
+                  value: _canCreateBookings,
+                  onChanged: (bool? value) =>
+                      setState(() => _canCreateBookings = value ?? false),
+                ),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('تعديل أو إلغاء الحجز'),
+                  value: _canEditBookings,
+                  onChanged: (bool? value) =>
+                      setState(() => _canEditBookings = value ?? false),
+                ),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('عرض التحليل المالي'),
+                  value: _canViewFinancialReports,
+                  onChanged: (bool? value) =>
+                      setState(() => _canViewFinancialReports = value ?? false),
+                ),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  key: const Key('staff_invite_submit'),
+                  onPressed: _submit,
+                  icon: const Icon(Icons.send_outlined),
+                  label: const Text('حفظ الدعوة والصلاحيات'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class NotificationSettingsScreen extends StatefulWidget {

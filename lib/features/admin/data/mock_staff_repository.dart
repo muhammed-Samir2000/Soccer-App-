@@ -7,6 +7,9 @@ class MockStaffRepository implements StaffRepository {
         const StaffMember(
           id: 'staff-001',
           name: 'أحمد الاستقبال',
+          email: 'ahmed@mal3ab.test',
+          role: StaffRole.reception,
+          invitationStatus: StaffInvitationStatus.active,
           canCreateBookings: true,
           canEditBookings: true,
           canViewFinancialReports: false,
@@ -14,6 +17,9 @@ class MockStaffRepository implements StaffRepository {
         const StaffMember(
           id: 'staff-002',
           name: 'محمود المشرف',
+          email: 'mahmoud@mal3ab.test',
+          role: StaffRole.manager,
+          invitationStatus: StaffInvitationStatus.active,
           canCreateBookings: true,
           canEditBookings: true,
           canViewFinancialReports: true,
@@ -24,6 +30,24 @@ class MockStaffRepository implements StaffRepository {
 
   @override
   Future<List<StaffMember>> getStaff() async => List.unmodifiable(_staff);
+
+  @override
+  Future<StaffMember> inviteStaff(StaffMember staffMember) async {
+    final String email = staffMember.email.trim().toLowerCase();
+    final bool alreadyInvited = _staff.any(
+      (StaffMember item) => item.email.toLowerCase() == email,
+    );
+    if (alreadyInvited) {
+      throw ArgumentError('البريد ده موجود بالفعل ضمن فريق الإدارة.');
+    }
+    final StaffMember invitation = staffMember.copyWith(
+      id: 'staff-${(_staff.length + 1).toString().padLeft(3, '0')}',
+      email: email,
+      invitationStatus: StaffInvitationStatus.pending,
+    );
+    _staff.add(invitation);
+    return invitation;
+  }
 
   @override
   Future<void> updateStaff(StaffMember staffMember) async {

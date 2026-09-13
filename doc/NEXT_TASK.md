@@ -1,17 +1,21 @@
 # Next Task
 
 ## Task
-- Create a staging Supabase project, configure Google OAuth redirect URLs, and
-  validate the booking and group-match invitation migrations before adding
-  authenticated Supabase repository adapters.
+- Apply and validate the staff e-mail invitation migration in the configured
+  Staging project, then connect the admin-team repository to that venue.
 
 ## Requirements
 - Read `SPECKIT.md`, `WORKFLOW_LOG.md`, and `DECISIONS_LOG.md` before any future work.
 - Preserve the Flutter/Dart-only application and the domain repository contracts.
-- Apply `supabase/migrations/20260910170000_initial_booking_schema.sql` and
-  `supabase/migrations/20260913110000_group_match_invites.sql` only to the
-  approved staging project. Test token expiry, revocation, anonymous preview,
-  authenticated RSVP, capacity race handling, and every RLS policy.
+- The initial booking and group-match migrations are reported as applied and
+  their RLS/function inventory was checked. Do not rerun them.
+- Review and apply
+  `supabase/migrations/20260913143000_admin_email_invitations.sql` once to
+  Staging. Seed a venue, fields, and one authorized manager using a controlled
+  administrative process before testing the UI against it.
+- Test a pending invitation, a case-insensitive matching Google e-mail, a
+  non-invited player denial, a revoked invitation, permission updates, and the
+  inability to create a `super_admin` account from the client.
 - Do not connect a production project without a backup, explicit approval, and
   a completed staging rehearsal. Never place a service-role key in Flutter.
 - Do not add a payment provider without separately approved payment scope.
@@ -21,5 +25,5 @@
 - After any future completed change set, verify it, commit it, and push it to `origin/main`; record the commit hash and outcome in `WORKFLOW_LOG.md`.
 
 ## Expected Output
-- Confirmed Auth/OAuth and RLS results, then an approved prompt to implement
-  authenticated Supabase repository adapters and transactional notifications.
+- A verified e-mail-to-membership promotion path and a Supabase staff
+  repository bound to a selected venue, without exposing any service-role key.

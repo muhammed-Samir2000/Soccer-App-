@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:soccer_booking_app/features/admin/presentation/admin_dashboard_screen.dart'
+    show StaffPermissionsScreen;
 import 'package:soccer_booking_app/features/admin/presentation/admin_week_screen.dart';
 import 'package:soccer_booking_app/features/admin/presentation/financial_analytics_screen.dart';
 import 'package:soccer_booking_app/features/admin/data/mock_notification_repository.dart';
 import 'package:soccer_booking_app/features/admin/data/mock_staff_repository.dart';
 import 'package:soccer_booking_app/features/admin/data/mock_venue_settings_repository.dart';
+import 'package:soccer_booking_app/features/admin/domain/staff_member.dart';
 import 'package:soccer_booking_app/features/bookings/data/mock_booking_repository.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking.dart';
 import 'package:soccer_booking_app/features/slots/data/mock_slot_repository.dart';
@@ -154,5 +157,45 @@ void main() {
     expect(find.text('حركة التحصيل'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('مقارنة بالفترة السابقة'), 300);
     expect(find.text('مقارنة بالفترة السابقة'), findsOneWidget);
+  });
+
+  testWidgets('adds an email invitation with manager permissions', (
+    WidgetTester tester,
+  ) async {
+    final MockStaffRepository repository = MockStaffRepository();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: StaffPermissionsScreen(repository: repository),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('ادعُ فريقك بالبريد'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('staff_invite_action')));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('staff_invite_email')),
+      'team.lead@example.com',
+    );
+    await tester.tap(find.text('مدير'));
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('staff_invite_submit')),
+      240,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.tap(find.byKey(const Key('staff_invite_submit')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('فريق الإدارة'), findsOneWidget);
+    final invited = (await repository.getStaff()).last;
+    expect(invited.email, 'team.lead@example.com');
+    expect(invited.invitationStatus, StaffInvitationStatus.pending);
+    expect(invited.canCreateBookings, isTrue);
+    expect(invited.canEditBookings, isTrue);
+    expect(invited.canViewFinancialReports, isTrue);
   });
 }

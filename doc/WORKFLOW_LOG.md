@@ -1,19 +1,28 @@
 # Workflow Log
 
+### 2026-09-13 14:30 | Google Sign-In Polish And Admin E-Mail Invitations | Status: completed (mock UI and backend-ready)
+
+- Actor: Codex.
+- Changed: replaced the improvised Google mark with a shared, outlined Google sign-in control and clear password-safety copy; upgraded Team Management to capture a specific e-mail, venue role, three permissions, and pending/active state; added mock duplicate-email protection and focused widget/unit coverage.
+- Security: added a separate Staging migration for a row-level-secured e-mail allowlist. Only a signed-in account whose normalized Google JWT e-mail matches a pending invite can receive an `admin` profile role and venue membership through `accept_admin_email_invitation()`. The Flutter client cannot create a super-admin or use a service-role key.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 41 tests.
+- Backend status: the initial and group-match migrations, RLS inventory, and Google OAuth configuration were reported verified in Staging. The new admin invitation migration is checked in but must be reviewed and applied once before using real invitations.
+- Source control: commit and push outcome follows after this workflow update.
+
 ### 2026-09-13 13:45 | Google Entry Actions And Admin Role Gate | Status: completed
 
 - Actor: Codex.
 - Changed: clear Google entry action with recognisable mark in player and admin screens when Staging authentication is active; player accounts are denied and signed out from the admin entry unless their server-owned profile role is `admin` or `super_admin`.
 - Security: the client never chooses an admin role. The final authority remains the profile role and database/RLS policies in Supabase.
 - Verification: formatting and analysis were run; focused login tests follow the existing mock path.
-- Source control: commit and push outcome follow after this workflow update.
+- Source control: commit `2218351` (`Add Google entry actions and admin role gate`) pushed to `origin/main`.
 
 ### 2026-09-13 13:15 | Supabase Google OAuth Client Integration | Status: completed
 
 - Actor: Codex.
 - Changed: added a Supabase-backed authentication repository, Google OAuth launch, authenticated-session restoration, profile-to-player/admin role mapping, and live-auth login behaviour when runtime Staging configuration is supplied.
 - Security: Project URL and publishable key remain runtime-only `--dart-define` values and are not committed. No Google Client Secret, service-role key, database password, booking repository, or invitation repository was added to the Flutter client.
-- Verification: `flutter analyze` passed with no issues; full test run started after the interface adjustment.
+- Verification: `flutter analyze` passed with no issues; the later full suite passed after the interface adjustment.
 - Next action: run the web app with Staging runtime defines, manually complete Google sign-in, then confirm the generated profile and session. Authenticated booking and invite repository adapters remain the next scoped change.
 
 ### 2026-09-13 12:45 | Invite Details And Web Hash Routing | Status: completed

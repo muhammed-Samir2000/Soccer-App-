@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
+import '../../../shared/widgets/google_sign_in_button.dart';
 import '../domain/app_session.dart';
 import '../domain/app_user.dart';
 import '../domain/auth_repository.dart';
@@ -93,7 +94,11 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
     final String title = _isAdminLogin
         ? 'دخول فريق الإدارة'
         : 'احجز ملعبك بسهولة';
-    final String subtitle = _isAdminLogin
+    final String subtitle = widget.repository.usesLiveAuthentication
+        ? _isAdminLogin
+              ? 'ادخل بحساب Google المدعو لفريق إدارة الملعب.'
+              : 'ادخل بحساب Google عشان تحفظ حجوزاتك وفريق ماتشك.'
+        : _isAdminLogin
         ? 'جرّب إدارة الملاعب دلوقتي من غير بريد أو كلمة مرور.'
         : 'جرّب الحجز وشوف المواعيد الفاضية من غير تسجيل بيانات.';
 
@@ -164,7 +169,9 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'نسخة تجريبية: الدخول ده لا ينشئ حساباً ولا يحفظ أي بيانات.',
+                            widget.repository.usesLiveAuthentication
+                                ? 'تسجيل Google بيتم في صفحة Google المؤمّنة. بيانات الحجز لسه تجريبية في النسخة دي.'
+                                : 'نسخة تجريبية: الدخول ده لا ينشئ حساباً ولا يحفظ أي بيانات.',
                             style: TextStyle(
                               color: colors.onSecondaryContainer,
                             ),
@@ -175,17 +182,13 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                   ),
                   const SizedBox(height: 24),
                   if (widget.repository.usesLiveAuthentication)
-                    FilledButton.icon(
+                    GoogleSignInButton(
                       key: const Key('google_sign_in_button'),
                       onPressed: _isSubmitting ? null : _signInWithGoogle,
-                      icon: const _GoogleMark(),
-                      label: Text(
-                        _isSubmitting
-                            ? 'ثانية واحدة...'
-                            : _isAdminLogin
-                            ? 'دخول الإدارة بحساب Google'
-                            : 'المتابعة بحساب Google',
-                      ),
+                      isLoading: _isSubmitting,
+                      label: _isAdminLogin
+                          ? 'دخول الإدارة بحساب Google'
+                          : 'المتابعة بحساب Google',
                     )
                   else
                     FilledButton.icon(
@@ -216,6 +219,8 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                   Text(
                     _isAdminLogin
                         ? 'دخول الإدارة متاح للحسابات المدعوة والمصرح لها فقط.'
+                        : widget.repository.usesLiveAuthentication
+                        ? 'هتتنقل لصفحة Google الرسمية، وإحنا لا بنشوف ولا بنخزن كلمة مرورك.'
                         : 'في النسخة الفعلية، هتختار طريقة دخول آمنة مناسبة ليك.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall,
@@ -228,29 +233,6 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
       ),
     );
   }
-}
-
-class _GoogleMark extends StatelessWidget {
-  const _GoogleMark();
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 24,
-    height: 24,
-    alignment: Alignment.center,
-    decoration: const BoxDecoration(
-      color: Colors.white,
-      shape: BoxShape.circle,
-    ),
-    child: const Text(
-      'G',
-      style: TextStyle(
-        color: Color(0xff4285F4),
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-      ),
-    ),
-  );
 }
 
 class _PitchLogo extends StatelessWidget {
