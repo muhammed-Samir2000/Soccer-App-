@@ -7,6 +7,7 @@
 - UX: the saved-account action is positioned above the fold on short screens. The Google button remains available for a different account; no password is collected by the app.
 - Verification: `dart format --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test --reporter compact` passed; 42 tests passed, including the restored-session confirmation and root-screen back-action regression coverage.
 - Limitation: this changes the local client entry experience only. Supabase still owns the persisted Google session, and booking data remains mock/in-memory until the authenticated repositories are implemented.
+- Source control: commit `873ba36` (`Require explicit continuation of saved sessions`) prepared for `origin/main`.
 
 ### 2026-09-21 11:35 | Authenticated Player Booking Continuity | Status: completed (local staging preview)
 
