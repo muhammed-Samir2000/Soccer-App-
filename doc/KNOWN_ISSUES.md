@@ -1,6 +1,8 @@
 # Known Issues
 
 ## Current Limitations
+- The Codex embedded browser does not render Flutter Canvas reliably. Use a
+  full Edge or Chrome window for local web acceptance tests.
 - Google OAuth is configured for Staging and its client adapter exists, but a
   complete manual Google sign-in and profile/session verification still needs
   to be recorded. Booking, RSVP, settings, notification, and staff data still

@@ -1,5 +1,12 @@
 # Workflow Log
 
+### 2026-09-21 10:47 | Local Live Preview Port Recovery | Status: ready for manual Google test
+
+- Actor: Codex.
+- Issue: an old static `build/web` Python preview and the Flutter debug server were both bound to port `7368`, so local requests could reach stale assets instead of the runtime-configured application.
+- Resolution: stopped the old static preview, verified the Flutter server responds on `127.0.0.1:7368`, verified `flutter_bootstrap.js` returns HTTP 200, and opened a visible Microsoft Edge window directly at the live root route.
+- Remaining acceptance step: complete one Google sign-in as a player and verify that the redirected session enters the slot screen. The Codex embedded browser is not a supported Flutter Canvas test surface; use Edge or Chrome for this local acceptance check.
+
 ### 2026-09-21 09:30 | Live Google OAuth Preview | Status: awaiting manual acceptance test
 
 - Actor: Codex.
