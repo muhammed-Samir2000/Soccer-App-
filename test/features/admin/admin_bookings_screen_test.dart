@@ -69,8 +69,11 @@ class _EmptyBookingRepository implements BookingRepository {
       const Stream<BookingActivity>.empty();
 
   @override
-  Future<Booking> createBooking(BookingDraft draft) =>
-      throw UnimplementedError();
+  Future<Booking> createBooking(
+    BookingDraft draft, {
+    String playerId = '',
+    String playerName = '',
+  }) => throw UnimplementedError();
 
   @override
   Future<List<Booking>> getBookings() async => <Booking>[];
@@ -123,8 +126,11 @@ class _FailingBookingRepository implements BookingRepository {
       const Stream<BookingActivity>.empty();
 
   @override
-  Future<Booking> createBooking(BookingDraft draft) =>
-      throw UnimplementedError();
+  Future<Booking> createBooking(
+    BookingDraft draft, {
+    String playerId = '',
+    String playerName = '',
+  }) => throw UnimplementedError();
 
   @override
   Future<List<Booking>> getBookings() =>

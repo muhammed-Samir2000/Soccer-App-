@@ -4,7 +4,13 @@ import 'booking_draft.dart';
 import 'match_result.dart';
 
 abstract interface class BookingRepository {
-  Future<Booking> createBooking(BookingDraft draft);
+  /// Creates the player's own booking. Production implementations must derive
+  /// and verify this identity from the authenticated session server-side.
+  Future<Booking> createBooking(
+    BookingDraft draft, {
+    required String playerId,
+    required String playerName,
+  });
 
   Future<List<Booking>> getBookings();
 

@@ -1,19 +1,16 @@
 # Known Issues
 
 ## Current Limitations
-- The current local Staging URL used for Google OAuth has no DNS A record, so
-  Supabase authorization cannot start. Recopy and verify the active Project URL
-  from Supabase API settings before retrying.
 - `flutter build apk --release` currently fails in Kotlin incremental-cache
   cleanup because the project is on `F:` while cached pub packages are on `C:`.
   Android release signing is also configured with a debug key and is not safe
   for distribution.
 - The Codex embedded browser does not render Flutter Canvas reliably. Use a
   full Edge or Chrome window for local web acceptance tests.
-- Google OAuth is configured for Staging and its client adapter exists, but a
-  complete manual Google sign-in and profile/session verification still needs
-  to be recorded. Booking, RSVP, settings, notification, and staff data still
-  use mock repositories.
+- Google OAuth is configured for the resumed Staging project and its client
+  adapter exists, but a complete manual Google sign-in and returned-session
+  verification still needs to be recorded. Booking, RSVP, settings,
+  notification, and staff data still use mock repositories.
 - Using mock data initially.
 - No payment integration yet.
 - Financial analytics uses mock booking totals and booking statuses, not payment receipts, refunds, taxes, discounts, or cash-reconciliation records.
@@ -27,6 +24,10 @@
 - The current admin route guard is a mock client-side session boundary, not production authorization. Google or email/password sign-in must resolve an approved server-side role, and backend policies must deny player access to every admin resource.
 - Slot watching updates inside the current mock process after booking activity. Supabase Realtime or a WebSocket backend must supply cross-device updates and server-side booking locks before live multi-user use.
 - Venue settings, field allocation, and slot availability are mock/in-memory. The active mock slot repository now reflects booking capacity, but a backend must persist and enforce the same source of truth across devices.
+- Google-authenticated player identity now labels a newly created mock booking
+  and makes it visible in `حجوزاتي` during the current app session only. A
+  refresh, another browser, or another device still loses the booking until an
+  authenticated Supabase booking repository and server-side booking RPC exist.
 - Flutter SDK is available at `F:\Apps\flutter-sdk`, but its `bin` folder is not in `PATH`; the project currently invokes it by absolute path.
 - Android emulators are listed by Flutter, but the attempted `Pixel_7` launch remained `offline`; a manual Android app run could not be completed. Resolve emulator boot/ADB readiness before Android release validation.
 - The live Edge preview now connects to Flutter and initializes Supabase, but a

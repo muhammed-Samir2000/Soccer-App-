@@ -1,5 +1,19 @@
 # Workflow Log
 
+### 2026-09-21 11:35 | Authenticated Player Booking Continuity | Status: completed (local staging preview)
+
+- Actor: Codex.
+- Changed: passed the active player's identity explicitly through the slot, booking-summary, and payment routes into the booking repository. A booking created after Google sign-in now belongs to the authenticated player's in-session identity and appears in `حجوزاتي` after confirmation.
+- Safety: direct routes validate their required route arguments and return to player entry instead of failing from incomplete navigation state. The repository contract makes identity explicit; a production implementation must still derive and validate identity server-side.
+- Verification: `dart format --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test --reporter compact` passed; 41 tests passed, including the end-to-end widget journey from an available slot through confirmation to `حجوزاتي`.
+- Limitation: slots, bookings, results, invitations, staff, and notifications remain mock/in-memory. Google authenticates a user, but this change does not save a booking to Supabase or make it available after refresh, in another browser, or on another device.
+
+### 2026-09-21 11:20 | Supabase DNS Recovery And Google Provider Check | Status: ready for manual local acceptance
+
+- Actor: Codex and project owner.
+- Result: after the project was resumed, the configured Staging host resolved successfully and its Auth settings endpoint returned HTTP 200 with the Google provider enabled.
+- Verification: the localhost-only static Flutter Web preview on `127.0.0.1:7368` returned HTTP 200 for its root and bootstrap assets. Use a full Edge or Chrome window for the Google OAuth acceptance check.
+
 ### 2026-09-21 11:05 | Release Readiness Code Review | Status: blocked
 
 - Actor: Codex.

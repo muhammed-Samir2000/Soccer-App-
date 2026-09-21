@@ -1,17 +1,17 @@
 # Current Phase
 
 ## Phase
-- Google authentication and the first two Supabase staging migrations are in place; authenticated booking, RSVP, and staff repositories remain pending.
+- Google authentication and the first two Supabase staging migrations are in place. The local player journey carries the authenticated identity into mock bookings; authenticated Supabase booking, RSVP, and staff repositories remain pending.
 
 ## Current Focus
-- Release readiness is blocked by an invalid or inactive configured Staging
-  Project URL. Verify it from Supabase before attempting Google OAuth again.
 - The approved Supabase staging project has the booking and group-match schema,
   RLS verification, Google provider, and local redirect URLs configured.
-- The Flutter client can start Google OAuth from runtime-only configuration.
-  The live Edge preview is running at the configured local return URL; complete
-  one manual Google sign-in and profile/session check before relying on it
-  operationally.
+- The Flutter client can start Google OAuth from runtime-only configuration, and
+  the resumed Staging host now resolves. Complete a manual Edge or Chrome
+  Google-sign-in/returned-session check before relying on it operationally.
+- A local authenticated player can create a mock booking and see it in
+  `حجوزاتي` during the same app session. Persistence remains the next backend
+  milestone.
 - Staff invitations are implemented in mock UI and a new backend migration is
   checked in. The migration must be applied before a real manager can grant an
   invited Google account venue access.
@@ -40,8 +40,8 @@
   permissions, and pending/active invitation state in mock mode.
 
 ## Next
-- Verify the active Supabase Project URL and successful Google OAuth redirect.
-- Replace mock staff, booking, slot, and match repositories incrementally only
+- Record successful Google OAuth redirect acceptance, then replace mock staff,
+  booking, slot, and match repositories incrementally only
   after the RLS/RPC acceptance checks pass. Do not use a service-role key in
   Flutter or add a payment provider.
 - Fix the Android Kotlin cache/environment issue and create a protected release

@@ -79,6 +79,17 @@ void main() {
     expect(find.text('HAGZ-1001'), findsOneWidget);
     expect(find.text('مشروبات ساقعة'), findsOneWidget);
     expect(find.textContaining('860'), findsAtLeastNWidgets(1));
+
+    await tester.scrollUntilVisible(
+      find.text('الانتقال إلى حجوزاتي'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('الانتقال إلى حجوزاتي'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('حجوزاتي'), findsAtLeastNWidgets(1));
+    expect(find.textContaining('HAGZ-1001'), findsOneWidget);
   });
 
   testWidgets('keeps a public admin link out of the player experience', (

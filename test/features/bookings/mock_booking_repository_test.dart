@@ -21,10 +21,15 @@ void main() {
     );
     final MockBookingRepository repository = MockBookingRepository();
 
-    final Booking booking = await repository.createBooking(draft);
+    final Booking booking = await repository.createBooking(
+      draft,
+      playerId: 'google-player-001',
+      playerName: 'محمد من Google',
+    );
 
     expect(booking.reference, 'HAGZ-1001');
-    expect(booking.playerName, 'الكابتن أحمد');
+    expect(booking.playerId, 'google-player-001');
+    expect(booking.playerName, 'محمد من Google');
     expect(booking.status, BookingStatus.confirmed);
     expect(booking.slot, same(slot));
     expect(booking.services, draft.selectedServices);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
+import '../../auth/domain/app_user.dart';
 import '../domain/booking.dart';
 import '../domain/booking_draft.dart';
 import '../domain/booking_repository.dart';
@@ -10,10 +11,12 @@ class PaymentPlaceholderScreen extends StatefulWidget {
   const PaymentPlaceholderScreen({
     super.key,
     required this.draft,
+    required this.player,
     required this.repository,
   });
 
   final BookingDraft draft;
+  final AppUser player;
   final BookingRepository repository;
 
   @override
@@ -33,6 +36,8 @@ class _PaymentPlaceholderScreenState extends State<PaymentPlaceholderScreen> {
     try {
       final Booking booking = await widget.repository.createBooking(
         widget.draft,
+        playerId: widget.player.id,
+        playerName: widget.player.name,
       );
       if (!mounted) {
         return;

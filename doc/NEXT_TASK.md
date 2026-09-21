@@ -1,15 +1,17 @@
 # Next Task
 
 ## Task
-- Verify the active Supabase Project URL and Google OAuth return flow, then
-  connect the first RLS-backed slot and booking repository to the selected
-  venue.
+- Record the successful local Google OAuth return flow, then connect the first
+  RLS-backed slot and booking repository to the selected venue.
 
 ## Requirements
 - Read `SPECKIT.md`, `WORKFLOW_LOG.md`, and `DECISIONS_LOG.md` before any future work.
 - Preserve the Flutter/Dart-only application and the domain repository contracts.
-- Do not retry OAuth until the configured Supabase Project URL resolves in DNS
-  and the browser can load its `/auth/v1/authorize` endpoint.
+- The configured Supabase Project URL was resumed and resolves in DNS. Verify
+  the full browser return/session path before treating authentication as ready.
+- Preserve the local contract that carries the active player's identity into a
+  booking, but let Supabase derive the final identity from `auth.uid()` rather
+  than trusting a client-supplied player ID.
 - The initial booking and group-match migrations are reported as applied and
   their RLS/function inventory was checked. Do not rerun them.
 - Review and apply

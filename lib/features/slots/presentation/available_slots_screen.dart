@@ -255,7 +255,10 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                           onTap: slot.isAvailable
                               ? () => Navigator.of(context).pushNamed(
                                   AppRouter.bookingSummaryRoute,
-                                  arguments: slot,
+                                  arguments: BookingSummaryRouteArguments(
+                                    slot: slot,
+                                    player: widget.player,
+                                  ),
                                 )
                               : null,
                         ),

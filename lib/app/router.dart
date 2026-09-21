@@ -55,10 +55,22 @@ class AppRouter {
               repository: dependencies.slotRepository,
             );
           case bookingSummaryRoute:
-            return BookingSummaryScreen(slot: settings.arguments! as TimeSlot);
+            final Object? arguments = settings.arguments;
+            if (arguments is! BookingSummaryRouteArguments) {
+              return _playerEntry();
+            }
+            return BookingSummaryScreen(
+              slot: arguments.slot,
+              player: arguments.player,
+            );
           case paymentPlaceholderRoute:
+            final Object? arguments = settings.arguments;
+            if (arguments is! PaymentPlaceholderRouteArguments) {
+              return _playerEntry();
+            }
             return PaymentPlaceholderScreen(
-              draft: settings.arguments! as BookingDraft,
+              draft: arguments.draft,
+              player: arguments.player,
               repository: dependencies.bookingRepository,
             );
           case bookingConfirmationRoute:
@@ -181,4 +193,24 @@ class AppRouter {
       session: dependencies.session,
     );
   }
+}
+
+class BookingSummaryRouteArguments {
+  const BookingSummaryRouteArguments({
+    required this.slot,
+    required this.player,
+  });
+
+  final TimeSlot slot;
+  final AppUser player;
+}
+
+class PaymentPlaceholderRouteArguments {
+  const PaymentPlaceholderRouteArguments({
+    required this.draft,
+    required this.player,
+  });
+
+  final BookingDraft draft;
+  final AppUser player;
 }

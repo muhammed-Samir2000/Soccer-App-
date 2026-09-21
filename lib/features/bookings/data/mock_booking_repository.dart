@@ -126,10 +126,14 @@ class MockBookingRepository implements BookingRepository {
   int get fieldCount => _fieldCount;
 
   @override
-  Future<Booking> createBooking(BookingDraft draft) async {
+  Future<Booking> createBooking(
+    BookingDraft draft, {
+    String playerId = 'player-001',
+    String playerName = 'الكابتن أحمد',
+  }) async {
     return _create(
-      playerId: 'player-001',
-      playerName: 'الكابتن أحمد',
+      playerId: playerId,
+      playerName: playerName,
       phoneNumber: '01012345678',
       draft: draft,
       status: BookingStatus.confirmed,

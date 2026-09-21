@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
+import '../../auth/domain/app_user.dart';
 import '../../slots/domain/time_slot.dart';
 import '../data/mock_optional_services.dart';
 import '../domain/booking_draft.dart';
 import '../domain/optional_service.dart';
 
 class BookingSummaryScreen extends StatefulWidget {
-  const BookingSummaryScreen({super.key, required this.slot});
+  const BookingSummaryScreen({
+    super.key,
+    required this.slot,
+    required this.player,
+  });
 
   final TimeSlot slot;
+  final AppUser player;
 
   @override
   State<BookingSummaryScreen> createState() => _BookingSummaryScreenState();
@@ -89,7 +95,10 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
               onPressed: () {
                 Navigator.of(context).pushNamed(
                   AppRouter.paymentPlaceholderRoute,
-                  arguments: _draft,
+                  arguments: PaymentPlaceholderRouteArguments(
+                    draft: _draft,
+                    player: widget.player,
+                  ),
                 );
               },
               child: Text('كمّل للدفع - ${_formatPrice(_draft.totalPrice)}'),
