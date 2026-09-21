@@ -1,5 +1,12 @@
 # Workflow Log
 
+### 2026-09-21 10:55 | Persistent Local Staging Preview | Status: ready for manual Google test
+
+- Actor: Codex.
+- Changed: built a local Web preview with the approved Staging runtime configuration and served it with a dedicated localhost-only process, rather than a Flutter debug process that could stop when its terminal session ended.
+- Verification: the local root page and `flutter_bootstrap.js` both returned HTTP 200 from `127.0.0.1:7368`; Microsoft Edge was opened only after this validation.
+- Remaining acceptance step: select `المتابعة بحساب Google` in the full Edge window and confirm redirect/session restoration. The embedded Codex browser remains unsuitable for Flutter Canvas rendering.
+
 ### 2026-09-21 10:47 | Local Live Preview Port Recovery | Status: ready for manual Google test
 
 - Actor: Codex.
