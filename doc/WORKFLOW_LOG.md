@@ -7,6 +7,7 @@
 - Safety: direct routes validate their required route arguments and return to player entry instead of failing from incomplete navigation state. The repository contract makes identity explicit; a production implementation must still derive and validate identity server-side.
 - Verification: `dart format --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test --reporter compact` passed; 41 tests passed, including the end-to-end widget journey from an available slot through confirmation to `حجوزاتي`.
 - Limitation: slots, bookings, results, invitations, staff, and notifications remain mock/in-memory. Google authenticates a user, but this change does not save a booking to Supabase or make it available after refresh, in another browser, or on another device.
+- Source control: commit `b78cbdd` (`Keep authenticated player bookings in session`) prepared for `origin/main`.
 
 ### 2026-09-21 11:20 | Supabase DNS Recovery And Google Provider Check | Status: ready for manual local acceptance
 
