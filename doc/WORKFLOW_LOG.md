@@ -7,6 +7,7 @@
 - Changed: the admin entry now receives the current verified session and presents the explicit saved-account continuation action. A super-admin continues to the admin dashboard; a player continues to be denied and signed out from this path.
 - Verification: `dart format --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test --reporter compact` passed; 44 tests passed, including restored super-admin continuation from the admin entry route.
 - Limitation: staff-management records remain mock/in-memory until the Supabase RLS/RPC staff adapter is implemented.
+- Source control: commit `3839c3c` (`Restore super admin sessions at admin entry`) prepared for `origin/main`.
 
 ### 2026-09-21 12:40 | Google-Only Entry And Super-Admin Team Controls | Status: completed (mock UI; backend migration pending)
 
