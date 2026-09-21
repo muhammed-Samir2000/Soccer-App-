@@ -103,6 +103,35 @@ void main() {
     expect(find.text('دخول لوحة الإدارة'), findsNothing);
   });
 
+  testWidgets('asks before continuing a restored player session', (
+    WidgetTester tester,
+  ) async {
+    final AppDependencies dependencies = AppDependencies.mock();
+    dependencies.session.signIn(
+      const AppUser(
+        id: 'saved-player',
+        name: 'لاعب محفوظ',
+        role: UserRole.player,
+      ),
+    );
+
+    await tester.pumpWidget(SoccerBookingApp(dependencies: dependencies));
+    await tester.pumpAndSettle();
+
+    expect(find.text('أنت مسجل بالفعل باسم لاعب محفوظ'), findsOneWidget);
+    expect(
+      find.byKey(const Key('continue_saved_session_button')),
+      findsOneWidget,
+    );
+    expect(find.text('المواعيد الفاضية'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('continue_saved_session_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('المواعيد الفاضية'), findsOneWidget);
+    expect(find.byTooltip('رجوع'), findsNothing);
+  });
+
   testWidgets('opens the admin dashboard only for an admin session', (
     WidgetTester tester,
   ) async {

@@ -181,16 +181,10 @@ class AppRouter {
 
   Widget _playerEntry() {
     final AppUser? player = _playerFrom(null);
-    if (player != null) {
-      return AvailableSlotsScreen(
-        player: player,
-        repository: dependencies.slotRepository,
-      );
-    }
-
     return MockLoginScreen(
       repository: dependencies.authRepository,
       session: dependencies.session,
+      initialUser: player,
     );
   }
 }

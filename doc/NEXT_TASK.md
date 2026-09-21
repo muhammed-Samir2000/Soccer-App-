@@ -12,6 +12,8 @@
 - Preserve the local contract that carries the active player's identity into a
   booking, but let Supabase derive the final identity from `auth.uid()` rather
   than trusting a client-supplied player ID.
+- Preserve the explicit saved-session continuation and sign-out/change-account
+  actions when replacing the mock entry flow with production navigation.
 - The initial booking and group-match migrations are reported as applied and
   their RLS/function inventory was checked. Do not rerun them.
 - Review and apply

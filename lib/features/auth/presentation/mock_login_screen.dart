@@ -14,11 +14,13 @@ class MockLoginScreen extends StatefulWidget {
     required this.repository,
     required this.session,
     this.audience = LoginAudience.player,
+    this.initialUser,
   });
 
   final AuthRepository repository;
   final AppSession session;
   final LoginAudience audience;
+  final AppUser? initialUser;
 
   @override
   State<MockLoginScreen> createState() => _MockLoginScreenState();
@@ -27,8 +29,60 @@ class MockLoginScreen extends StatefulWidget {
 class _MockLoginScreenState extends State<MockLoginScreen> {
   bool _isSubmitting = false;
   String? _errorMessage;
+  late AppUser? _restoredUser;
 
   bool get _isAdminLogin => widget.audience == LoginAudience.admin;
+
+  @override
+  void initState() {
+    super.initState();
+    _restoredUser = widget.initialUser;
+  }
+
+  Future<void> _continueSavedSession() async {
+    final AppUser? user = _restoredUser;
+    if (user == null) {
+      return;
+    }
+    if (_isAdminLogin && user.role != UserRole.admin) {
+      await _signOutSavedSession(
+        errorMessage: 'الحساب ده مش مدعو لفريق الإدارة.',
+      );
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    widget.session.signIn(user);
+    Navigator.of(context).pushReplacementNamed(
+      user.role == UserRole.admin
+          ? AppRouter.adminBookingsRoute
+          : AppRouter.slotsRoute,
+      arguments: user.role == UserRole.player ? user : null,
+    );
+  }
+
+  Future<void> _signOutSavedSession({String? errorMessage}) async {
+    setState(() => _isSubmitting = true);
+    try {
+      await widget.repository.signOut();
+      widget.session.signOut();
+      if (mounted) {
+        setState(() {
+          _restoredUser = null;
+          _isSubmitting = false;
+          _errorMessage = errorMessage;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _errorMessage = 'حصلت مشكلة وإحنا بنسجل خروجك. جرّب تاني.';
+        });
+      }
+    }
+  }
 
   Future<void> _enterDemo() async {
     setState(() => _isSubmitting = true);
@@ -154,33 +208,86 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 28),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: colors.secondaryContainer,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.science_outlined,
-                          color: colors.onSecondaryContainer,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            widget.repository.usesLiveAuthentication
-                                ? 'تسجيل Google بيتم في صفحة Google المؤمّنة. بيانات الحجز لسه تجريبية في النسخة دي.'
-                                : 'نسخة تجريبية: الدخول ده لا ينشئ حساباً ولا يحفظ أي بيانات.',
-                            style: TextStyle(
-                              color: colors.onSecondaryContainer,
+                  if (_restoredUser == null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: colors.secondaryContainer,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.science_outlined,
+                            color: colors.onSecondaryContainer,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              widget.repository.usesLiveAuthentication
+                                  ? 'تسجيل Google بيتم في صفحة Google المؤمّنة. بيانات الحجز لسه تجريبية في النسخة دي.'
+                                  : 'نسخة تجريبية: الدخول ده لا ينشئ حساباً ولا يحفظ أي بيانات.',
+                              style: TextStyle(
+                                color: colors.onSecondaryContainer,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
+                  ],
+                  if (_restoredUser != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        border: Border.all(color: colors.outlineVariant),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.account_circle_outlined,
+                            color: colors.primary,
+                            size: 34,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'أنت مسجل بالفعل باسم ${_restoredUser!.name}',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 12),
+                          FilledButton.icon(
+                            key: const Key('continue_saved_session_button'),
+                            onPressed: _isSubmitting
+                                ? null
+                                : _continueSavedSession,
+                            icon: const Icon(Icons.arrow_forward),
+                            label: const Text('كمل للتطبيق'),
+                          ),
+                          TextButton.icon(
+                            key: const Key('sign_out_saved_session_button'),
+                            onPressed: _isSubmitting
+                                ? null
+                                : _signOutSavedSession,
+                            icon: const Icon(Icons.logout_outlined),
+                            label: const Text(
+                              'تسجيل الخروج واستخدام حساب مختلف',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'أو سجل بحساب Google تاني',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   if (widget.repository.usesLiveAuthentication)
                     GoogleSignInButton(
                       key: const Key('google_sign_in_button'),
@@ -188,7 +295,9 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                       isLoading: _isSubmitting,
                       label: _isAdminLogin
                           ? 'دخول الإدارة بحساب Google'
-                          : 'المتابعة بحساب Google',
+                          : _restoredUser == null
+                          ? 'المتابعة بحساب Google'
+                          : 'تسجيل Google بحساب مختلف',
                     )
                   else
                     FilledButton.icon(

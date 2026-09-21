@@ -1,5 +1,13 @@
 # Workflow Log
 
+### 2026-09-21 12:05 | Explicit Session Continuation And Back Navigation | Status: completed (local staging preview)
+
+- Actor: Codex.
+- Changed: the shared app bar now hides its back action when there is no previous route, removing the inert back arrow from root dashboard screens. A restored Google session now opens an explicit entry screen that identifies the signed-in account and lets the user choose `كمل للتطبيق` or `تسجيل الخروج واستخدام حساب مختلف`.
+- UX: the saved-account action is positioned above the fold on short screens. The Google button remains available for a different account; no password is collected by the app.
+- Verification: `dart format --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test --reporter compact` passed; 42 tests passed, including the restored-session confirmation and root-screen back-action regression coverage.
+- Limitation: this changes the local client entry experience only. Supabase still owns the persisted Google session, and booking data remains mock/in-memory until the authenticated repositories are implemented.
+
 ### 2026-09-21 11:35 | Authenticated Player Booking Continuity | Status: completed (local staging preview)
 
 - Actor: Codex.

@@ -17,10 +17,14 @@ class AppPageAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool canPop = Navigator.of(context).canPop();
     return AppBar(
       automaticallyImplyLeading: false,
       title: Text(title),
-      actions: <Widget>[...actions, if (showBack) const _AppBackButton()],
+      actions: <Widget>[
+        ...actions,
+        if (showBack && canPop) const _AppBackButton(),
+      ],
     );
   }
 }

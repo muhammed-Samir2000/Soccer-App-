@@ -9,6 +9,9 @@
 - The Flutter client can start Google OAuth from runtime-only configuration, and
   the resumed Staging host now resolves. Complete a manual Edge or Chrome
   Google-sign-in/returned-session check before relying on it operationally.
+- A restored Google session now requires an explicit `كمل للتطبيق` action or a
+  visible sign-out/change-account choice; root screens no longer show a
+  non-functional back action.
 - A local authenticated player can create a mock booking and see it in
   `حجوزاتي` during the same app session. Persistence remains the next backend
   milestone.
