@@ -1,5 +1,12 @@
 # Workflow Log
 
+### 2026-09-21 09:30 | Live Google OAuth Preview | Status: awaiting manual acceptance test
+
+- Actor: Codex.
+- Changed: started the Flutter Web debug preview with the approved Staging runtime configuration at the configured local OAuth return URL. The public root route now presents the live Google entry; the prior direct `/slots` demo URL is not the authentication entry point.
+- Verification: Flutter connected to the Edge debug service and Supabase initialization completed. A human must now select `المتابعة بحساب Google`, complete the Google page, and confirm that the app returns with a restored player session.
+- Release gate: this verifies only authentication startup. Bookings, slots, staff, notifications, and RSVPs still use mock repositories, so this is a Staging preview rather than a public booking release.
+
 ### 2026-09-13 14:30 | Google Sign-In Polish And Admin E-Mail Invitations | Status: completed (mock UI and backend-ready)
 
 - Actor: Codex.

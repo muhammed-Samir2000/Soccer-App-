@@ -20,7 +20,9 @@
 - Venue settings, field allocation, and slot availability are mock/in-memory. The active mock slot repository now reflects booking capacity, but a backend must persist and enforce the same source of truth across devices.
 - Flutter SDK is available at `F:\Apps\flutter-sdk`, but its `bin` folder is not in `PATH`; the project currently invokes it by absolute path.
 - Android emulators are listed by Flutter, but the attempted `Pixel_7` launch remained `offline`; a manual Android app run could not be completed. Resolve emulator boot/ADB readiness before Android release validation.
-- The supported Chrome launch reached the Flutter debug-service connection wait during this session, but the tool session did not receive a completed connection confirmation; repeat an interactive Chrome run before release validation.
+- The live Edge preview now connects to Flutter and initializes Supabase, but a
+  complete manual Google sign-in and returned-session check is still required
+  before authentication can pass its release gate.
 - A copied demo invitation can open in a fresh local browser tab, but its RSVP
   data is mock/in-memory. A refresh, another browser, or another device cannot
   see an attendee's response until authenticated Supabase repositories replace

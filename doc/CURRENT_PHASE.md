@@ -7,7 +7,9 @@
 - The approved Supabase staging project has the booking and group-match schema,
   RLS verification, Google provider, and local redirect URLs configured.
 - The Flutter client can start Google OAuth from runtime-only configuration.
-  Complete one manual sign-in before relying on it operationally.
+  The live Edge preview is running at the configured local return URL; complete
+  one manual Google sign-in and profile/session check before relying on it
+  operationally.
 - Staff invitations are implemented in mock UI and a new backend migration is
   checked in. The migration must be applied before a real manager can grant an
   invited Google account venue access.
