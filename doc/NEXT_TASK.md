@@ -28,6 +28,10 @@
 - Implement and test a RLS/RPC-backed `StaffRepository` against the selected
   venue before claiming invitations, phone records, permission changes, or
   revocations are persistent.
+- Apply `supabase/migrations/20260921140000_allow_overnight_venue_hours.sql`
+  once to Staging before persisting a venue schedule that closes after
+  midnight, such as 15:00 to 02:00. Do not modify the already-applied initial
+  migration; this additive migration replaces its old closing-hour constraint.
 - Test a pending invitation, a case-insensitive matching Google e-mail, a
   non-invited player denial, a revoked invitation, permission updates, and the
   inability to create a `super_admin` account from the client.

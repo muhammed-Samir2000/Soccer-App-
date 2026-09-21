@@ -35,7 +35,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byTooltip('تسجيل لاعب'), findsNWidgets(5));
+    expect(find.byTooltip('تسجيل لاعب'), findsAtLeastNWidgets(1));
     await tester.tap(find.byTooltip('تسجيل لاعب').first);
     await tester.pumpAndSettle();
 

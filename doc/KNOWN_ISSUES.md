@@ -24,6 +24,9 @@
 - The current admin route guard is a mock client-side session boundary, not production authorization. Google or email/password sign-in must resolve an approved server-side role, and backend policies must deny player access to every admin resource.
 - Slot watching updates inside the current mock process after booking activity. Supabase Realtime or a WebSocket backend must supply cross-device updates and server-side booking locks before live multi-user use.
 - Venue settings, field allocation, and slot availability are mock/in-memory. The active mock slot repository now reflects booking capacity, but a backend must persist and enforce the same source of truth across devices.
+- Until `20260921140000_allow_overnight_venue_hours.sql` is applied, the
+  existing Supabase `venues` constraint rejects a closing hour earlier than
+  the opening hour. The local mock settings already support overnight shifts.
 - Google-authenticated player identity now labels a newly created mock booking
   and makes it visible in `حجوزاتي` during the current app session only. A
   refresh, another browser, or another device still loses the booking until an

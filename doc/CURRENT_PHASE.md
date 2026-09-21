@@ -17,6 +17,9 @@
   only in the client; the corresponding RLS/RPC migration is pending.
 - Restored Google sessions are now available at the admin entry route, so a
   verified super-admin can explicitly continue to the administration dashboard.
+- Operating schedules support an overnight operational day: for example,
+  3:00 PM to 2:00 AM is an 11-hour shift and the post-midnight hours belong to
+  the day that began the shift. The Supabase constraint migration is pending.
 - A local authenticated player can create a mock booking and see it in
   `حجوزاتي` during the same app session. Persistence remains the next backend
   milestone.

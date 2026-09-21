@@ -7,8 +7,8 @@ class MockVenueSettingsRepository implements VenueSettingsRepository {
   MockVenueSettingsRepository({
     VenueSettings initialSettings = const VenueSettings(
       fieldCount: 3,
-      openingHour: 16,
-      closingHour: 21,
+      openingHour: 15,
+      closingHour: 2,
     ),
   }) : _settings = initialSettings;
 
@@ -31,9 +31,13 @@ class MockVenueSettingsRepository implements VenueSettingsRepository {
       throw ArgumentError('عدد الملاعب لازم يكون بين 1 و12.');
     }
     if (settings.openingHour < 0 ||
-        settings.closingHour > 24 ||
-        settings.openingHour >= settings.closingHour) {
-      throw ArgumentError('اختار موعد فتح قبل موعد القفل.');
+        settings.openingHour > 23 ||
+        settings.closingHour < 0 ||
+        settings.closingHour > 23 ||
+        settings.operatingHours == 0) {
+      throw ArgumentError(
+        'اختار وقتين مختلفين للفتح والقفل. القفل ممكن يكون في اليوم التالي.',
+      );
     }
     _settings = settings;
     _changes.add(settings);

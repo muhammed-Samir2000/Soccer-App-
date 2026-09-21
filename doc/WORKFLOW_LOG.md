@@ -1,5 +1,16 @@
 # Workflow Log
 
+### 2026-09-21 | Overnight Venue Operating Hours | Status: completed
+
+- Actor: Codex.
+- Intent: allow a venue schedule such as opening at 3:00 PM and closing at 2:00 AM the following calendar day, without rejecting it as invalid.
+- Changed: overnight-aware `VenueSettings` duration and hour list; default mock schedule set to 3:00 PM to 2:00 AM; admin day availability, quick/fixed booking timestamps, and occupancy calculations now use an operational day rather than a simple calendar-day comparison; Supabase migration `20260921140000_allow_overnight_venue_hours.sql`; focused settings tests.
+- Decision: a closing hour may be earlier than the opening hour and then means the next calendar day. Equal opening and closing hours remain invalid. Hours from midnight until closing belong to the prior operational day.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test` passed with 45 tests.
+- Blockers/Risks: venue settings are still supplied by the mock repository. Apply the new migration to Staging before a future Supabase settings adapter writes `15:00` to `02:00`.
+- Source control: pending commit and push to `origin/main` after this log update.
+- Next action: apply the overnight-hours migration to Staging, then replace the mock venue-settings repository with an RLS-backed implementation.
+
 ### 2026-09-21 13:10 | Restored Super-Admin Admin Entry | Status: completed (local staging preview)
 
 - Actor: Codex.

@@ -293,26 +293,25 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
             }
             final List<Booking> dayBookings = snapshot.data!
                 .where(
-                  (Booking booking) =>
-                      _sameDay(booking.slot.startTime, widget.day),
+                  (Booking booking) => _isBookingInOperatingDay(
+                    booking,
+                    widget.day,
+                    settings.data!,
+                  ),
                 )
                 .toList();
-            final List<int> availableHours =
-                List<int>.generate(
-                      settings.data!.operatingHours,
-                      (int index) => settings.data!.openingHour + index,
-                    )
-                    .where(
-                      (int hour) =>
-                          dayBookings
-                              .where(
-                                (Booking booking) =>
-                                    booking.slot.startTime.hour == hour,
-                              )
-                              .length <
-                          settings.data!.fieldCount,
-                    )
-                    .toList();
+            final List<int> availableHours = settings.data!.operatingHourList
+                .where(
+                  (int hour) =>
+                      dayBookings
+                          .where(
+                            (Booking booking) =>
+                                booking.slot.startTime.hour == hour,
+                          )
+                          .length <
+                      settings.data!.fieldCount,
+                )
+                .toList();
             return ListView(
               padding: const EdgeInsets.all(20),
               children: [
@@ -343,7 +342,7 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
                     child: ListTile(
                       leading: const Icon(Icons.sports_soccer),
                       title: Text(
-                        '${_formatHour(hour)} - ${_formatHour(hour + 1)}',
+                        '${_formatHour(hour)} - ${_formatHour((hour + 1) % 24)}',
                       ),
                       subtitle: Text('$freeFields ملعب فاضي'),
                       trailing: Semantics(
@@ -874,20 +873,16 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
           DropdownButtonFormField<int>(
             initialValue: _hour,
             decoration: const InputDecoration(labelText: 'الساعة'),
-            items:
-                List<int>.generate(
-                      settings.operatingHours,
-                      (int index) => settings.openingHour + index,
-                    )
-                    .map(
-                      (int hour) => DropdownMenuItem(
-                        value: hour,
-                        child: Text(
-                          '${_formatHour(hour)} - ${_formatHour(hour + 1)}',
-                        ),
-                      ),
-                    )
-                    .toList(),
+            items: settings.operatingHourList
+                .map(
+                  (int hour) => DropdownMenuItem(
+                    value: hour,
+                    child: Text(
+                      '${_formatHour(hour)} - ${_formatHour((hour + 1) % 24)}',
+                    ),
+                  ),
+                )
+                .toList(),
             onChanged: (int? hour) {
               if (hour != null) setState(() => _hour = hour);
             },
@@ -910,11 +905,12 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
   }
 
   Future<void> _create() async {
+    final DateTime startsAt = _operatingDateTime(_day, _hour, _settings!);
     final BookingDraft draft = BookingDraft(
       slot: TimeSlot(
         id: 'admin-${_day.toIso8601String()}-$_hour',
-        startTime: DateTime(_day.year, _day.month, _day.day, _hour),
-        endTime: DateTime(_day.year, _day.month, _day.day, _hour + 1),
+        startTime: startsAt,
+        endTime: startsAt.add(const Duration(hours: 1)),
         status: SlotStatus.available,
       ),
       basePrice: 800,
@@ -1008,9 +1004,13 @@ class _VenueSettingsScreenState extends State<VenueSettingsScreen> {
 
   Future<void> _save() async {
     final VenueSettings settings = _settings!;
-    if (settings.openingHour >= settings.closingHour) {
+    if (settings.operatingHours == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('وقت الفتح لازم يسبق وقت القفل.')),
+        const SnackBar(
+          content: Text(
+            'اختار وقتين مختلفين للفتح والقفل. القفل ممكن يكون في اليوم التالي.',
+          ),
+        ),
       );
       return;
     }
@@ -1149,12 +1149,10 @@ class _OccupancySummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Booking> weekBookings = bookings
-        .where(_isInSelectedWeek)
         .where(
           (Booking booking) =>
               booking.fieldNumber <= settings.fieldCount &&
-              booking.slot.startTime.hour >= settings.openingHour &&
-              booking.slot.startTime.hour < settings.closingHour,
+              _isBookingInOperatingWeek(booking, week, settings),
         )
         .toList();
     final int total = settings.dailyFieldHours * week.length;
@@ -1257,10 +1255,6 @@ class _OccupancySummary extends StatelessWidget {
       ],
     );
   }
-
-  bool _isInSelectedWeek(Booking booking) =>
-      !booking.slot.startTime.isBefore(week.first) &&
-      booking.slot.startTime.isBefore(week.last.add(const Duration(days: 1)));
 }
 
 class _FieldOccupancyCard extends StatelessWidget {
@@ -1310,10 +1304,9 @@ int _freeFieldHours(
   final int occupied = bookings
       .where(
         (Booking booking) =>
-            _sameDay(booking.slot.startTime, day) &&
+            _isBookingInOperatingDay(booking, day, settings) &&
             booking.fieldNumber <= settings.fieldCount &&
-            booking.slot.startTime.hour >= settings.openingHour &&
-            booking.slot.startTime.hour < settings.closingHour,
+            settings.containsOperatingHour(booking.slot.startTime.hour),
       )
       .length;
   final int free = settings.dailyFieldHours - occupied;
@@ -1324,6 +1317,55 @@ bool _sameDay(DateTime first, DateTime second) =>
     first.year == second.year &&
     first.month == second.month &&
     first.day == second.day;
+
+DateTime _operatingDateTime(
+  DateTime operatingDay,
+  int hour,
+  VenueSettings settings,
+) {
+  final DateTime calendarDay =
+      settings.crossesMidnight && hour < settings.closingHour
+      ? operatingDay.add(const Duration(days: 1))
+      : operatingDay;
+  return DateTime(calendarDay.year, calendarDay.month, calendarDay.day, hour);
+}
+
+DateTime _operatingDayFor(DateTime dateTime, VenueSettings settings) {
+  final DateTime calendarDay = DateTime(
+    dateTime.year,
+    dateTime.month,
+    dateTime.day,
+  );
+  if (settings.crossesMidnight && dateTime.hour < settings.closingHour) {
+    return calendarDay.subtract(const Duration(days: 1));
+  }
+  return calendarDay;
+}
+
+bool _isBookingInOperatingDay(
+  Booking booking,
+  DateTime operatingDay,
+  VenueSettings settings,
+) =>
+    settings.containsOperatingHour(booking.slot.startTime.hour) &&
+    _sameDay(_operatingDayFor(booking.slot.startTime, settings), operatingDay);
+
+bool _isBookingInOperatingWeek(
+  Booking booking,
+  List<DateTime> week,
+  VenueSettings settings,
+) {
+  if (!settings.containsOperatingHour(booking.slot.startTime.hour)) {
+    return false;
+  }
+  final DateTime operatingDay = _operatingDayFor(
+    booking.slot.startTime,
+    settings,
+  );
+  return !operatingDay.isBefore(week.first) &&
+      operatingDay.isBefore(week.last.add(const Duration(days: 1)));
+}
+
 String _dayLabel(DateTime day) {
   const List<String> days = <String>[
     'السبت',
