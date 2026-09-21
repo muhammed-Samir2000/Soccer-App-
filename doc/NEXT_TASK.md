@@ -1,12 +1,15 @@
 # Next Task
 
 ## Task
-- Apply and validate the staff e-mail invitation migration in the configured
-  Staging project, then connect the admin-team repository to that venue.
+- Verify the active Supabase Project URL and Google OAuth return flow, then
+  connect the first RLS-backed slot and booking repository to the selected
+  venue.
 
 ## Requirements
 - Read `SPECKIT.md`, `WORKFLOW_LOG.md`, and `DECISIONS_LOG.md` before any future work.
 - Preserve the Flutter/Dart-only application and the domain repository contracts.
+- Do not retry OAuth until the configured Supabase Project URL resolves in DNS
+  and the browser can load its `/auth/v1/authorize` endpoint.
 - The initial booking and group-match migrations are reported as applied and
   their RLS/function inventory was checked. Do not rerun them.
 - Review and apply

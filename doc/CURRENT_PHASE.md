@@ -4,6 +4,8 @@
 - Google authentication and the first two Supabase staging migrations are in place; authenticated booking, RSVP, and staff repositories remain pending.
 
 ## Current Focus
+- Release readiness is blocked by an invalid or inactive configured Staging
+  Project URL. Verify it from Supabase before attempting Google OAuth again.
 - The approved Supabase staging project has the booking and group-match schema,
   RLS verification, Google provider, and local redirect URLs configured.
 - The Flutter client can start Google OAuth from runtime-only configuration.
@@ -38,9 +40,9 @@
   permissions, and pending/active invitation state in mock mode.
 
 ## Next
-- Review and apply `20260913143000_admin_email_invitations.sql` to Staging;
-  create one real venue and manager membership, then manually verify that a
-  matching Google account is promoted only after accepting its invitation.
+- Verify the active Supabase Project URL and successful Google OAuth redirect.
 - Replace mock staff, booking, slot, and match repositories incrementally only
   after the RLS/RPC acceptance checks pass. Do not use a service-role key in
   Flutter or add a payment provider.
+- Fix the Android Kotlin cache/environment issue and create a protected release
+  signing configuration before producing a distributable Android build.

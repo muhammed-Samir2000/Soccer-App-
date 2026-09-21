@@ -1,6 +1,13 @@
 # Known Issues
 
 ## Current Limitations
+- The current local Staging URL used for Google OAuth has no DNS A record, so
+  Supabase authorization cannot start. Recopy and verify the active Project URL
+  from Supabase API settings before retrying.
+- `flutter build apk --release` currently fails in Kotlin incremental-cache
+  cleanup because the project is on `F:` while cached pub packages are on `C:`.
+  Android release signing is also configured with a debug key and is not safe
+  for distribution.
 - The Codex embedded browser does not render Flutter Canvas reliably. Use a
   full Edge or Chrome window for local web acceptance tests.
 - Google OAuth is configured for Staging and its client adapter exists, but a

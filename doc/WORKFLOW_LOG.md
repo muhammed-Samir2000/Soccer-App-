@@ -1,5 +1,14 @@
 # Workflow Log
 
+### 2026-09-21 11:05 | Release Readiness Code Review | Status: blocked
+
+- Actor: Codex.
+- Authentication finding: the configured Staging project host used in the local preview returned `DNS_PROBE_FINISHED_NXDOMAIN`; DNS resolution found no A record. Google OAuth cannot begin until the Project URL is copied again from the active Supabase project's API settings and verified.
+- Data finding: live authentication is the only Supabase-backed repository. Slots, bookings, matches, staff, venue settings, and notifications are all still mock/in-memory implementations, so a public booking release would lose data and cannot support multiple devices.
+- Quality verification: `dart format --set-exit-if-changed lib test` passed with zero changes; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 41 tests.
+- Android verification: `flutter build apk --release` failed after 5m14s in Kotlin incremental-cache cleanup for `url_launcher_android` and `shared_preferences_android`. The cache errors report files rooted on both `C:` and `F:`; no cache deletion was performed during review. Release signing is also still explicitly configured to use the debug signing key.
+- Recovery order: verify the active Supabase Project URL; add a live, RLS-backed slot/booking repository and server-side booking RPC; fix the Android/Gradle cache environment and configure a protected release signing key; then rerun device and OAuth acceptance tests.
+
 ### 2026-09-21 10:55 | Persistent Local Staging Preview | Status: ready for manual Google test
 
 - Actor: Codex.
