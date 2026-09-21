@@ -26,7 +26,7 @@ class NotificationCenterScreen extends StatelessWidget {
   final BookingRepository bookingRepository;
   final SlotRepository slotRepository;
 
-  NotificationAudience get _audience => user.role == UserRole.admin
+  NotificationAudience get _audience => user.canAccessAdmin
       ? NotificationAudience.admin
       : NotificationAudience.player;
 

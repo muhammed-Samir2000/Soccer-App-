@@ -24,12 +24,14 @@ class AdminWeekScreen extends StatefulWidget {
     required this.staffRepository,
     required this.notificationRepository,
     required this.venueSettingsRepository,
+    this.canManageTeam = false,
   });
 
   final BookingRepository bookingRepository;
   final StaffRepository staffRepository;
   final NotificationRepository notificationRepository;
   final VenueSettingsRepository venueSettingsRepository;
+  final bool canManageTeam;
 
   @override
   State<AdminWeekScreen> createState() => _AdminWeekScreenState();
@@ -77,7 +79,10 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
                 return;
               }
               final Widget page = value == 'staff'
-                  ? StaffPermissionsScreen(repository: widget.staffRepository)
+                  ? StaffPermissionsScreen(
+                      repository: widget.staffRepository,
+                      canManageTeam: widget.canManageTeam,
+                    )
                   : NotificationSettingsScreen(
                       repository: widget.notificationRepository,
                     );
@@ -85,10 +90,20 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
                 context,
               ).push(MaterialPageRoute<void>(builder: (_) => page));
             },
-            itemBuilder: (BuildContext context) => const [
-              PopupMenuItem(value: 'venue', child: Text('إعدادات الملعب')),
-              PopupMenuItem(value: 'staff', child: Text('الصلاحيات')),
-              PopupMenuItem(value: 'notifications', child: Text('التنبيهات')),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem(
+                value: 'venue',
+                child: Text('إعدادات الملعب'),
+              ),
+              if (widget.canManageTeam)
+                const PopupMenuItem(
+                  value: 'staff',
+                  child: Text('فريق الإدارة والصلاحيات'),
+                ),
+              const PopupMenuItem(
+                value: 'notifications',
+                child: Text('التنبيهات'),
+              ),
             ],
           ),
         ),

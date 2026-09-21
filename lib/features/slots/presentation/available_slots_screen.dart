@@ -15,11 +15,13 @@ class AvailableSlotsScreen extends StatefulWidget {
     required this.player,
     required this.repository,
     this.initialDay,
+    this.onSignOut,
   });
 
   final AppUser player;
   final SlotRepository repository;
   final DateTime? initialDay;
+  final Future<void> Function()? onSignOut;
 
   @override
   State<AvailableSlotsScreen> createState() => _AvailableSlotsScreenState();
@@ -91,6 +93,27 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
               icon: const Icon(Icons.calendar_month_outlined),
             ),
           ),
+          if (widget.onSignOut != null)
+            PopupMenuButton<_PlayerAccountAction>(
+              tooltip: 'الحساب',
+              icon: const Icon(Icons.account_circle_outlined),
+              onSelected: (_PlayerAccountAction action) async {
+                if (action == _PlayerAccountAction.signOut) {
+                  await widget.onSignOut!();
+                }
+              },
+              itemBuilder: (BuildContext context) =>
+                  <PopupMenuEntry<_PlayerAccountAction>>[
+                    PopupMenuItem<_PlayerAccountAction>(
+                      enabled: false,
+                      child: Text(widget.player.name),
+                    ),
+                    const PopupMenuItem<_PlayerAccountAction>(
+                      value: _PlayerAccountAction.signOut,
+                      child: Text('تسجيل الخروج'),
+                    ),
+                  ],
+            ),
           Padding(
             padding: const EdgeInsetsDirectional.only(end: 12),
             child: Center(child: Text('أهلاً يا ${widget.player.name}')),
@@ -290,6 +313,8 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
     );
   }
 }
+
+enum _PlayerAccountAction { signOut }
 
 class _PlayerSlotsHero extends StatelessWidget {
   const _PlayerSlotsHero({required this.day, required this.availableCount});

@@ -36,13 +36,12 @@ class SupabaseAuthRepository implements AuthRepository {
         user.email?.split('@').first ??
         'لاعب جديد';
     final String role = profile?['platform_role'] as String? ?? 'player';
-    return AppUser(
-      id: user.id,
-      name: name,
-      role: role == 'admin' || role == 'super_admin'
-          ? UserRole.admin
-          : UserRole.player,
-    );
+    final UserRole appRole = switch (role) {
+      'super_admin' => UserRole.superAdmin,
+      'admin' => UserRole.admin,
+      _ => UserRole.player,
+    };
+    return AppUser(id: user.id, name: name, role: appRole);
   }
 
   @override

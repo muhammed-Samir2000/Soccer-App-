@@ -44,3 +44,8 @@
   release. `20260913143000_admin_email_invitations.sql` is not yet reported as
   applied; until it is and a Supabase staff repository is connected, inviting a
   real e-mail will not grant production access.
+- The super-admin team screen is protected by client session role for the
+  preview. Its secure enforcement migration
+  `20260921130000_super_admin_staff_management.sql` is not yet reported as
+  applied, and no RLS/RPC-backed Flutter staff adapter exists. Phone details,
+  permission edits, and revocation therefore remain mock-only.

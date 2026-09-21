@@ -20,10 +20,12 @@ class AdminDashboardScreen extends StatefulWidget {
     required this.bookingRepository,
     required this.staffRepository,
     required this.notificationRepository,
+    this.canManageTeam = false,
   });
   final BookingRepository bookingRepository;
   final StaffRepository staffRepository;
   final NotificationRepository notificationRepository;
+  final bool canManageTeam;
   @override
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
@@ -66,13 +68,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     repository: widget.bookingRepository,
                   ),
                 ),
-                _NavButton(
-                  label: 'صلاحيات الموظفين',
-                  icon: Icons.manage_accounts_outlined,
-                  page: StaffPermissionsScreen(
-                    repository: widget.staffRepository,
+                if (widget.canManageTeam)
+                  _NavButton(
+                    label: 'فريق الإدارة',
+                    icon: Icons.manage_accounts_outlined,
+                    page: StaffPermissionsScreen(
+                      repository: widget.staffRepository,
+                      canManageTeam: true,
+                    ),
                   ),
-                ),
                 _NavButton(
                   label: 'التنبيهات',
                   icon: Icons.notifications_outlined,
@@ -268,8 +272,13 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
 }
 
 class StaffPermissionsScreen extends StatefulWidget {
-  const StaffPermissionsScreen({super.key, required this.repository});
+  const StaffPermissionsScreen({
+    super.key,
+    required this.repository,
+    this.canManageTeam = false,
+  });
   final StaffRepository repository;
+  final bool canManageTeam;
   @override
   State<StaffPermissionsScreen> createState() => _StaffPermissionsScreenState();
 }
@@ -290,6 +299,9 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
   }
 
   Future<void> _openInviteSheet() async {
+    if (!widget.canManageTeam) {
+      return;
+    }
     final StaffMember? invitation = await showModalBottomSheet<StaffMember>(
       context: context,
       isScrollControlled: true,
@@ -317,54 +329,88 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
     }
   }
 
+  Future<void> _revokeStaff(StaffMember member) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('إلغاء صلاحيات العضو؟'),
+        content: Text('هيتوقف وصول ${member.name} للإدارة.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('رجوع'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('إلغاء الصلاحيات'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      return;
+    }
+    await widget.repository.revokeStaff(member.id);
+    _reload();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppPageAppBar(
       title: 'فريق الإدارة',
       actions: [
-        IconButton(
-          key: const Key('staff_invite_action'),
-          tooltip: 'دعوة عضو',
-          onPressed: _openInviteSheet,
-          icon: const Icon(Icons.person_add_alt_1_outlined),
-        ),
+        if (widget.canManageTeam)
+          IconButton(
+            key: const Key('staff_invite_action'),
+            tooltip: 'دعوة عضو',
+            onPressed: _openInviteSheet,
+            icon: const Icon(Icons.person_add_alt_1_outlined),
+          ),
       ],
     ),
-    floatingActionButton: FloatingActionButton.extended(
-      onPressed: _openInviteSheet,
-      icon: const Icon(Icons.person_add_alt_1_outlined),
-      label: const Text('دعوة عضو'),
-    ),
-    body: FutureBuilder<List<StaffMember>>(
-      future: _staff,
-      builder:
-          (BuildContext context, AsyncSnapshot<List<StaffMember>> snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-              children: [
-                const _InvitationGuidanceCard(),
-                const SizedBox(height: 20),
-                Text(
-                  'الأعضاء والصلاحيات',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                ...snapshot.data!.map(
-                  (StaffMember member) => _StaffPermissionCard(
-                    member: member,
-                    onPermissionChanged: (StaffMember updated) async {
-                      await widget.repository.updateStaff(updated);
-                      _reload();
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-    ),
+    floatingActionButton: widget.canManageTeam
+        ? FloatingActionButton.extended(
+            onPressed: _openInviteSheet,
+            icon: const Icon(Icons.person_add_alt_1_outlined),
+            label: const Text('دعوة عضو'),
+          )
+        : null,
+    body: !widget.canManageTeam
+        ? const _TeamAccessDenied()
+        : FutureBuilder<List<StaffMember>>(
+            future: _staff,
+            builder:
+                (
+                  BuildContext context,
+                  AsyncSnapshot<List<StaffMember>> snapshot,
+                ) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                    children: [
+                      const _InvitationGuidanceCard(),
+                      const SizedBox(height: 20),
+                      Text(
+                        'الأعضاء والصلاحيات',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      ...snapshot.data!.map(
+                        (StaffMember member) => _StaffPermissionCard(
+                          member: member,
+                          onPermissionChanged: (StaffMember updated) async {
+                            await widget.repository.updateStaff(updated);
+                            _reload();
+                          },
+                          onRevoked: () => _revokeStaff(member),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+          ),
   );
 }
 
@@ -391,14 +437,14 @@ class _InvitationGuidanceCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'ادعُ فريقك بالبريد',
+                    'ادعُ فريقك عبر Google',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: colors.onPrimaryContainer,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'العضو بيدخل بنفس حساب Google المدعو. مش ممكن تعيين Super Admin من هنا.',
+                    'سجّل بريد وموبايل العضو وحدد صلاحياته. الدخول متاح فقط بحساب Google المدعو، ومش ممكن تعيين Super Admin من هنا.',
                     style: TextStyle(color: colors.onPrimaryContainer),
                   ),
                 ],
@@ -411,14 +457,31 @@ class _InvitationGuidanceCard extends StatelessWidget {
   }
 }
 
+class _TeamAccessDenied extends StatelessWidget {
+  const _TeamAccessDenied();
+
+  @override
+  Widget build(BuildContext context) => const Center(
+    child: Padding(
+      padding: EdgeInsets.all(24),
+      child: Text(
+        'إدارة أعضاء الفريق وصلاحياتهم متاحة لحساب السوبر أدمن فقط.',
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
+}
+
 class _StaffPermissionCard extends StatelessWidget {
   const _StaffPermissionCard({
     required this.member,
     required this.onPermissionChanged,
+    required this.onRevoked,
   });
 
   final StaffMember member;
   final ValueChanged<StaffMember> onPermissionChanged;
+  final VoidCallback onRevoked;
 
   @override
   Widget build(BuildContext context) {
@@ -440,7 +503,9 @@ class _StaffPermissionCard extends StatelessWidget {
           ),
         ),
         title: Text(member.name),
-        subtitle: Text('${member.email}\n${member.role.label}'),
+        subtitle: Text(
+          '${member.email}\n${member.phoneNumber}\n${member.role.label}',
+        ),
         trailing: _InvitationStatusChip(status: member.invitationStatus),
         children: [
           const Divider(height: 1),
@@ -466,7 +531,16 @@ class _StaffPermissionCard extends StatelessWidget {
                 member.copyWith(canViewFinancialReports: value),
             onChanged: onPermissionChanged,
           ),
-          const SizedBox(height: 8),
+          if (member.invitationStatus != StaffInvitationStatus.revoked)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: OutlinedButton.icon(
+                key: Key('staff_revoke_${member.id}'),
+                onPressed: onRevoked,
+                icon: const Icon(Icons.person_off_outlined),
+                label: const Text('إلغاء الصلاحيات'),
+              ),
+            ),
         ],
       ),
     );
@@ -481,22 +555,30 @@ class _InvitationStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colors = Theme.of(context).colorScheme;
-    final bool pending = status == StaffInvitationStatus.pending;
+    final (Color background, Color foreground, IconData icon) appearance =
+        switch (status) {
+          StaffInvitationStatus.pending => (
+            colors.secondaryContainer,
+            colors.onSecondaryContainer,
+            Icons.schedule_outlined,
+          ),
+          StaffInvitationStatus.active => (
+            colors.primaryContainer,
+            colors.onPrimaryContainer,
+            Icons.check_circle_outline,
+          ),
+          StaffInvitationStatus.revoked => (
+            colors.errorContainer,
+            colors.onErrorContainer,
+            Icons.person_off_outlined,
+          ),
+        };
     return Chip(
-      avatar: Icon(
-        pending ? Icons.schedule_outlined : Icons.check_circle_outline,
-        size: 18,
-      ),
+      avatar: Icon(appearance.$3, size: 18),
       label: Text(status.label),
-      backgroundColor: pending
-          ? colors.secondaryContainer
-          : colors.primaryContainer,
+      backgroundColor: appearance.$1,
       side: BorderSide.none,
-      labelStyle: TextStyle(
-        color: pending
-            ? colors.onSecondaryContainer
-            : colors.onPrimaryContainer,
-      ),
+      labelStyle: TextStyle(color: appearance.$2),
     );
   }
 }
@@ -520,7 +602,9 @@ class _PermissionSwitch extends StatelessWidget {
   Widget build(BuildContext context) => SwitchListTile(
     title: Text(label),
     value: value,
-    onChanged: (bool enabled) => onChanged(update(enabled)),
+    onChanged: member.invitationStatus == StaffInvitationStatus.revoked
+        ? null
+        : (bool enabled) => onChanged(update(enabled)),
   );
 }
 
@@ -535,6 +619,7 @@ class _StaffInviteSheetState extends State<_StaffInviteSheet> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _email = TextEditingController();
+  final TextEditingController _phone = TextEditingController();
   StaffRole _role = StaffRole.reception;
   bool _canCreateBookings = true;
   bool _canEditBookings = true;
@@ -544,6 +629,7 @@ class _StaffInviteSheetState extends State<_StaffInviteSheet> {
   void dispose() {
     _name.dispose();
     _email.dispose();
+    _phone.dispose();
     super.dispose();
   }
 
@@ -569,6 +655,7 @@ class _StaffInviteSheetState extends State<_StaffInviteSheet> {
         id: '',
         name: name.isEmpty ? email.split('@').first : name,
         email: email,
+        phoneNumber: _phone.text.trim(),
         role: _role,
         invitationStatus: StaffInvitationStatus.pending,
         canCreateBookings: _canCreateBookings,
@@ -636,6 +723,21 @@ class _StaffInviteSheetState extends State<_StaffInviteSheet> {
                   ),
                   validator: (String? value) =>
                       validateShortText(value ?? '', 'الاسم', required: false),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _phone,
+                  key: const Key('staff_invite_phone'),
+                  maxLength: 11,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'رقم الموبايل',
+                    hintText: '01012345678',
+                    prefixIcon: Icon(Icons.phone_outlined),
+                  ),
+                  validator: (String? value) =>
+                      validateEgyptianMobile(value ?? ''),
                 ),
                 const SizedBox(height: 8),
                 Text('الدور', style: Theme.of(context).textTheme.titleMedium),

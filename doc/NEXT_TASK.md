@@ -20,6 +20,14 @@
   `supabase/migrations/20260913143000_admin_email_invitations.sql` once to
   Staging. Seed a venue, fields, and one authorized manager using a controlled
   administrative process before testing the UI against it.
+- After that migration, review and apply
+  `supabase/migrations/20260921130000_super_admin_staff_management.sql`. Use a
+  controlled Supabase server-side process to assign exactly one existing,
+  verified Google profile the `super_admin` platform role; never expose a
+  client button, service-role key, or e-mail-based self-promotion path.
+- Implement and test a RLS/RPC-backed `StaffRepository` against the selected
+  venue before claiming invitations, phone records, permission changes, or
+  revocations are persistent.
 - Test a pending invitation, a case-insensitive matching Google e-mail, a
   non-invited player denial, a revoked invitation, permission updates, and the
   inability to create a `super_admin` account from the client.

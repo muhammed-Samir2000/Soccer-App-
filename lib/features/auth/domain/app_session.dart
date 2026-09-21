@@ -11,7 +11,9 @@ class AppSession extends ChangeNotifier {
 
   AppUser? get currentUser => _currentUser;
 
-  bool get isAdmin => _currentUser?.role == UserRole.admin;
+  bool get isAdmin => _currentUser?.canAccessAdmin ?? false;
+
+  bool get isSuperAdmin => _currentUser?.isSuperAdmin ?? false;
 
   void signIn(AppUser user) {
     _currentUser = user;

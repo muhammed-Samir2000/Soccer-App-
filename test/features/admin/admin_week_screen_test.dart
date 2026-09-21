@@ -167,19 +167,26 @@ void main() {
       MaterialApp(
         home: Directionality(
           textDirection: TextDirection.rtl,
-          child: StaffPermissionsScreen(repository: repository),
+          child: StaffPermissionsScreen(
+            repository: repository,
+            canManageTeam: true,
+          ),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('ادعُ فريقك بالبريد'), findsOneWidget);
+    expect(find.text('ادعُ فريقك عبر Google'), findsOneWidget);
     await tester.tap(find.byKey(const Key('staff_invite_action')));
     await tester.pumpAndSettle();
 
     await tester.enterText(
       find.byKey(const Key('staff_invite_email')),
       'team.lead@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('staff_invite_phone')),
+      '01098765432',
     );
     await tester.tap(find.text('مدير'));
     await tester.scrollUntilVisible(
@@ -193,6 +200,7 @@ void main() {
     expect(find.text('فريق الإدارة'), findsOneWidget);
     final invited = (await repository.getStaff()).last;
     expect(invited.email, 'team.lead@example.com');
+    expect(invited.phoneNumber, '01098765432');
     expect(invited.invitationStatus, StaffInvitationStatus.pending);
     expect(invited.canCreateBookings, isTrue);
     expect(invited.canEditBookings, isTrue);

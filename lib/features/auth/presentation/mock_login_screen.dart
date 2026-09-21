@@ -44,7 +44,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
     if (user == null) {
       return;
     }
-    if (_isAdminLogin && user.role != UserRole.admin) {
+    if (_isAdminLogin && !user.canAccessAdmin) {
       await _signOutSavedSession(
         errorMessage: 'الحساب ده مش مدعو لفريق الإدارة.',
       );
@@ -55,9 +55,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
     }
     widget.session.signIn(user);
     Navigator.of(context).pushReplacementNamed(
-      user.role == UserRole.admin
-          ? AppRouter.adminBookingsRoute
-          : AppRouter.slotsRoute,
+      user.canAccessAdmin ? AppRouter.adminBookingsRoute : AppRouter.slotsRoute,
       arguments: user.role == UserRole.player ? user : null,
     );
   }
@@ -94,9 +92,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
     }
     widget.session.signIn(user);
     Navigator.of(context).pushReplacementNamed(
-      user.role == UserRole.admin
-          ? AppRouter.adminBookingsRoute
-          : AppRouter.slotsRoute,
+      user.canAccessAdmin ? AppRouter.adminBookingsRoute : AppRouter.slotsRoute,
       arguments: user.role == UserRole.player ? user : null,
     );
   }
@@ -114,7 +110,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
         }
         return;
       }
-      if (_isAdminLogin && user.role != UserRole.admin) {
+      if (_isAdminLogin && !user.canAccessAdmin) {
         await widget.repository.signOut();
         if (mounted) {
           setState(() {
@@ -127,7 +123,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
       if (!mounted) return;
       widget.session.signIn(user);
       Navigator.of(context).pushReplacementNamed(
-        user.role == UserRole.admin
+        user.canAccessAdmin
             ? AppRouter.adminBookingsRoute
             : AppRouter.slotsRoute,
         arguments: user.role == UserRole.player ? user : null,

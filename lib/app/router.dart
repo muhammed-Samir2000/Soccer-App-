@@ -53,6 +53,7 @@ class AppRouter {
             return AvailableSlotsScreen(
               player: player,
               repository: dependencies.slotRepository,
+              onSignOut: () => _signOutAndReturnToEntry(context),
             );
           case bookingSummaryRoute:
             final Object? arguments = settings.arguments;
@@ -109,6 +110,7 @@ class AppRouter {
               staffRepository: dependencies.staffRepository,
               notificationRepository: dependencies.notificationRepository,
               venueSettingsRepository: dependencies.venueSettingsRepository,
+              canManageTeam: dependencies.session.isSuperAdmin,
             );
           case adminLoginRoute:
             return MockLoginScreen(
@@ -166,6 +168,19 @@ class AppRouter {
 
     final AppUser? sessionUser = dependencies.session.currentUser;
     return sessionUser?.role == UserRole.player ? sessionUser : null;
+  }
+
+  Future<void> _signOutAndReturnToEntry(BuildContext context) async {
+    try {
+      await dependencies.authRepository.signOut();
+    } finally {
+      dependencies.session.signOut();
+    }
+    if (context.mounted) {
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(launchRoute, (Route<dynamic> route) => false);
+    }
   }
 
   String? _inviteToken(String? routeName) {

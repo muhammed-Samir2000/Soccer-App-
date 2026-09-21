@@ -8,6 +8,7 @@ class MockStaffRepository implements StaffRepository {
           id: 'staff-001',
           name: 'أحمد الاستقبال',
           email: 'ahmed@mal3ab.test',
+          phoneNumber: '01012345678',
           role: StaffRole.reception,
           invitationStatus: StaffInvitationStatus.active,
           canCreateBookings: true,
@@ -18,6 +19,7 @@ class MockStaffRepository implements StaffRepository {
           id: 'staff-002',
           name: 'محمود المشرف',
           email: 'mahmoud@mal3ab.test',
+          phoneNumber: '01112345678',
           role: StaffRole.manager,
           invitationStatus: StaffInvitationStatus.active,
           canCreateBookings: true,
@@ -58,5 +60,21 @@ class MockStaffRepository implements StaffRepository {
       throw StateError('Staff member not found');
     }
     _staff[index] = staffMember;
+  }
+
+  @override
+  Future<void> revokeStaff(String staffId) async {
+    final int index = _staff.indexWhere(
+      (StaffMember item) => item.id == staffId,
+    );
+    if (index == -1) {
+      throw StateError('Staff member not found');
+    }
+    _staff[index] = _staff[index].copyWith(
+      invitationStatus: StaffInvitationStatus.revoked,
+      canCreateBookings: false,
+      canEditBookings: false,
+      canViewFinancialReports: false,
+    );
   }
 }
