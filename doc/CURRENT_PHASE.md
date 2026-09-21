@@ -15,6 +15,8 @@
 - The UI distinguishes super-admin from ordinary admin. Team invitations,
   mobile contact details, permission changes, and revocation are super-admin
   only in the client; the corresponding RLS/RPC migration is pending.
+- Restored Google sessions are now available at the admin entry route, so a
+  verified super-admin can explicitly continue to the administration dashboard.
 - A local authenticated player can create a mock booking and see it in
   `حجوزاتي` during the same app session. Persistence remains the next backend
   milestone.

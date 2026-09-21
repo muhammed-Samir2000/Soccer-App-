@@ -117,6 +117,7 @@ class AppRouter {
               repository: dependencies.authRepository,
               session: dependencies.session,
               audience: LoginAudience.admin,
+              initialUser: dependencies.session.currentUser,
             );
           case adminBookingListRoute:
             if (!dependencies.session.isAdmin) {

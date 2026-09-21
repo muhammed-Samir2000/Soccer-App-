@@ -196,6 +196,33 @@ void main() {
     expect(find.byType(TextFormField), findsNothing);
   });
 
+  testWidgets('continues a restored super-admin session from admin entry', (
+    WidgetTester tester,
+  ) async {
+    final AppDependencies dependencies = AppDependencies.mock();
+    dependencies.session.signIn(
+      const AppUser(
+        id: 'super-admin-test',
+        name: 'مالك المنصة',
+        role: UserRole.superAdmin,
+      ),
+    );
+
+    await tester.pumpWidget(
+      SoccerBookingApp(
+        dependencies: dependencies,
+        initialRoute: AppRouter.adminLoginRoute,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('أنت مسجل بالفعل باسم مالك المنصة'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('continue_saved_session_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('لوحة التحكم'), findsAtLeastNWidgets(1));
+  });
+
   testWidgets('uses the outlined Google entry for live authentication', (
     WidgetTester tester,
   ) async {

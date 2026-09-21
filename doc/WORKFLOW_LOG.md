@@ -1,5 +1,13 @@
 # Workflow Log
 
+### 2026-09-21 13:10 | Restored Super-Admin Admin Entry | Status: completed (local staging preview)
+
+- Actor: Codex.
+- Issue: the admin-entry route did not pass an already restored Google session to its entry screen, causing an authenticated super-admin to restart OAuth and return to the entry point.
+- Changed: the admin entry now receives the current verified session and presents the explicit saved-account continuation action. A super-admin continues to the admin dashboard; a player continues to be denied and signed out from this path.
+- Verification: `dart format --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test --reporter compact` passed; 44 tests passed, including restored super-admin continuation from the admin entry route.
+- Limitation: staff-management records remain mock/in-memory until the Supabase RLS/RPC staff adapter is implemented.
+
 ### 2026-09-21 12:40 | Google-Only Entry And Super-Admin Team Controls | Status: completed (mock UI; backend migration pending)
 
 - Actor: Codex.
