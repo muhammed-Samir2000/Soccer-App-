@@ -8,6 +8,7 @@
 - Backend readiness: added `supabase/migrations/20260921130000_super_admin_staff_management.sql`. It adds phone validation, super-admin-only RLS, and security-definer invitation/update/revocation RPCs. Revocation removes the matching venue membership and demotes an ordinary admin with no remaining membership; it never demotes a super admin.
 - Verification: `dart format --set-exit-if-changed lib test`, `flutter analyze`, and `flutter test --reporter compact` passed; 43 tests passed.
 - Limitation: Flutter still uses `MockStaffRepository`, so invitations, permission edits, and revocation are not yet written to Supabase. Do not call the feature production-secure until the migration is applied, the first super-admin is provisioned through a controlled server-side process, and an RLS-backed staff repository is connected.
+- Source control: commit `edfd602` (`Add super admin team controls`) prepared for `origin/main`.
 
 ### 2026-09-21 12:05 | Explicit Session Continuation And Back Navigation | Status: completed (local staging preview)
 
