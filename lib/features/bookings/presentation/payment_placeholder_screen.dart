@@ -64,9 +64,9 @@ class _PaymentPlaceholderScreenState extends State<PaymentPlaceholderScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Column(
+          child: ListView(
             children: [
-              const Spacer(),
+              const SizedBox(height: 24),
               Icon(
                 Icons.payments_outlined,
                 color: Theme.of(context).colorScheme.primary,
@@ -74,12 +74,12 @@ class _PaymentPlaceholderScreenState extends State<PaymentPlaceholderScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                'دفع يدوي',
+                'الدفع في الملعب',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 12),
               const Text(
-                'دي نسخة تجريبية. اعتبر إنك دفعت كاش في الملعب.',
+                'هتدفع كاش عند الوصول للملعب. تأكيد الحجز هنا مش إثبات دفع، ومش هيتخصم منك أي مبلغ أونلاين.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -95,12 +95,12 @@ class _PaymentPlaceholderScreenState extends State<PaymentPlaceholderScreen> {
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ],
-              const Spacer(),
+              const SizedBox(height: 32),
               FilledButton(
                 key: const Key('complete_mock_payment_button'),
                 onPressed: _isCreatingBooking ? null : _completeManualPayment,
                 child: Text(
-                  _isCreatingBooking ? 'بنأكد حجزك...' : 'تم الدفع كاش',
+                  _isCreatingBooking ? 'بنأكد حجزك...' : 'تأكيد الحجز والدفع في الملعب',
                 ),
               ),
             ],

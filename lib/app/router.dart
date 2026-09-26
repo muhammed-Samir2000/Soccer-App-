@@ -4,6 +4,9 @@ import '../features/admin/presentation/admin_bookings_screen.dart';
 import '../features/admin/presentation/notification_center_screen.dart';
 import '../features/admin/presentation/admin_week_screen.dart';
 import '../features/admin/presentation/financial_analytics_screen.dart';
+import '../features/admin/presentation/venue_setup_gate.dart';
+import '../features/admin/presentation/venue_setup_screen.dart';
+import '../features/admin/domain/venue_profile.dart';
 import '../features/auth/domain/app_user.dart';
 import '../features/auth/presentation/mock_login_screen.dart';
 import '../features/bookings/domain/booking_draft.dart';
@@ -50,10 +53,13 @@ class AppRouter {
             if (player == null) {
               return _playerEntry();
             }
-            return AvailableSlotsScreen(
-              player: player,
-              repository: dependencies.slotRepository,
-              onSignOut: () => _signOutAndReturnToEntry(context),
+            return _withVenue(
+              canConfigure: false,
+              builder: (_) => AvailableSlotsScreen(
+                player: player,
+                repository: dependencies.slotRepository,
+                onSignOut: () => _signOutAndReturnToEntry(context),
+              ),
             );
           case bookingSummaryRoute:
             final Object? arguments = settings.arguments;
@@ -105,12 +111,15 @@ class AppRouter {
             if (!dependencies.session.isAdmin) {
               return _playerEntry();
             }
-            return AdminWeekScreen(
-              bookingRepository: dependencies.bookingRepository,
-              staffRepository: dependencies.staffRepository,
-              notificationRepository: dependencies.notificationRepository,
-              venueSettingsRepository: dependencies.venueSettingsRepository,
-              canManageTeam: dependencies.session.isSuperAdmin,
+            return _withVenue(
+              canConfigure: dependencies.session.isSuperAdmin,
+              builder: (_) => AdminWeekScreen(
+                bookingRepository: dependencies.bookingRepository,
+                staffRepository: dependencies.staffRepository,
+                notificationRepository: dependencies.notificationRepository,
+                venueSettingsRepository: dependencies.venueSettingsRepository,
+                canManageTeam: dependencies.session.isSuperAdmin,
+              ),
             );
           case adminLoginRoute:
             return MockLoginScreen(
@@ -137,9 +146,19 @@ class AppRouter {
             if (!dependencies.session.isAdmin) {
               return _playerEntry();
             }
-            return VenueSettingsScreen(
-              settingsRepository: dependencies.venueSettingsRepository,
-              bookingRepository: dependencies.bookingRepository,
+            if (dependencies.venueProfileRepository == null) {
+              return VenueSettingsScreen(
+                settingsRepository: dependencies.venueSettingsRepository,
+                bookingRepository: dependencies.bookingRepository,
+              );
+            }
+            return _withVenue(
+              canConfigure: dependencies.session.isSuperAdmin,
+              builder: (venue) => VenueSetupScreen(
+                repository: dependencies.venueProfileRepository!,
+                initialVenue: venue,
+                onSaved: () => Navigator.of(context).pop(),
+              ),
             );
           case notificationsRoute:
             final AppUser? user = settings.arguments is AppUser
@@ -196,11 +215,25 @@ class AppRouter {
   }
 
   Widget _playerEntry() {
-    final AppUser? player = _playerFrom(null);
     return MockLoginScreen(
       repository: dependencies.authRepository,
       session: dependencies.session,
-      initialUser: player,
+      initialUser: dependencies.session.currentUser,
+    );
+  }
+
+  Widget _withVenue({
+    required bool canConfigure,
+    required Widget Function(VenueProfile? venue) builder,
+  }) {
+    final repository = dependencies.venueProfileRepository;
+    if (repository == null) {
+      return builder(null);
+    }
+    return VenueSetupGate(
+      repository: repository,
+      canConfigure: canConfigure,
+      builder: builder,
     );
   }
 }

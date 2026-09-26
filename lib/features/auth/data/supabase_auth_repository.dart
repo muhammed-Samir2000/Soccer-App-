@@ -60,6 +60,7 @@ class SupabaseAuthRepository implements AuthRepository {
     await _client.auth.signInWithOAuth(
       OAuthProvider.google,
       redirectTo: kIsWeb ? Uri.base.origin : null,
+      queryParams: const <String, String>{'prompt': 'select_account'},
     );
     return restoreSession();
   }

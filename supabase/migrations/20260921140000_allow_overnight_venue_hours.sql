@@ -3,6 +3,9 @@
 -- invalid because they do not describe a usable schedule.
 
 alter table public.venues
+  drop constraint if exists venues_check;
+
+alter table public.venues
   drop constraint if exists venues_closing_hour_check;
 
 alter table public.venues

@@ -68,11 +68,11 @@ class _FinancialAnalyticsScreenState extends State<FinancialAnalyticsScreen> {
           padding: const EdgeInsetsDirectional.fromSTEB(20, 12, 20, 32),
           children: [
             Text(
-              'التحصيل المالي',
+              'قيمة الحجوزات',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 6),
-            const Text('تابع المبالغ المحصلة وقارنها بالفترة اللي قبلها.'),
+            const Text('تابع قيمة الحجوزات المؤكدة والثابتة وقارنها بالفترة اللي قبلها.'),
             const SizedBox(height: 18),
             OutlinedButton.icon(
               onPressed: _selectPeriod,
@@ -100,7 +100,7 @@ class _FinancialAnalyticsScreenState extends State<FinancialAnalyticsScreen> {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'التحصيل هنا مبني على الحجوزات المؤكدة والثابتة في النسخة التجريبية. الحجز المبدئي لا يُحسب كمبلغ محصل.',
+                      'الأرقام دي قيمة الحجوزات المؤكدة والثابتة، مش مبالغ تم تحصيلها. الحجز المبدئي مستبعد، والسداد بيتراجع في الملعب.',
                     ),
                   ),
                 ],
@@ -125,7 +125,7 @@ class _CollectedHero extends StatelessWidget {
     final int difference = report.differenceFromPrevious;
     final String comparison = report.changeRate == null
         ? report.comparisonAmount == 0
-              ? 'لا توجد فترة محصلة سابقة للمقارنة'
+              ? 'مفيش قيمة حجوزات سابقة للمقارنة'
               : ''
         : '${difference >= 0 ? '+' : ''}${(report.changeRate! * 100).round()}% عن الفترة السابقة';
     return Container(
@@ -145,7 +145,7 @@ class _CollectedHero extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'المبلغ المحصل',
+                  'قيمة الحجوزات المؤكدة والثابتة',
                   style: TextStyle(
                     color: colors.onPrimary.withValues(alpha: 0.8),
                   ),
@@ -196,7 +196,7 @@ class _FinancialMetrics extends StatelessWidget {
     children: [
       Expanded(
         child: _MetricCard(
-          label: 'حجوزات محصلة',
+          label: 'حجوزات مؤكدة وثابتة',
           value: '${report.collectedBookings}',
           icon: Icons.check_circle_outline,
         ),
@@ -204,7 +204,7 @@ class _FinancialMetrics extends StatelessWidget {
       const SizedBox(width: 12),
       Expanded(
         child: _MetricCard(
-          label: 'مبدئي غير محصل',
+          label: 'حجوزات مبدئية مستبعدة',
           value: _money(report.pendingAmount),
           icon: Icons.pending_outlined,
           accent: Colors.orange.shade800,
@@ -258,8 +258,8 @@ class _TrendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _AnalyticsCard(
-    title: 'حركة التحصيل',
-    subtitle: 'الإيراد المحصل لكل شهر داخل الفترة المختارة.',
+    title: 'حركة الحجوزات',
+    subtitle: 'قيمة الحجوزات المؤكدة والثابتة لكل شهر داخل الفترة المختارة.',
     child: Column(
       children: [
         SizedBox(
@@ -275,7 +275,7 @@ class _TrendCard extends StatelessWidget {
                 report.trend.every(
                   (MonthlyCollection item) => item.collectedAmount == 0,
                 )
-                ? const Center(child: Text('لسه مفيش تحصيل مؤكد في الفترة دي.'))
+                ? const Center(child: Text('لسه مفيش حجوزات مؤكدة أو ثابتة في الفترة دي.'))
                 : null,
           ),
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
 import '../../../core/utils/arabic_date.dart';
+import '../../../core/utils/booking_input_validators.dart';
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_draft.dart';
 import '../../bookings/domain/booking_repository.dart';
@@ -350,11 +351,19 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
                         button: true,
                         child: IconButton.filledTonal(
                           tooltip: 'تسجيل لاعب',
-                          onPressed: () => _registerPlayer(hour, freeFields),
+                          onPressed: () => _registerPlayer(
+                            hour,
+                            freeFields,
+                            settings.data!.hourlyPrice,
+                          ),
                           icon: const Icon(Icons.person_add_alt_1_outlined),
                         ),
                       ),
-                      onTap: () => _registerPlayer(hour, freeFields),
+                      onTap: () => _registerPlayer(
+                        hour,
+                        freeFields,
+                        settings.data!.hourlyPrice,
+                      ),
                     ),
                   );
                 }),
@@ -535,7 +544,11 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
     }
   }
 
-  Future<void> _registerPlayer(int hour, int freeFields) async {
+  Future<void> _registerPlayer(
+    int hour,
+    int freeFields,
+    int hourlyPrice,
+  ) async {
     final _AdminRegistration? registration =
         await showModalBottomSheet<_AdminRegistration>(
           context: context,
@@ -567,7 +580,7 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
         ),
         status: SlotStatus.available,
       ),
-      basePrice: 800,
+      basePrice: hourlyPrice,
     );
     try {
       final Booking booking = await widget.repository.createAdminBooking(
@@ -799,6 +812,7 @@ class AdminBookingToolsScreen extends StatefulWidget {
 }
 
 class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _phone = TextEditingController();
   late DateTime _day;
@@ -839,25 +853,29 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
     }
     return Scaffold(
       appBar: const AppPageAppBar(title: 'حجز سريع أو ثابت'),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
           SwitchListTile(
             value: _recurring,
             onChanged: (bool value) => setState(() => _recurring = value),
             title: const Text('حجز أسبوعي ثابت'),
           ),
-          TextField(
+          TextFormField(
             controller: _name,
             maxLength: 80,
+            validator: (String? value) => validatePlayerName(value ?? ''),
             decoration: const InputDecoration(
               labelText: 'اسم اللاعب أو المجموعة',
             ),
           ),
-          TextField(
+          TextFormField(
             controller: _phone,
             keyboardType: TextInputType.phone,
             maxLength: 11,
+            validator: (String? value) => validateEgyptianMobile(value ?? ''),
             decoration: const InputDecoration(labelText: 'رقم الهاتف'),
           ),
           const SizedBox(height: 16),
@@ -899,12 +917,16 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
               padding: const EdgeInsets.only(top: 12),
               child: Text(_message!),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Future<void> _create() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     final DateTime startsAt = _operatingDateTime(_day, _hour, _settings!);
     final BookingDraft draft = BookingDraft(
       slot: TimeSlot(
@@ -913,7 +935,7 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
         endTime: startsAt.add(const Duration(hours: 1)),
         status: SlotStatus.available,
       ),
-      basePrice: 800,
+      basePrice: _settings!.hourlyPrice,
     );
     try {
       final Booking booking = _recurring
@@ -1189,7 +1211,7 @@ class _OccupancySummary extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      '$occupied من $total ساعة ملعب محجوزة الأسبوع ده.',
+                      '$occupied من $total ساعة ملعب محجوزة في الفترة المعروضة.',
                       style: TextStyle(
                         color: colors.onPrimary.withValues(alpha: 0.82),
                       ),

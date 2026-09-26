@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Keep the Flutter image aligned with the SDK used by this project.
-ARG FLUTTER_IMAGE=ghcr.io/cirruslabs/flutter:3.47.2
+ARG FLUTTER_IMAGE=ghcr.io/cirruslabs/flutter:3.44.0
 FROM ${FLUTTER_IMAGE} AS build
 
 WORKDIR /app

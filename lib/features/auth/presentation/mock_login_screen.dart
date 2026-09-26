@@ -221,7 +221,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                           Expanded(
                             child: Text(
                               widget.repository.usesLiveAuthentication
-                                  ? 'تسجيل Google بيتم في صفحة Google المؤمّنة. بيانات الحجز لسه تجريبية في النسخة دي.'
+                                  ? 'تسجيل Google بيتم في صفحة Google المؤمّنة، والحجوزات والأسعار بتتحفظ في قاعدة البيانات المشتركة.'
                                   : 'نسخة تجريبية: الدخول ده لا ينشئ حساباً ولا يحفظ أي بيانات.',
                               style: TextStyle(
                                 color: colors.onSecondaryContainer,

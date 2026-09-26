@@ -69,8 +69,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('طريقة الدفع'), findsOneWidget);
+    expect(find.text('الدفع في الملعب'), findsOneWidget);
+    expect(find.text('تم الدفع كاش'), findsNothing);
     expect(find.textContaining('860'), findsAtLeastNWidgets(1));
 
+    await tester.ensureVisible(find.byKey(const Key('complete_mock_payment_button')));
     await tester.tap(find.byKey(const Key('complete_mock_payment_button')));
     await tester.pumpAndSettle();
 
@@ -180,7 +183,7 @@ void main() {
     await tester.tap(find.text('المالية'));
     await tester.pumpAndSettle();
 
-    expect(find.text('التحصيل المالي'), findsOneWidget);
+    expect(find.text('قيمة الحجوزات'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 

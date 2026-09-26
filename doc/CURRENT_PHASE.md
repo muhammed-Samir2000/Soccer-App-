@@ -1,7 +1,7 @@
 # Current Phase
 
 ## Phase
-- Google authentication and the first two Supabase staging migrations are in place. The local player journey carries the authenticated identity into mock bookings; authenticated Supabase booking, RSVP, and staff repositories remain pending.
+- Google authentication, venue setup, shared slot availability, and secure one-off booking RPCs are now present in Supabase staging. The Flutter adapters are wired locally and await a successful rebuild and end-to-end browser verification.
 
 ## Current Focus
 - The approved Supabase staging project has the booking and group-match schema,

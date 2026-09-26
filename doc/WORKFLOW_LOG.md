@@ -1,5 +1,13 @@
 # Workflow Log
 
+### 2026-09-25 | MVP readiness review | Status: in progress
+
+- Reviewed active specifications and repository wiring; inspected live demo admin entry and dashboard.
+- Corrected cash-payment wording, scrollable payment layout, confirmation reference guidance, finance labels and occupancy period wording. Updated existing widget expectations.
+- Review and remaining release gates are recorded in `MVP_READINESS_REVIEW.md`.
+- Validation blocked: Docker Engine pipe permission denied for this agent; no local Flutter SDK found at documented location or in PATH. No tests or rebuilt UI claimed as passing.
+- Shared Supabase versus single-device persistence choice is pending. No remote database or production configuration changed. No project Git metadata is present in this ZIP extraction, so no commit or push performed.
+
 ### 2026-09-21 | Overnight Venue Operating Hours | Status: completed
 
 - Actor: Codex.
@@ -701,3 +709,30 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: financial values remain mock operational estimates until real payment records are available.
 - Source control: committed as `d088d41` (`Polish mobile financial chart`); local web preview was rebuilt successfully. Push to `origin/main` follows with this workflow-log update.
 - Next action: connect approved payment records before using this view for reconciliation.
+
+### 2026-09-25 | Shared Venue Setup And Booking Foundation | Status: database applied, client verification pending
+
+- Actor: Codex.
+- Intent: replace the fixed demo venue and booking data with one shared Supabase-backed venue, price, availability, and one-off booking flow.
+- Changed: venue profile domain/repository and setup screens; Supabase venue settings, slot, and booking repositories; dependency composition and route gate; server-validated venue setup, availability, and booking migrations; public runtime `.env`; UI wording and tests; `doc/APP_CURRENT_STATE.md`; phase and readiness documentation.
+- Decisions: the super-admin enters the venue name, field count, whole-EGP hourly price, and Cairo opening/closing hours inside the app. The database owns identity, price validation, field allocation, overlap rejection, and administrative authorization. Overnight schedules are supported.
+- Database verification: the three functions `save_soccer_venue`, `soccer_slots`, and `soccer_create_booking` exist as `SECURITY DEFINER`; anonymous execution is false and authenticated execution is true for all three functions. No venue row was created by the migration.
+- Verification limitation: Docker Desktop started its interface but its Linux engine did not become available to this agent session, and Flutter/Dart are not on PATH. Formatting, analysis, tests, and the release rebuild remain pending.
+- Source control: the supplied project directory has no `.git` metadata, so no commit or push was possible.
+- Next action: start Docker Engine, run formatting/analyzer/tests, rebuild the web container, then use the super-admin account to enter the first venue and perform a two-browser booking conflict test.
+
+### 2026-09-25 | Live Build And Venue Setup Smoke Test | Status: passed with cache fix pending rebuild
+
+- Actor: Codex.
+- Intent: verify that the rebuilt container uses Supabase and reaches first-run venue setup.
+- Verification: the served JavaScript contains the approved Supabase public configuration. On a clean local origin, Google OAuth returned successfully, restored `Mohamed Samir` as the signed-in account, routed it to administration, and displayed the empty first-run `إعداد الملعب` form with name, field count, hourly price, opening time, and closing time.
+- Finding: the existing `localhost` origin continued to run the old demo bundle because Nginx cached `flutter_service_worker.js` under the generic seven-day JavaScript rule.
+- Changed: Nginx now sends no-cache/no-store headers for `flutter_service_worker.js`, `flutter_bootstrap.js`, and `manifest.json`, in addition to `index.html`.
+- Remaining verification: rebuild once more for the cache headers, run analyzer/tests when Docker CLI access is available to the agent, then save venue data and complete a two-browser booking test.
+
+### 2026-09-25 | Admin Form Validation Retest | Status: passed
+
+- Actor: Codex.
+- Verification: a clean-origin load of the rebuilt container restored the super-admin session, loaded the shared venue, and showed explicit validation for an empty player name and invalid Egyptian mobile in the quick-booking form without sending a booking request.
+- Changed: Google OAuth now requests the account chooser so «تسجيل Google بحساب مختلف» can actually select a separate player account instead of silently reusing the administrator account.
+- Remaining verification: rebuild the account-chooser change, sign in with a player account, create one controlled booking, and attempt the same slot from a second player session.

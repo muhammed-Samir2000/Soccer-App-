@@ -3,6 +3,9 @@
 Flutter application for football playground booking, with player and manager
 experiences in Egyptian Arabic.
 
+For a complete Arabic inventory of the current screens, features, live data,
+and unfinished work, see `doc/APP_CURRENT_STATE.md`.
+
 ## Run With Docker
 
 Docker builds the Flutter Web application and serves it through Nginx. It lets

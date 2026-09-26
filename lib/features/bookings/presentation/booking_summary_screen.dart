@@ -28,7 +28,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
   @override
   void initState() {
     super.initState();
-    _draft = BookingDraft(slot: widget.slot, basePrice: 800);
+    _draft = BookingDraft(slot: widget.slot, basePrice: widget.slot.basePrice);
   }
 
   void _toggleService(OptionalService service) {
@@ -74,7 +74,7 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
-            ...MockOptionalServices.all.map(
+            ...(widget.slot.services ?? MockOptionalServices.all).map(
               (OptionalService service) => Card(
                 clipBehavior: Clip.antiAlias,
                 child: CheckboxListTile(

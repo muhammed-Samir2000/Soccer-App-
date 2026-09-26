@@ -82,7 +82,7 @@ class BookingConfirmationScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const Text(
-              'رمز QR هيظهر هنا بعد ربط خدمة التحقق في مرحلة لاحقة.',
+              'احتفظ برقم الحجز واعرضه عند الوصول. تأكيد الحجز مش إيصال دفع.',
               textAlign: TextAlign.center,
             ),
           ],
