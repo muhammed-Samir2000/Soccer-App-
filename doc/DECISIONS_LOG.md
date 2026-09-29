@@ -47,3 +47,9 @@
 - `super_admin` is a distinct server-owned role. Only that role may manage team invitations, contact data, permissions, or revocation. The first super-admin is provisioned by a controlled server-side operation after Google identity verification; neither the Flutter client nor an ordinary admin can create or promote one.
 - Operating hours describe an operational day, not necessarily one calendar day. A closing hour earlier than the opening hour means closing on the next calendar day; for example, `15:00` to `02:00` exposes eleven bookable hourly slots and assigns `00:00` and `01:00` to the prior evening's operating day. Equal hours are invalid.
 - Booking dates have no business horizon. Players and authorized managers may request any future Cairo calendar day; the calendar starts at today and uses only the framework maximum date as a technical picker bound. Supabase remains responsible for rejecting past times, unavailable slots, schedule violations, duplicate allocations, and unauthorized manager changes.
+- Team invitations are explicitly created or refreshed by the organizer rather
+  than implicitly when opening a screen. The raw high-entropy token is returned
+  only once to the requester; only its SHA-256 hash is persisted. Invitation
+  previews reveal only match-level details and captain name, while team rosters
+  remain restricted to the organizer or authorized venue staff. Match results
+  are server-authorized to the booking owner after a one-hour post-match delay.

@@ -90,6 +90,13 @@ class _MatchInviteScreenState extends State<MatchInviteScreen> {
           _error = error.message.toString();
         });
       }
+    } on ArgumentError catch (error) {
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+          _error = error.message.toString();
+        });
+      }
     }
   }
 

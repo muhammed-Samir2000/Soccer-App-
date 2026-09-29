@@ -9,9 +9,12 @@ class BookingMatch {
     required this.endsAt,
     required this.fieldNumber,
     required this.capacity,
-    required this.inviteToken,
+    this.inviteToken,
     required List<MatchParticipant> participants,
-  }) : participants = List<MatchParticipant>.unmodifiable(participants);
+    int? goingCount,
+  }) : assert(goingCount == null || goingCount >= 0),
+       participants = List<MatchParticipant>.unmodifiable(participants),
+       _goingCount = goingCount;
 
   final String bookingReference;
   final String organizerId;
@@ -21,22 +24,31 @@ class BookingMatch {
   final int fieldNumber;
   final int capacity;
 
-  /// Mock-only value. Production stores only a token hash and resolves it by RPC.
-  final String inviteToken;
+  /// Available only immediately after the organizer explicitly creates or
+  /// refreshes a share link. Production stores only a token hash.
+  final String? inviteToken;
   final List<MatchParticipant> participants;
+  final int? _goingCount;
 
-  int get goingCount => participants
-      .where(
-        (MatchParticipant participant) =>
-            participant.status == MatchParticipationStatus.going,
-      )
-      .length;
+  /// Invite previews receive an aggregate count, not the team's identities.
+  int get goingCount =>
+      _goingCount ??
+      participants
+          .where(
+            (MatchParticipant participant) =>
+                participant.status == MatchParticipationStatus.going,
+          )
+          .length;
 
   int get remainingSpots => capacity - goingCount;
 
   bool get isFull => remainingSpots <= 0;
 
-  BookingMatch copyWith({List<MatchParticipant>? participants}) => BookingMatch(
+  BookingMatch copyWith({
+    List<MatchParticipant>? participants,
+    String? inviteToken,
+    int? goingCount,
+  }) => BookingMatch(
     bookingReference: bookingReference,
     organizerId: organizerId,
     organizerName: organizerName,
@@ -44,7 +56,8 @@ class BookingMatch {
     endsAt: endsAt,
     fieldNumber: fieldNumber,
     capacity: capacity,
-    inviteToken: inviteToken,
+    inviteToken: inviteToken ?? this.inviteToken,
     participants: participants ?? this.participants,
+    goingCount: goingCount ?? _goingCount,
   );
 }

@@ -18,6 +18,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/bookings/data/mock_booking_repository.dart';
 import '../features/bookings/data/supabase_booking_repository.dart';
 import '../features/bookings/data/mock_match_repository.dart';
+import '../features/bookings/data/supabase_match_repository.dart';
 import '../features/bookings/domain/booking_repository.dart';
 import '../features/bookings/domain/match_repository.dart';
 import '../features/slots/data/mock_slot_repository.dart';
@@ -91,7 +92,7 @@ class AppDependencies {
         Supabase.instance.client,
         venueIdProvider,
       ),
-      matchRepository: dependencies.matchRepository,
+      matchRepository: SupabaseMatchRepository(Supabase.instance.client),
       staffRepository: SupabaseStaffRepository(
         Supabase.instance.client,
         venueIdProvider,

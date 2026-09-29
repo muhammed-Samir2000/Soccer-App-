@@ -24,16 +24,20 @@ class MatchHubScreen extends StatefulWidget {
 }
 
 class _MatchHubScreenState extends State<MatchHubScreen> {
-  late Future<BookingMatch> _match;
+  late Future<BookingMatch?> _match;
 
   @override
   void initState() {
     super.initState();
-    _match = widget.repository.getOrCreateForBooking(widget.booking);
+    _match = widget.repository.getForBooking(widget.booking.reference);
   }
 
   Future<void> _copyInviteLink(BookingMatch match) async {
-    final String link = _inviteLink(match.inviteToken);
+    final String? token = match.inviteToken;
+    if (token == null) {
+      return;
+    }
+    final String link = _inviteLink(token);
     await Clipboard.setData(ClipboardData(text: link));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -42,16 +46,68 @@ class _MatchHubScreenState extends State<MatchHubScreen> {
     }
   }
 
+  Future<void> _createOrRefreshInvite() async {
+    try {
+      final BookingMatch match = await widget.repository
+          .createOrRefreshInviteForBooking(widget.booking);
+      if (!mounted) {
+        return;
+      }
+      setState(() => _match = Future<BookingMatch?>.value(match));
+      await _copyInviteLink(match);
+    } on StateError catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error.message.toString())));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: const AppPageAppBar(title: 'فريق الماتش'),
-    body: FutureBuilder<BookingMatch>(
+    body: FutureBuilder<BookingMatch?>(
       future: _match,
-      builder: (BuildContext context, AsyncSnapshot<BookingMatch> snapshot) {
-        if (!snapshot.hasData) {
+      builder: (BuildContext context, AsyncSnapshot<BookingMatch?> snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: FilledButton.tonal(
+              onPressed: () => setState(
+                () => _match = widget.repository.getForBooking(
+                  widget.booking.reference,
+                ),
+              ),
+              child: const Text('حاول تاني'),
+            ),
+          );
+        }
+        if (snapshot.connectionState != ConnectionState.done) {
           return const Center(child: CircularProgressIndicator());
         }
-        final BookingMatch match = snapshot.data!;
+        final BookingMatch? match = snapshot.data;
+        if (match == null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Icon(Icons.groups_outlined, size: 56),
+                  const SizedBox(height: 16),
+                  const Text('لسه ما أنشأتش دعوة للفريق.'),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    key: const Key('create_match_invite_button'),
+                    onPressed: _createOrRefreshInvite,
+                    icon: const Icon(Icons.link_rounded),
+                    label: const Text('أنشئ رابط الدعوة'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         final double progress = match.goingCount / match.capacity;
         return ListView(
           padding: const EdgeInsets.all(20),
@@ -96,9 +152,15 @@ class _MatchHubScreenState extends State<MatchHubScreen> {
             const SizedBox(height: 16),
             FilledButton.icon(
               key: const Key('copy_match_invite_button'),
-              onPressed: () => _copyInviteLink(match),
+              onPressed: match.inviteToken == null
+                  ? _createOrRefreshInvite
+                  : () => _copyInviteLink(match),
               icon: const Icon(Icons.link_rounded),
-              label: const Text('انسخ رابط الدعوة'),
+              label: Text(
+                match.inviteToken == null
+                    ? 'أنشئ رابط دعوة جديد'
+                    : 'انسخ رابط الدعوة',
+              ),
             ),
             const SizedBox(height: 8),
             Text(

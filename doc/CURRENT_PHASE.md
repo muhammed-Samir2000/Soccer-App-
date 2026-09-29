@@ -29,6 +29,9 @@
 - Staff invitations, permission edits and revocation now have an RPC-backed
   Flutter adapter. The invitation, super-admin and V1 hardening migrations
   must still be applied and verified before treating them as live operations.
+- Team invitation creation, invite previews, authenticated RSVP, and
+  post-match results now have Supabase adapters and a dedicated RPC migration.
+  Apply and verify the migration before enabling these persisted features.
 - Player and manager calendars now accept every future date without a monthly
   or 90-day product cap. The companion migration for live unbounded slots and
   manager update/cancel actions is checked in and awaits one Staging apply.
@@ -48,9 +51,10 @@
   overlap prevention, and security test checklist.
 - Supabase client initialization through runtime-only Dart defines; mock
   repositories remain active until authenticated adapters are verified.
-- Group match flow: organizer creates a shareable invitation from a confirmed
-  booking; teammates respond `جاي` or `مش جاي`; capacity is configurable and
-  never changes the validity of the original booking.
+- Group match flow: organizer explicitly creates or refreshes a shareable
+  invitation from a future confirmed booking; teammates respond `جاي` or
+  `مش جاي`; capacity is configurable and never changes the validity of the
+  original booking. The database stores a hash rather than a raw token.
 - Google entry uses the standard outlined, multi-colour Google treatment and
   explains that the password is entered only on Google's official page.
 - Admin team management now records an e-mail invitation, venue role, three
@@ -59,9 +63,9 @@
   no client path creates or promotes a super-admin.
 
 ## Next
-- Record successful Google OAuth redirect acceptance, then replace mock staff,
-  booking, slot, and match repositories incrementally only
-  after the RLS/RPC acceptance checks pass. Do not use a service-role key in
-  Flutter or add a payment provider.
+- Back up Staging, apply and verify the pending migrations in timestamp order,
+  including `20260929110000_match_invite_and_results_api.sql`, then run the
+  two-account booking, invitation, RSVP, staff and permission acceptance
+  matrix. Do not use a service-role key in Flutter or add a payment provider.
 - Fix the Android Kotlin cache/environment issue and create a protected release
   signing configuration before producing a distributable Android build.

@@ -10,6 +10,8 @@ import 'package:soccer_booking_app/features/auth/presentation/mock_login_screen.
 import 'package:soccer_booking_app/features/bookings/domain/booking.dart';
 import 'package:soccer_booking_app/features/bookings/domain/booking_match.dart';
 import 'package:soccer_booking_app/features/bookings/domain/match_repository.dart';
+import 'package:soccer_booking_app/features/bookings/data/mock_match_repository.dart';
+import 'package:soccer_booking_app/features/bookings/presentation/match_hub_screen.dart';
 import 'package:soccer_booking_app/features/slots/domain/time_slot.dart';
 
 void main() {
@@ -276,6 +278,23 @@ void main() {
 
     expect(find.text('2 من 10 أكدوا حضورهم'), findsOneWidget);
   });
+
+  testWidgets('offers an explicit invite action when no team exists yet', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MatchHubScreen(
+          booking: _inviteFixtureBooking(),
+          repository: MockMatchRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('لسه ما أنشأتش دعوة للفريق.'), findsOneWidget);
+    expect(find.byKey(const Key('create_match_invite_button')), findsOneWidget);
+  });
 }
 
 class _LiveAuthRepository extends MockAuthRepository {
@@ -293,21 +312,25 @@ class BookingMatchFixture {
 Future<BookingMatchFixture> _createInviteFixture(
   MatchRepository repository,
 ) async {
-  final Booking booking = Booking(
-    reference: 'HAGZ-INVITE-1',
-    playerId: 'organizer-1',
-    playerName: 'الكابتن أحمد',
-    slot: TimeSlot(
-      id: 'invite-slot',
-      startTime: DateTime(2026, 9, 15, 19),
-      endTime: DateTime(2026, 9, 15, 20),
-      status: SlotStatus.booked,
-    ),
-    services: const [],
-    totalPrice: 800,
-    status: BookingStatus.confirmed,
-    fieldNumber: 1,
+  final Booking booking = _inviteFixtureBooking();
+  final BookingMatch match = await repository.createOrRefreshInviteForBooking(
+    booking,
   );
-  final BookingMatch match = await repository.getOrCreateForBooking(booking);
-  return BookingMatchFixture(match.inviteToken);
+  return BookingMatchFixture(match.inviteToken!);
 }
+
+Booking _inviteFixtureBooking() => Booking(
+  reference: 'HAGZ-INVITE-1',
+  playerId: 'organizer-1',
+  playerName: 'الكابتن أحمد',
+  slot: TimeSlot(
+    id: 'invite-slot',
+    startTime: DateTime(2026, 9, 15, 19),
+    endTime: DateTime(2026, 9, 15, 20),
+    status: SlotStatus.booked,
+  ),
+  services: const [],
+  totalPrice: 800,
+  status: BookingStatus.confirmed,
+  fieldNumber: 1,
+);

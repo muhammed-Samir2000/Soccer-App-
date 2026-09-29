@@ -46,7 +46,28 @@ class SupabaseBookingRepository implements BookingRepository {
     fieldNumber:
         row['field_number'] as int? ??
         (row['fields'] as Map<String, dynamic>)['sort_order'] as int,
+    matchResult: _decodeMatchResult(row['match_result']),
   );
+
+  static MatchResult? _decodeMatchResult(Object? raw) {
+    if (raw is! Map) {
+      return null;
+    }
+    final Map<String, dynamic> result = Map<String, dynamic>.from(raw);
+    final String? winningTeam = result['winning_team'] as String?;
+    final String? manOfTheMatch = result['man_of_the_match'] as String?;
+    if (winningTeam == null || manOfTheMatch == null) {
+      return null;
+    }
+    return MatchResult(
+      winningTeam: winningTeam,
+      manOfTheMatch: manOfTheMatch,
+      manOfTheMatchDescription:
+          result['man_of_the_match_description'] as String? ?? '',
+      bestGoal: result['best_goal'] as String? ?? '',
+      bestGoalDescription: result['best_goal_description'] as String? ?? '',
+    );
+  }
 
   @override
   Future<List<Booking>> getBookings() async {
@@ -168,7 +189,27 @@ class SupabaseBookingRepository implements BookingRepository {
   Future<void> saveMatchResult({
     required String bookingReference,
     required MatchResult result,
-  }) async => throw StateError('تسجيل النتائج مش مفعّل في الربط الحالي.');
+  }) async {
+    try {
+      await client.rpc(
+        'soccer_save_match_result',
+        params: <String, dynamic>{
+          'p_booking_reference': bookingReference,
+          'p_winning_team': result.winningTeam,
+          'p_man_of_the_match': result.manOfTheMatch,
+          'p_man_of_the_match_description': result.manOfTheMatchDescription,
+          'p_best_goal': result.bestGoal,
+          'p_best_goal_description': result.bestGoalDescription,
+        },
+      );
+    } on PostgrestException catch (error) {
+      if (error.message.contains('one hour after')) {
+        throw StateError('تقدر تسجل النتيجة بعد ساعة من نهاية المباراة.');
+      }
+      throw StateError('حفظ بيانات المباراة ما اكتملش. راجع حسابك وحاول تاني.');
+    }
+  }
+
   @override
   Future<void> updateBooking(Booking booking) async {
     try {

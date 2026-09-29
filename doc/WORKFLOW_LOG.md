@@ -769,3 +769,14 @@ At the end of your response, provide the final completion summary and state that
 - Verification: a clean-origin load of the rebuilt container restored the super-admin session, loaded the shared venue, and showed explicit validation for an empty player name and invalid Egyptian mobile in the quick-booking form without sending a booking request.
 - Changed: Google OAuth now requests the account chooser so «تسجيل Google بحساب مختلف» can actually select a separate player account instead of silently reusing the administrator account.
 - Remaining verification: rebuild the account-chooser change, sign in with a player account, create one controlled booking, and attempt the same slot from a second player session.
+
+### 2026-09-29 | Persistent Match Invitations And Results Boundary | Status: completed locally, Staging migration pending
+
+- Actor: Codex.
+- Intent: replace the live-backend fallback to in-memory match data with an authenticated Supabase boundary for team invitations, RSVP and player-recorded post-match results, while preserving the mock mode used by widget tests.
+- Changed: `SupabaseMatchRepository`; dependency composition; match repository contract and organizer/invite screens; persisted `match_result` decoding and result-save RPC call; mapping tests; `20260929110000_match_invite_and_results_api.sql`; V1 readiness documentation.
+- Decisions: opening the team screen never rotates a share link. The organizer explicitly creates or refreshes a token, and only a SHA-256 hash is stored. Anonymous link previews expose only captain name, booking time, field number, capacity and attendance count; the roster is limited to the organizer or authorized venue staff. RSVP requires Google-authenticated identity, validates the display name in the RPC, serializes capacity, and updates the participant's profile name. Results can be written only by the booking owner and only one hour after the match ends.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 53 tests, including Supabase invite-preview and organizer-roster mapping plus the empty-team create-link state. `flutter build web --release` also completed and refreshed `build/web`.
+- Blockers/Risks: no remote migration was applied. Before live use, back up Staging and apply `20260929110000_match_invite_and_results_api.sql` after the existing schema, group-match, unbounded-booking and hardening migrations; then record a two-account organizer/invitee RSVP test and result-save authorization test. Push/SMS/WhatsApp reminders remain intentionally unimplemented.
+- Source control: pending commit and push after this workflow-log update.
+- Next action: perform the Staging backup/migration and two-account acceptance matrix before enabling a controlled V1 pilot.

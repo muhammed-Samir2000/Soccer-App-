@@ -303,6 +303,13 @@ class _ResultEditorState extends State<_ResultEditor> {
                       _errorMessage = error.message.toString();
                     });
                   }
+                } on StateError catch (error) {
+                  if (mounted) {
+                    setState(() {
+                      _saving = false;
+                      _errorMessage = error.message.toString();
+                    });
+                  }
                 }
               },
         child: Text(_saving ? 'بيتحفظ...' : 'حفظ بيانات المباراة'),

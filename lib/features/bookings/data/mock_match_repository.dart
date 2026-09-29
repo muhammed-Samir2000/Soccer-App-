@@ -8,7 +8,7 @@ class MockMatchRepository implements MatchRepository {
   final Map<String, BookingMatch> _matchesByBooking = <String, BookingMatch>{};
 
   @override
-  Future<BookingMatch> getOrCreateForBooking(
+  Future<BookingMatch> createOrRefreshInviteForBooking(
     Booking booking, {
     int capacity = 10,
   }) async {
@@ -17,7 +17,11 @@ class MockMatchRepository implements MatchRepository {
     }
     final BookingMatch? existing = _matchesByBooking[booking.reference];
     if (existing != null) {
-      return existing;
+      final BookingMatch refreshed = existing.copyWith(
+        inviteToken: 'demo-${_nextTokenNumber++}-${booking.reference}',
+      );
+      _matchesByBooking[booking.reference] = refreshed;
+      return refreshed;
     }
     final BookingMatch match = BookingMatch(
       bookingReference: booking.reference,
