@@ -26,6 +26,9 @@
 - Staff invitations are implemented in mock UI and a new backend migration is
   checked in. The migration must be applied before a real manager can grant an
   invited Google account venue access.
+- Player and manager calendars now accept every future date without a monthly
+  or 90-day product cap. The companion migration for live unbounded slots and
+  manager update/cancel actions is checked in and awaits one Staging apply.
 
 ## Completed
 - Product, scope, and player-flow documentation.

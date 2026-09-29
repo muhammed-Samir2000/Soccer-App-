@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
 import '../../../core/utils/arabic_date.dart';
+import '../../../core/utils/booking_dates.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
+import '../../../shared/widgets/booking_date_picker_field.dart';
 import '../../auth/domain/app_user.dart';
 import '../../bookings/presentation/player_bottom_navigation.dart';
-import '../data/mock_slot_repository.dart';
 import '../domain/slot_repository.dart';
 import '../domain/time_slot.dart';
 
@@ -29,17 +30,18 @@ class AvailableSlotsScreen extends StatefulWidget {
 
 class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
   late DateTime _selectedDay;
+  late DateTime _visibleStart;
   late Stream<List<TimeSlot>> _slots;
   final ScrollController _daysController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    final DateTime requestedDay =
-        widget.initialDay ?? MockSlotRepository.bookingStart;
-    _selectedDay = requestedDay.isBefore(MockSlotRepository.bookingStart)
-        ? MockSlotRepository.bookingStart
-        : requestedDay;
+    final DateTime requestedDay = BookingDates.clampToBookableDay(
+      widget.initialDay ?? BookingDates.today,
+    );
+    _selectedDay = requestedDay;
+    _visibleStart = requestedDay;
     _slots = widget.repository.watchSlotsForDay(_selectedDay);
   }
 
@@ -58,11 +60,7 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime start = MockSlotRepository.bookingStart;
-    final List<DateTime> days = List<DateTime>.generate(
-      MockSlotRepository.bookingEnd.difference(start).inDays,
-      (int index) => start.add(Duration(days: index)),
-    );
+    final List<DateTime> days = BookingDates.sevenDaysFrom(_visibleStart);
     final double dayWidth = MediaQuery.sizeOf(context).width < 360 ? 66 : 74;
 
     return Scaffold(
@@ -123,175 +121,175 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
       body: SafeArea(
         child: StreamBuilder<List<TimeSlot>>(
           stream: _slots,
-          builder:
-              (BuildContext context, AsyncSnapshot<List<TimeSlot>> snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: FilledButton.tonal(
-                      onPressed: () => _selectDay(_selectedDay),
-                      child: const Text('حاول تاني تحميل المواعيد'),
-                    ),
-                  );
-                }
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final int availableCount = snapshot.data!
-                    .where((TimeSlot slot) => slot.isAvailable)
-                    .length;
+          builder: (BuildContext context, AsyncSnapshot<List<TimeSlot>> snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: FilledButton.tonal(
+                  onPressed: () => _selectDay(_selectedDay),
+                  child: const Text('حاول تاني تحميل المواعيد'),
+                ),
+              );
+            }
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final int availableCount = snapshot.data!
+                .where((TimeSlot slot) => slot.isAvailable)
+                .length;
 
-                return ListView(
-                  padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 20, 24),
+            return ListView(
+              padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 20, 24),
+              children: [
+                Text(
+                  'اختار ميعاد ماتشك',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'اختار أي تاريخ جاي من التقويم، وبنظهر لك أسبوع من التاريخ المختار.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                BookingDatePickerField(
+                  selectedDate: _selectedDay,
+                  firstDate: BookingDates.today,
+                  lastDate: BookingDates.calendarLastDate,
+                  label: 'تاريخ الحجز',
+                  onChanged: _selectCalendarDay,
+                ),
+                const SizedBox(height: 24),
+                Row(
                   children: [
-                    Text(
-                      'اختار ميعاد ماتشك',
-                      style: Theme.of(context).textTheme.headlineSmall,
+                    IconButton(
+                      tooltip: 'أيام قبل كده',
+                      onPressed: _visibleStart == BookingDates.today
+                          ? null
+                          : () => _moveDays(-1),
+                      icon: const Icon(Icons.arrow_forward),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'المواعيد المتاحة قدامك لمدة ${days.length} أيام.',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        IconButton(
-                          tooltip: 'أيام قبل كده',
-                          onPressed: () => _moveDays(-1),
-                          icon: const Icon(Icons.arrow_forward),
-                        ),
-                        Expanded(
-                          child: SizedBox(
-                            height: 92,
-                            child: ListView.separated(
-                              controller: _daysController,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: days.length,
-                              separatorBuilder: (_, _) =>
-                                  const SizedBox(width: 10),
-                              itemBuilder: (BuildContext context, int index) {
-                                final DateTime day = days[index];
-                                final bool isSelected = _sameDay(
-                                  day,
-                                  _selectedDay,
-                                );
-                                return Semantics(
-                                  label: 'اختيار ${_dayLabel(day)}',
-                                  selected: isSelected,
-                                  button: true,
-                                  child: InkWell(
-                                    onTap: () => _selectDay(day),
+                    Expanded(
+                      child: SizedBox(
+                        height: 92,
+                        child: ListView.separated(
+                          controller: _daysController,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: days.length,
+                          separatorBuilder: (_, _) => const SizedBox(width: 10),
+                          itemBuilder: (BuildContext context, int index) {
+                            final DateTime day = days[index];
+                            final bool isSelected = _sameDay(day, _selectedDay);
+                            return Semantics(
+                              label: 'اختيار ${_dayLabel(day)}',
+                              selected: isSelected,
+                              button: true,
+                              child: InkWell(
+                                onTap: () => _selectDay(day),
+                                borderRadius: BorderRadius.circular(16),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  width: dayWidth,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.white,
                                     borderRadius: BorderRadius.circular(16),
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 180,
-                                      ),
-                                      width: dayWidth,
-                                      decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? Theme.of(
-                                                context,
-                                              ).colorScheme.primary
-                                            : Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outlineVariant,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _weekdayName(day),
+                                        style: TextStyle(
                                           color: isSelected
                                               ? Theme.of(
                                                   context,
-                                                ).colorScheme.primary
-                                              : Theme.of(
-                                                  context,
-                                                ).colorScheme.outlineVariant,
+                                                ).colorScheme.onPrimary
+                                              : null,
                                         ),
                                       ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            _weekdayName(day),
-                                            style: TextStyle(
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${day.day}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
                                               color: isSelected
                                                   ? Theme.of(
                                                       context,
                                                     ).colorScheme.onPrimary
                                                   : null,
                                             ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${day.day}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge
-                                                ?.copyWith(
-                                                  color: isSelected
-                                                      ? Theme.of(
-                                                          context,
-                                                        ).colorScheme.onPrimary
-                                                      : null,
-                                                ),
-                                          ),
-                                          Text(
-                                            arabicMonthName(day),
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: isSelected
-                                                  ? Theme.of(
-                                                      context,
-                                                    ).colorScheme.onPrimary
-                                                  : null,
-                                            ),
-                                          ),
-                                        ],
                                       ),
-                                    ),
+                                      Text(
+                                        arabicMonthName(day),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: isSelected
+                                              ? Theme.of(
+                                                  context,
+                                                ).colorScheme.onPrimary
+                                              : null,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: 'أيام بعد كده',
-                          onPressed: () => _moveDays(1),
-                          icon: const Icon(Icons.arrow_back),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _PlayerSlotsHero(
-                      day: _selectedDay,
-                      availableCount: availableCount,
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'مواعيد الملعب',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 12),
-                    ...snapshot.data!.map(
-                      (TimeSlot slot) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _SlotCard(
-                          slot: slot,
-                          onTap: slot.isAvailable
-                              ? () => Navigator.of(context).pushNamed(
-                                  AppRouter.bookingSummaryRoute,
-                                  arguments: BookingSummaryRouteArguments(
-                                    slot: slot,
-                                    player: widget.player,
-                                  ),
-                                )
-                              : null,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const _SlotLegend(),
+                    IconButton(
+                      tooltip: 'أيام بعد كده',
+                      onPressed: () => _moveDays(1),
+                      icon: const Icon(Icons.arrow_back),
+                    ),
                   ],
-                );
-              },
+                ),
+                const SizedBox(height: 24),
+                _PlayerSlotsHero(
+                  day: _selectedDay,
+                  availableCount: availableCount,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'مواعيد الملعب',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 12),
+                ...snapshot.data!.map(
+                  (TimeSlot slot) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _SlotCard(
+                      slot: slot,
+                      onTap: slot.isAvailable
+                          ? () => Navigator.of(context).pushNamed(
+                              AppRouter.bookingSummaryRoute,
+                              arguments: BookingSummaryRouteArguments(
+                                slot: slot,
+                                player: widget.player,
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const _SlotLegend(),
+              ],
+            );
+          },
         ),
       ),
       bottomNavigationBar: PlayerBottomNavigation(
@@ -302,15 +300,28 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
   }
 
   void _moveDays(int direction) {
-    final double next = (_daysController.offset + direction * 260).clamp(
-      0,
-      _daysController.position.maxScrollExtent,
-    );
-    _daysController.animateTo(
-      next,
-      duration: const Duration(milliseconds: 240),
-      curve: Curves.easeOut,
-    );
+    final DateTime requested = _visibleStart.add(Duration(days: direction * 7));
+    final DateTime next = BookingDates.clampToBookableDay(requested);
+    setState(() {
+      _visibleStart = next;
+      _selectedDay = next;
+      _slots = widget.repository.watchSlotsForDay(next);
+    });
+    if (_daysController.hasClients) {
+      _daysController.jumpTo(0);
+    }
+  }
+
+  void _selectCalendarDay(DateTime day) {
+    final DateTime selected = BookingDates.clampToBookableDay(day);
+    setState(() {
+      _selectedDay = selected;
+      _visibleStart = selected;
+      _slots = widget.repository.watchSlotsForDay(selected);
+    });
+    if (_daysController.hasClients) {
+      _daysController.jumpTo(0);
+    }
   }
 }
 

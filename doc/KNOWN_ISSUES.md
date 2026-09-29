@@ -52,3 +52,7 @@
   `20260921130000_super_admin_staff_management.sql` is not yet reported as
   applied, and no RLS/RPC-backed Flutter staff adapter exists. Phone details,
   permission edits, and revocation therefore remain mock-only.
+- Until `20260929090000_remove_booking_horizon.sql` is applied, Staging still
+  enforces its old 90-day booking cap and does not expose the secured manager
+  booking-update/cancel RPCs. The Flutter calendar is already unbounded from
+  today onward, so apply the migration before live acceptance testing.

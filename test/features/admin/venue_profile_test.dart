@@ -25,6 +25,6 @@ void main() {
       closingHour: 15,
     );
 
-    expect(venue.validate(), contains('مختلفين'));
+    expect(venue.validate(), contains('مختلفتين'));
   });
 }

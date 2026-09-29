@@ -17,6 +17,7 @@ class TimeSlot {
   final DateTime endTime;
   final SlotStatus status;
   final int basePrice;
+
   /// Null is the legacy demo catalog; an empty list means no live extras.
   final List<OptionalService>? services;
 

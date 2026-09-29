@@ -72,7 +72,9 @@ class _FinancialAnalyticsScreenState extends State<FinancialAnalyticsScreen> {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 6),
-            const Text('تابع قيمة الحجوزات المؤكدة والثابتة وقارنها بالفترة اللي قبلها.'),
+            const Text(
+              'تابع قيمة الحجوزات المؤكدة والثابتة وقارنها بالفترة اللي قبلها.',
+            ),
             const SizedBox(height: 18),
             OutlinedButton.icon(
               onPressed: _selectPeriod,
@@ -275,7 +277,9 @@ class _TrendCard extends StatelessWidget {
                 report.trend.every(
                   (MonthlyCollection item) => item.collectedAmount == 0,
                 )
-                ? const Center(child: Text('لسه مفيش حجوزات مؤكدة أو ثابتة في الفترة دي.'))
+                ? const Center(
+                    child: Text('لسه مفيش حجوزات مؤكدة أو ثابتة في الفترة دي.'),
+                  )
                 : null,
           ),
         ),

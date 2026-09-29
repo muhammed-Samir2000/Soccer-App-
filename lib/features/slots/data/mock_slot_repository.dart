@@ -1,6 +1,7 @@
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_activity.dart';
 import '../../bookings/domain/booking_repository.dart';
+import '../../../core/utils/booking_dates.dart';
 import '../domain/slot_repository.dart';
 import '../domain/time_slot.dart';
 
@@ -13,15 +14,7 @@ class MockSlotRepository implements SlotRepository {
   final BookingRepository _bookingRepository;
   final Future<int> Function() _fieldCountProvider;
 
-  static DateTime get bookingStart {
-    final DateTime now = DateTime.now();
-    return DateTime(now.year, now.month, now.day);
-  }
-
-  static DateTime get bookingEnd {
-    final DateTime start = bookingStart;
-    return DateTime(start.year, start.month + 1);
-  }
+  static DateTime get bookingStart => BookingDates.today;
 
   /// Retained as a compatibility alias for existing mock and dashboard flows.
   static DateTime get weekStart => bookingStart;

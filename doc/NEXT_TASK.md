@@ -32,6 +32,11 @@
   once to Staging before persisting a venue schedule that closes after
   midnight, such as 15:00 to 02:00. Do not modify the already-applied initial
   migration; this additive migration replaces its old closing-hour constraint.
+- Apply `supabase/migrations/20260929090000_remove_booking_horizon.sql` once
+  to Staging. It removes the temporary 90-day server cap and supplies the
+  authenticated manager update/cancel RPCs. Then validate tomorrow, a later
+  day this month, the first day of next month, and a date several months ahead
+  with two accounts attempting the same slot.
 - Test a pending invitation, a case-insensitive matching Google e-mail, a
   non-invited player denial, a revoked invitation, permission updates, and the
   inability to create a `super_admin` account from the client.

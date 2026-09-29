@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
 import '../../../core/utils/arabic_date.dart';
+import '../../../core/utils/booking_dates.dart';
 import '../../../core/utils/booking_input_validators.dart';
 import '../../bookings/domain/booking.dart';
 import '../../bookings/domain/booking_draft.dart';
 import '../../bookings/domain/booking_repository.dart';
-import '../../slots/data/mock_slot_repository.dart';
 import '../../slots/domain/time_slot.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../../shared/widgets/booking_date_picker_field.dart';
@@ -40,11 +40,13 @@ class AdminWeekScreen extends StatefulWidget {
 
 class _AdminWeekScreenState extends State<AdminWeekScreen> {
   late Future<List<Booking>> _bookings;
+  late DateTime _visibleStart;
 
   @override
   void initState() {
     super.initState();
     _bookings = widget.bookingRepository.getBookings();
+    _visibleStart = BookingDates.today;
   }
 
   void _reload() {
@@ -141,10 +143,8 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
-            final DateTime start = MockSlotRepository.bookingStart;
-            final List<DateTime> week = List<DateTime>.generate(
-              MockSlotRepository.bookingEnd.difference(start).inDays,
-              (int index) => start.add(Duration(days: index)),
+            final List<DateTime> week = BookingDates.sevenDaysFrom(
+              _visibleStart,
             );
             return ListView(
               padding: const EdgeInsets.all(20),
@@ -165,14 +165,50 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'مواعيد الشهر من النهارده',
+                  'مواعيد الحجز القادمة',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 6),
                 const Text(
-                  'اختار أي يوم متاح لآخر الشهر علشان تشوف الساعات وتدير حجوزاته.',
+                  'اختار أي تاريخ جاي من التقويم لإدارة ساعاته وحجوزاته.',
                 ),
                 const SizedBox(height: 16),
+                BookingDatePickerField(
+                  selectedDate: _visibleStart,
+                  firstDate: BookingDates.today,
+                  lastDate: BookingDates.calendarLastDate,
+                  label: 'بداية عرض الأيام',
+                  onChanged: (DateTime day) => setState(
+                    () => _visibleStart = BookingDates.clampToBookableDay(day),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: _visibleStart == BookingDates.today
+                          ? null
+                          : () => setState(() {
+                              _visibleStart = BookingDates.clampToBookableDay(
+                                _visibleStart.subtract(const Duration(days: 7)),
+                              );
+                            }),
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('الأسبوع السابق'),
+                    ),
+                    const SizedBox(width: 12),
+                    OutlinedButton.icon(
+                      onPressed: () => setState(() {
+                        _visibleStart = _visibleStart.add(
+                          const Duration(days: 7),
+                        );
+                      }),
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('الأسبوع التالي'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 ...week.map(
                   (DateTime day) => _DaySummaryCard(
                     day: day,
@@ -415,94 +451,92 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
   );
 
   Future<void> _editBooking(Booking booking) async {
+    final VenueSettings settings = await widget.venueSettingsRepository
+        .getSettings();
+    if (!mounted) {
+      return;
+    }
     final TextEditingController name = TextEditingController(
       text: booking.playerName,
     );
-    DateTime selectedDay = DateTime(
-      booking.slot.startTime.year,
-      booking.slot.startTime.month,
-      booking.slot.startTime.day,
+    DateTime selectedDay = BookingDates.clampToBookableDay(
+      booking.slot.startTime,
     );
-    int selectedHour = booking.slot.startTime.hour;
+    int selectedHour =
+        settings.containsOperatingHour(booking.slot.startTime.hour)
+        ? booking.slot.startTime.hour
+        : settings.openingHour;
     final bool? shouldSave = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) => StatefulBuilder(
-        builder: (BuildContext context, StateSetter setDialogState) =>
-            AlertDialog(
-              title: const Text('تعديل الحجز'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: name,
-                      decoration: const InputDecoration(
-                        labelText: 'اسم اللاعب أو المجموعة',
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    BookingDatePickerField(
-                      selectedDate: selectedDay,
-                      firstDate: MockSlotRepository.bookingStart,
-                      lastDate: MockSlotRepository.bookingEnd.subtract(
-                        const Duration(days: 1),
-                      ),
-                      onChanged: (DateTime day) {
-                        setDialogState(() => selectedDay = day);
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      initialValue: selectedHour,
-                      decoration: const InputDecoration(labelText: 'الساعة'),
-                      items: <int>[16, 17, 18, 19, 20]
-                          .map(
-                            (int hour) => DropdownMenuItem<int>(
-                              value: hour,
-                              child: Text(
-                                '${_formatHour(hour)} - ${_formatHour(hour + 1)}',
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (int? hour) {
-                        if (hour != null) {
-                          setDialogState(() => selectedHour = hour);
-                        }
-                      },
-                    ),
-                  ],
+        builder: (BuildContext context, StateSetter setDialogState) => AlertDialog(
+          title: const Text('تعديل الحجز'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: name,
+                  decoration: const InputDecoration(
+                    labelText: 'اسم اللاعب أو المجموعة',
+                  ),
                 ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('إلغاء'),
+                const SizedBox(height: 12),
+                BookingDatePickerField(
+                  selectedDate: selectedDay,
+                  firstDate: BookingDates.today,
+                  lastDate: BookingDates.calendarLastDate,
+                  onChanged: (DateTime day) {
+                    setDialogState(() => selectedDay = day);
+                  },
                 ),
-                FilledButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('حفظ'),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<int>(
+                  initialValue: selectedHour,
+                  decoration: const InputDecoration(labelText: 'الساعة'),
+                  items: settings.operatingHourList
+                      .map(
+                        (int hour) => DropdownMenuItem<int>(
+                          value: hour,
+                          child: Text(
+                            '${_formatHour(hour)} - ${_formatHour((hour + 1) % 24)}',
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (int? hour) {
+                    if (hour != null) {
+                      setDialogState(() => selectedHour = hour);
+                    }
+                  },
                 ),
               ],
             ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('إلغاء'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('حفظ'),
+            ),
+          ],
+        ),
       ),
     );
     if (shouldSave == true) {
       try {
+        final DateTime startsAt = _operatingDateTime(
+          selectedDay,
+          selectedHour,
+          settings,
+        );
         final TimeSlot updatedSlot = TimeSlot(
           id: booking.slot.id,
-          startTime: DateTime(
-            selectedDay.year,
-            selectedDay.month,
-            selectedDay.day,
-            selectedHour,
-          ),
-          endTime: DateTime(
-            selectedDay.year,
-            selectedDay.month,
-            selectedDay.day,
-            selectedHour + 1,
-          ),
+          startTime: startsAt,
+          endTime: startsAt.add(const Duration(hours: 1)),
           status: SlotStatus.booked,
         );
         await widget.repository.updateBooking(
@@ -562,22 +596,15 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
     if (registration == null) {
       return;
     }
+    final VenueSettings settings = await widget.venueSettingsRepository
+        .getSettings();
+    final DateTime startsAt = _operatingDateTime(widget.day, hour, settings);
 
     final BookingDraft draft = BookingDraft(
       slot: TimeSlot(
         id: 'admin-${widget.day.toIso8601String()}-$hour',
-        startTime: DateTime(
-          widget.day.year,
-          widget.day.month,
-          widget.day.day,
-          hour,
-        ),
-        endTime: DateTime(
-          widget.day.year,
-          widget.day.month,
-          widget.day.day,
-          hour + 1,
-        ),
+        startTime: startsAt,
+        endTime: startsAt.add(const Duration(hours: 1)),
         status: SlotStatus.available,
       ),
       basePrice: hourlyPrice,
@@ -823,7 +850,7 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
   @override
   void initState() {
     super.initState();
-    _day = MockSlotRepository.weekStart;
+    _day = BookingDates.today;
     _loadSettings();
   }
 
@@ -858,65 +885,63 @@ class _AdminBookingToolsScreenState extends State<AdminBookingToolsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-          SwitchListTile(
-            value: _recurring,
-            onChanged: (bool value) => setState(() => _recurring = value),
-            title: const Text('حجز أسبوعي ثابت'),
-          ),
-          TextFormField(
-            controller: _name,
-            maxLength: 80,
-            validator: (String? value) => validatePlayerName(value ?? ''),
-            decoration: const InputDecoration(
-              labelText: 'اسم اللاعب أو المجموعة',
+            SwitchListTile(
+              value: _recurring,
+              onChanged: (bool value) => setState(() => _recurring = value),
+              title: const Text('حجز أسبوعي ثابت'),
             ),
-          ),
-          TextFormField(
-            controller: _phone,
-            keyboardType: TextInputType.phone,
-            maxLength: 11,
-            validator: (String? value) => validateEgyptianMobile(value ?? ''),
-            decoration: const InputDecoration(labelText: 'رقم الهاتف'),
-          ),
-          const SizedBox(height: 16),
-          BookingDatePickerField(
-            selectedDate: _day,
-            firstDate: MockSlotRepository.bookingStart,
-            lastDate: MockSlotRepository.bookingEnd.subtract(
-              const Duration(days: 1),
+            TextFormField(
+              controller: _name,
+              maxLength: 80,
+              validator: (String? value) => validatePlayerName(value ?? ''),
+              decoration: const InputDecoration(
+                labelText: 'اسم اللاعب أو المجموعة',
+              ),
             ),
-            onChanged: (DateTime day) => setState(() => _day = day),
-          ),
-          const SizedBox(height: 12),
-          DropdownButtonFormField<int>(
-            initialValue: _hour,
-            decoration: const InputDecoration(labelText: 'الساعة'),
-            items: settings.operatingHourList
-                .map(
-                  (int hour) => DropdownMenuItem(
-                    value: hour,
-                    child: Text(
-                      '${_formatHour(hour)} - ${_formatHour((hour + 1) % 24)}',
+            TextFormField(
+              controller: _phone,
+              keyboardType: TextInputType.phone,
+              maxLength: 11,
+              validator: (String? value) => validateEgyptianMobile(value ?? ''),
+              decoration: const InputDecoration(labelText: 'رقم الهاتف'),
+            ),
+            const SizedBox(height: 16),
+            BookingDatePickerField(
+              selectedDate: _day,
+              firstDate: BookingDates.today,
+              lastDate: BookingDates.calendarLastDate,
+              onChanged: (DateTime day) => setState(() => _day = day),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int>(
+              initialValue: _hour,
+              decoration: const InputDecoration(labelText: 'الساعة'),
+              items: settings.operatingHourList
+                  .map(
+                    (int hour) => DropdownMenuItem(
+                      value: hour,
+                      child: Text(
+                        '${_formatHour(hour)} - ${_formatHour((hour + 1) % 24)}',
+                      ),
                     ),
-                  ),
-                )
-                .toList(),
-            onChanged: (int? hour) {
-              if (hour != null) setState(() => _hour = hour);
-            },
-          ),
-          const SizedBox(height: 20),
-          FilledButton(
-            onPressed: _create,
-            child: Text(
-              _recurring ? 'تثبيت الحجز الأسبوعي' : 'تسجيل حجز مبدئي',
+                  )
+                  .toList(),
+              onChanged: (int? hour) {
+                if (hour != null) setState(() => _hour = hour);
+              },
             ),
-          ),
-          if (_message != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: Text(_message!),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: _create,
+              child: Text(
+                _recurring ? 'تثبيت الحجز الأسبوعي' : 'تسجيل حجز مبدئي',
+              ),
             ),
+            if (_message != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(_message!),
+              ),
           ],
         ),
       ),

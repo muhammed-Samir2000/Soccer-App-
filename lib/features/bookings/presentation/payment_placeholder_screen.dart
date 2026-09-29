@@ -100,7 +100,9 @@ class _PaymentPlaceholderScreenState extends State<PaymentPlaceholderScreen> {
                 key: const Key('complete_mock_payment_button'),
                 onPressed: _isCreatingBooking ? null : _completeManualPayment,
                 child: Text(
-                  _isCreatingBooking ? 'بنأكد حجزك...' : 'تأكيد الحجز والدفع في الملعب',
+                  _isCreatingBooking
+                      ? 'بنأكد حجزك...'
+                      : 'تأكيد الحجز والدفع في الملعب',
                 ),
               ),
             ],

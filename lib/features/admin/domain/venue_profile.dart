@@ -25,8 +25,11 @@ class VenueProfile {
     if (hourlyPrice < 1 || hourlyPrice > 100000) {
       return 'سعر الساعة لازم يكون بين 1 و100000 جنيه.';
     }
-    if (openingHour < 0 || openingHour > 23 ||
-        closingHour < 0 || closingHour > 23 || openingHour == closingHour) {
+    if (openingHour < 0 ||
+        openingHour > 23 ||
+        closingHour < 0 ||
+        closingHour > 23 ||
+        openingHour == closingHour) {
       return 'اختار ساعتين مختلفتين للفتح والقفل.';
     }
     return null;

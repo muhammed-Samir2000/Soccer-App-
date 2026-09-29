@@ -153,7 +153,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('قيمة الحجوزات'), findsOneWidget);
-    expect(find.text('المبلغ المحصل'), findsOneWidget);
+    expect(find.text('قيمة الحجوزات المؤكدة والثابتة'), findsOneWidget);
     expect(find.text('حركة الحجوزات'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('مقارنة بالفترة السابقة'), 300);
     expect(find.text('مقارنة بالفترة السابقة'), findsOneWidget);

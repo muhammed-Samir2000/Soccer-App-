@@ -78,6 +78,7 @@ class AppDependencies {
       }
       return venue.id;
     }
+
     final AppDependencies configured = AppDependencies(
       authRepository: authRepository,
       session: dependencies.session,

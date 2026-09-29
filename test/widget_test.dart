@@ -25,7 +25,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('المواعيد الفاضية'), findsOneWidget);
-    expect(find.textContaining('المواعيد المتاحة قدامك لمدة'), findsOneWidget);
+    expect(
+      find.textContaining('اختار أي تاريخ جاي من التقويم'),
+      findsOneWidget,
+    );
     expect(find.text('جاهز للماتش؟'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.byKey(const Key('slot-003')),
@@ -73,7 +76,9 @@ void main() {
     expect(find.text('تم الدفع كاش'), findsNothing);
     expect(find.textContaining('860'), findsAtLeastNWidgets(1));
 
-    await tester.ensureVisible(find.byKey(const Key('complete_mock_payment_button')));
+    await tester.ensureVisible(
+      find.byKey(const Key('complete_mock_payment_button')),
+    );
     await tester.tap(find.byKey(const Key('complete_mock_payment_button')));
     await tester.pumpAndSettle();
 
