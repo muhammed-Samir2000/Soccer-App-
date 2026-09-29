@@ -778,7 +778,7 @@ At the end of your response, provide the final completion summary and state that
 - Decisions: opening the team screen never rotates a share link. The organizer explicitly creates or refreshes a token, and only a SHA-256 hash is stored. Anonymous link previews expose only captain name, booking time, field number, capacity and attendance count; the roster is limited to the organizer or authorized venue staff. RSVP requires Google-authenticated identity, validates the display name in the RPC, serializes capacity, and updates the participant's profile name. Results can be written only by the booking owner and only one hour after the match ends.
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 53 tests, including Supabase invite-preview and organizer-roster mapping plus the empty-team create-link state. `flutter build web --release` also completed and refreshed `build/web`.
 - Blockers/Risks: no remote migration was applied. Before live use, back up Staging and apply `20260929110000_match_invite_and_results_api.sql` after the existing schema, group-match, unbounded-booking and hardening migrations; then record a two-account organizer/invitee RSVP test and result-save authorization test. Push/SMS/WhatsApp reminders remain intentionally unimplemented.
-- Source control: committed locally as `9f96d22` (`Persist match invites and results via Supabase`). Two pushes to `origin/main` were attempted and both were blocked by DNS resolution for `github.com`; retry the push when network DNS is available.
+- Source control: committed as `9f96d22` (`Persist match invites and results via Supabase`) and delivery status as `49384b6`; both were subsequently pushed to `origin/main` after DNS recovered.
 - Next action: perform the Staging backup/migration and two-account acceptance matrix before enabling a controlled V1 pilot.
 
 ### 2026-09-29 | Slot Catalogue Polling Optimization | Status: completed
@@ -788,7 +788,7 @@ At the end of your response, provide the final completion summary and state that
 - Changed: `VenueServiceCatalog`; `SupabaseSlotRepository`; catalogue cache tests; V1 audit and known-issues documentation.
 - Decisions: service options are cached independently for each venue and exposed as immutable lists. A failed service request is evicted immediately so the next slot refresh can retry instead of retaining a failed future. Availability itself continues to poll and is still revalidated atomically by the booking RPC.
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 55 tests, including cache reuse, invalidation and failed-load recovery.
-- Source control: the previously blocked commits `9f96d22` and `49384b6` were successfully pushed to `origin/main` after DNS recovered. This optimization commit is pending push after the workflow-log update.
+- Source control: committed and pushed as `40d1cd7` (`Cache Supabase service catalog per venue`) to `origin/main`.
 - Next action: apply pending Staging migrations and execute the two-account acceptance matrix; consider Realtime only after a privacy and authorization review.
 
 ### 2026-09-29 | Staff Management Error Recovery | Status: completed
@@ -798,5 +798,5 @@ At the end of your response, provide the final completion summary and state that
 - Changed: `StaffPermissionsScreen`; staff loading-error widget coverage; V1 audit and workflow documentation.
 - Decisions: an unavailable staff list renders a clear Arabic explanation and retry action instead of a permanent progress indicator. Invitation, permission-update and revocation failures are caught at the screen boundary, retain the current list and show the repository's safe Arabic message. A successful revocation confirms the outcome.
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 56 tests, including staff-list failure and retry rendering.
-- Source control: pending commit and push after this workflow-log update.
+- Source control: committed and pushed as `4013b6a` (`Add staff management error recovery`) to `origin/main`.
 - Next action: apply the pending super-admin and hardening migrations, then verify these recovery paths against a deliberately denied non-super-admin account.
