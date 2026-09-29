@@ -780,3 +780,13 @@ At the end of your response, provide the final completion summary and state that
 - Blockers/Risks: no remote migration was applied. Before live use, back up Staging and apply `20260929110000_match_invite_and_results_api.sql` after the existing schema, group-match, unbounded-booking and hardening migrations; then record a two-account organizer/invitee RSVP test and result-save authorization test. Push/SMS/WhatsApp reminders remain intentionally unimplemented.
 - Source control: committed locally as `9f96d22` (`Persist match invites and results via Supabase`). Two pushes to `origin/main` were attempted and both were blocked by DNS resolution for `github.com`; retry the push when network DNS is available.
 - Next action: perform the Staging backup/migration and two-account acceptance matrix before enabling a controlled V1 pilot.
+
+### 2026-09-29 | Slot Catalogue Polling Optimization | Status: completed
+
+- Actor: Codex.
+- Intent: remove an unnecessary `optional_services` query from every 15-second Supabase availability refresh without changing pricing or booking rules.
+- Changed: `VenueServiceCatalog`; `SupabaseSlotRepository`; catalogue cache tests; V1 audit and known-issues documentation.
+- Decisions: service options are cached independently for each venue and exposed as immutable lists. A failed service request is evicted immediately so the next slot refresh can retry instead of retaining a failed future. Availability itself continues to poll and is still revalidated atomically by the booking RPC.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 55 tests, including cache reuse, invalidation and failed-load recovery.
+- Source control: the previously blocked commits `9f96d22` and `49384b6` were successfully pushed to `origin/main` after DNS recovered. This optimization commit is pending push after the workflow-log update.
+- Next action: apply pending Staging migrations and execute the two-account acceptance matrix; consider Realtime only after a privacy and authorization review.
