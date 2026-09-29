@@ -298,6 +298,20 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
     });
   }
 
+  void _showOperationError(Object error) {
+    final String message = switch (error) {
+      ArgumentError() =>
+        error.message?.toString() ?? 'راجع البيانات وحاول تاني.',
+      StateError() => error.message.toString(),
+      _ => 'تعذّر حفظ تغييرات فريق الإدارة. حاول تاني.',
+    };
+    if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
   Future<void> _openInviteSheet() async {
     if (!widget.canManageTeam) {
       return;
@@ -321,11 +335,20 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
         );
       }
     } on ArgumentError catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(error.message.toString())));
-      }
+      _showOperationError(error);
+    } on StateError catch (error) {
+      _showOperationError(error);
+    }
+  }
+
+  Future<void> _updateStaff(StaffMember member) async {
+    try {
+      await widget.repository.updateStaff(member);
+      _reload();
+    } on ArgumentError catch (error) {
+      _showOperationError(error);
+    } on StateError catch (error) {
+      _showOperationError(error);
     }
   }
 
@@ -350,8 +373,19 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
     if (confirmed != true) {
       return;
     }
-    await widget.repository.revokeStaff(member.id);
-    _reload();
+    try {
+      await widget.repository.revokeStaff(member.id);
+      _reload();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم إلغاء صلاحيات ${member.name}.')),
+        );
+      }
+    } on ArgumentError catch (error) {
+      _showOperationError(error);
+    } on StateError catch (error) {
+      _showOperationError(error);
+    }
   }
 
   @override
@@ -384,7 +418,28 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
                   BuildContext context,
                   AsyncSnapshot<List<StaffMember>> snapshot,
                 ) {
-                  if (!snapshot.hasData) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            const Text(
+                              'تعذر تحميل فريق الإدارة. راجع حساب السوبر أدمن وحاول تاني.',
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 12),
+                            FilledButton.tonal(
+                              onPressed: _reload,
+                              child: const Text('إعادة المحاولة'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  if (snapshot.connectionState != ConnectionState.done) {
                     return const Center(child: CircularProgressIndicator());
                   }
                   return ListView(
@@ -400,10 +455,7 @@ class _StaffPermissionsScreenState extends State<StaffPermissionsScreen> {
                       ...snapshot.data!.map(
                         (StaffMember member) => _StaffPermissionCard(
                           member: member,
-                          onPermissionChanged: (StaffMember updated) async {
-                            await widget.repository.updateStaff(updated);
-                            _reload();
-                          },
+                          onPermissionChanged: _updateStaff,
                           onRevoked: () => _revokeStaff(member),
                         ),
                       ),

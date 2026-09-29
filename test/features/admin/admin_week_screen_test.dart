@@ -238,6 +238,29 @@ void main() {
     expect(invited.canEditBookings, isTrue);
     expect(invited.canViewFinancialReports, isTrue);
   });
+
+  testWidgets('offers retry when the staff list cannot load', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: StaffPermissionsScreen(
+            repository: _FailingStaffRepository(),
+            canManageTeam: true,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('تعذر تحميل فريق الإدارة. راجع حساب السوبر أدمن وحاول تاني.'),
+      findsOneWidget,
+    );
+    expect(find.text('إعادة المحاولة'), findsOneWidget);
+  });
 }
 
 class _ControlledBookingRepository extends MockBookingRepository {
@@ -247,4 +270,10 @@ class _ControlledBookingRepository extends MockBookingRepository {
 
   @override
   Future<List<Booking>> getBookings() => _bookings;
+}
+
+class _FailingStaffRepository extends MockStaffRepository {
+  @override
+  Future<List<StaffMember>> getStaff() =>
+      Future<List<StaffMember>>.error(StateError('Network unavailable'));
 }

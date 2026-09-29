@@ -790,3 +790,13 @@ At the end of your response, provide the final completion summary and state that
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 55 tests, including cache reuse, invalidation and failed-load recovery.
 - Source control: the previously blocked commits `9f96d22` and `49384b6` were successfully pushed to `origin/main` after DNS recovered. This optimization commit is pending push after the workflow-log update.
 - Next action: apply pending Staging migrations and execute the two-account acceptance matrix; consider Realtime only after a privacy and authorization review.
+
+### 2026-09-29 | Staff Management Error Recovery | Status: completed
+
+- Actor: Codex.
+- Intent: make team invitation, permission and revocation failures understandable and recoverable when the authenticated Supabase adapter is active.
+- Changed: `StaffPermissionsScreen`; staff loading-error widget coverage; V1 audit and workflow documentation.
+- Decisions: an unavailable staff list renders a clear Arabic explanation and retry action instead of a permanent progress indicator. Invitation, permission-update and revocation failures are caught at the screen boundary, retain the current list and show the repository's safe Arabic message. A successful revocation confirms the outcome.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 56 tests, including staff-list failure and retry rendering.
+- Source control: pending commit and push after this workflow-log update.
+- Next action: apply the pending super-admin and hardening migrations, then verify these recovery paths against a deliberately denied non-super-admin account.
