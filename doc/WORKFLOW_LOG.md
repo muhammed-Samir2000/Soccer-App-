@@ -13,6 +13,13 @@
   committed as `c2519ed` (`Audit V1 security and error handling`) and pushed
   successfully to `origin/main`.
 
+### 2026-09-29 | Supabase Staff Repository | Status: completed
+
+- Changed: added `SupabaseStaffRepository` and wired it into backend dependencies. Super-admin staff list, invite, permission update and revocation now call only `admin_email_invitations` select and the restricted invitation RPCs; mock mode remains unchanged.
+- Safety: the adapter has no service-role key and does not expose membership writes. It remains inactive until runtime Supabase configuration is present, and real Staging use still requires the invitation, super-admin, and V1 hardening migrations.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; full `flutter test --reporter compact` passed with 50 tests.
+- Source control: commit and push to `origin/main` follow this finalization.
+
 ### 2026-09-29 | Unbounded Future Booking Dates | Status: completed
 
 - Actor: Codex.

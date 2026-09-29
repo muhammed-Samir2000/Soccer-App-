@@ -2,6 +2,7 @@ import '../core/config/backend_configuration.dart';
 import '../features/admin/data/mock_notification_repository.dart';
 import '../features/admin/data/mock_staff_repository.dart';
 import '../features/admin/data/mock_venue_settings_repository.dart';
+import '../features/admin/data/supabase_staff_repository.dart';
 import '../features/admin/data/supabase_venue_profile_repository.dart';
 import '../features/admin/data/supabase_venue_settings_repository.dart';
 import '../features/admin/domain/notification_repository.dart';
@@ -91,7 +92,10 @@ class AppDependencies {
         venueIdProvider,
       ),
       matchRepository: dependencies.matchRepository,
-      staffRepository: dependencies.staffRepository,
+      staffRepository: SupabaseStaffRepository(
+        Supabase.instance.client,
+        venueIdProvider,
+      ),
       notificationRepository: dependencies.notificationRepository,
       venueSettingsRepository: SupabaseVenueSettingsRepository(
         venueProfileRepository,

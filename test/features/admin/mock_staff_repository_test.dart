@@ -1,8 +1,26 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soccer_booking_app/features/admin/data/mock_staff_repository.dart';
+import 'package:soccer_booking_app/features/admin/data/supabase_staff_repository.dart';
 import 'package:soccer_booking_app/features/admin/domain/staff_member.dart';
 
 void main() {
+  test('maps Supabase invitation states to safe staff list states', () {
+    final StaffMember member = SupabaseStaffRepository.decode(<String, dynamic>{
+      'id': 'invite-1',
+      'email': 'team.lead@example.com',
+      'phone_number': '01098765432',
+      'role': 'manager',
+      'status': 'accepted',
+      'can_create_bookings': true,
+      'can_edit_bookings': true,
+      'can_view_financial_reports': false,
+    });
+
+    expect(member.name, 'team.lead');
+    expect(member.role, StaffRole.manager);
+    expect(member.invitationStatus, StaffInvitationStatus.active);
+  });
+
   test('prevents duplicate staff invitations by normalized e-mail', () async {
     final MockStaffRepository repository = MockStaffRepository();
     final StaffMember invitation = StaffMember(

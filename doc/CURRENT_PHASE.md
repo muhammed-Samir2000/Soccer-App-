@@ -26,9 +26,9 @@
 - A local authenticated player can create a mock booking and see it in
   `حجوزاتي` during the same app session. Persistence remains the next backend
   milestone.
-- Staff invitations are implemented in mock UI and a new backend migration is
-  checked in. The migration must be applied before a real manager can grant an
-  invited Google account venue access.
+- Staff invitations, permission edits and revocation now have an RPC-backed
+  Flutter adapter. The invitation, super-admin and V1 hardening migrations
+  must still be applied and verified before treating them as live operations.
 - Player and manager calendars now accept every future date without a monthly
   or 90-day product cap. The companion migration for live unbounded slots and
   manager update/cancel actions is checked in and awaits one Staging apply.

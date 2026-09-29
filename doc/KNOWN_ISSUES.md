@@ -53,11 +53,12 @@
   release. `20260913143000_admin_email_invitations.sql` is not yet reported as
   applied; until it is and a Supabase staff repository is connected, inviting a
   real e-mail will not grant production access.
-- The super-admin team screen is protected by client session role for the
-  preview. Its secure enforcement migration
+- The super-admin team screen now has an RLS/RPC-backed Flutter staff adapter,
+  but its secure enforcement migration
   `20260921130000_super_admin_staff_management.sql` is not yet reported as
-  applied, and no RLS/RPC-backed Flutter staff adapter exists. Phone details,
-  permission edits, and revocation therefore remain mock-only.
+  applied or live-tested. Do not treat invitations, phone details, permission
+  edits, or revocation as persistent until it and the V1 hardening migration
+  are applied and verified with two accounts.
 - Until `20260929090000_remove_booking_horizon.sql` is applied, Staging still
   enforces its old 90-day booking cap and does not expose the secured manager
   booking-update/cancel RPCs. The Flutter calendar is already unbounded from
