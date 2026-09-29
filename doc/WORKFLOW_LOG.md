@@ -9,7 +9,7 @@
 - Decision: there is no product booking horizon. The UI starts at Cairo today and uses Flutter's maximum calendar year only because the framework date picker requires a finite technical value. The server remains the authority for past-time rejection, operating hours, role permissions, price checks, allocation, and overlap prevention.
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; full `flutter test` passed; focused player/manager date tests passed, including tomorrow, later this month, the first day of next month, and a date six months ahead. Existing unavailable/full-slot tests also passed.
 - Blockers/Risks: apply the new SQL migration to Staging before treating live dates beyond 90 days or live manager edits/cancellations as enabled. A two-account browser acceptance test remains required after migration.
-- Source control: pending commit and push to `origin/main` after this workflow-log update.
+- Source control: committed as `381ede6` (`Allow bookings on any future date`); push to `origin/main` follows with this workflow-log finalization.
 - Next action: apply the migration once, rebuild with the public runtime configuration, then perform the controlled live booking and conflict test.
 
 ### 2026-09-25 | MVP readiness review | Status: in progress
