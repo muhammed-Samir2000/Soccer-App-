@@ -47,6 +47,20 @@ class _PaymentPlaceholderScreenState extends State<PaymentPlaceholderScreen> {
         AppRouter.bookingConfirmationRoute,
         arguments: booking,
       );
+    } on ArgumentError catch (error) {
+      if (mounted) {
+        setState(() {
+          _isCreatingBooking = false;
+          _errorMessage = error.message?.toString() ?? 'راجع بيانات الحجز.';
+        });
+      }
+    } on StateError catch (error) {
+      if (mounted) {
+        setState(() {
+          _isCreatingBooking = false;
+          _errorMessage = error.message;
+        });
+      }
     } catch (_) {
       if (mounted) {
         setState(() {

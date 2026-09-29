@@ -4,6 +4,9 @@
 - Google authentication, venue setup, shared slot availability, and secure one-off booking RPCs are now present in Supabase staging. The Flutter adapters are wired locally and await a successful rebuild and end-to-end browser verification.
 
 ## Current Focus
+- V1 audit and release-hardening work is in progress. The report is in
+  `doc/V1_AUDIT_2026-09-29.md`; public release remains NO-GO until its
+  Critical and High findings are closed and live acceptance evidence exists.
 - The approved Supabase staging project has the booking and group-match schema,
   RLS verification, Google provider, and local redirect URLs configured.
 - The Flutter client can start Google OAuth from runtime-only configuration, and

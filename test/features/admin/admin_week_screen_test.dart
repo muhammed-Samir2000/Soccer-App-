@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -137,6 +139,36 @@ void main() {
     expect(find.text('المالية'), findsOneWidget);
   });
 
+  testWidgets('offers retry states when the admin dashboard cannot load', (
+    WidgetTester tester,
+  ) async {
+    final Completer<List<Booking>> bookings = Completer<List<Booking>>();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Directionality(
+          textDirection: TextDirection.rtl,
+          child: AdminWeekScreen(
+            bookingRepository: _ControlledBookingRepository(bookings.future),
+            staffRepository: MockStaffRepository(),
+            notificationRepository: MockNotificationRepository(),
+            venueSettingsRepository: MockVenueSettingsRepository(),
+          ),
+        ),
+      ),
+    );
+    // The settings stream builds the nested booking FutureBuilder next.
+    await tester.pump();
+    await tester.pump();
+    bookings.completeError(StateError('Network unavailable'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('تعذر تحميل الحجوزات. راجع الاتصال وحاول تاني.'),
+      findsOneWidget,
+    );
+    expect(find.text('إعادة المحاولة'), findsOneWidget);
+  });
+
   testWidgets('shows collected and comparative revenue analytics', (
     WidgetTester tester,
   ) async {
@@ -206,4 +238,13 @@ void main() {
     expect(invited.canEditBookings, isTrue);
     expect(invited.canViewFinancialReports, isTrue);
   });
+}
+
+class _ControlledBookingRepository extends MockBookingRepository {
+  _ControlledBookingRepository(this._bookings);
+
+  final Future<List<Booking>> _bookings;
+
+  @override
+  Future<List<Booking>> getBookings() => _bookings;
 }

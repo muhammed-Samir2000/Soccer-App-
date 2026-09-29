@@ -134,12 +134,24 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
     body: StreamBuilder<VenueSettings>(
       stream: widget.venueSettingsRepository.watchSettings(),
       builder: (BuildContext context, AsyncSnapshot<VenueSettings> settings) {
+        if (settings.hasError) {
+          return _AdminLoadFailure(
+            message: 'تعذر تحميل إعدادات الملعب. راجع الاتصال وحاول تاني.',
+            onRetry: _reload,
+          );
+        }
         if (!settings.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
         return FutureBuilder<List<Booking>>(
           future: _bookings,
           builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
+            if (snapshot.hasError) {
+              return _AdminLoadFailure(
+                message: 'تعذر تحميل الحجوزات. راجع الاتصال وحاول تاني.',
+                onRetry: _reload,
+              );
+            }
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
@@ -244,6 +256,33 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
   );
 }
 
+class _AdminLoadFailure extends StatelessWidget {
+  const _AdminLoadFailure({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.cloud_off_outlined, size: 40),
+          const SizedBox(height: 12),
+          Text(message, textAlign: TextAlign.center),
+          const SizedBox(height: 12),
+          FilledButton.tonal(
+            onPressed: onRetry,
+            child: const Text('إعادة المحاولة'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class _DaySummaryCard extends StatelessWidget {
   const _DaySummaryCard({
     required this.day,
@@ -319,12 +358,24 @@ class _AdminDayScreenState extends State<AdminDayScreen> {
     body: StreamBuilder<VenueSettings>(
       stream: widget.venueSettingsRepository.watchSettings(),
       builder: (BuildContext context, AsyncSnapshot<VenueSettings> settings) {
+        if (settings.hasError) {
+          return _AdminLoadFailure(
+            message: 'تعذر تحميل إعدادات الملعب. راجع الاتصال وحاول تاني.',
+            onRetry: _reload,
+          );
+        }
         if (!settings.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
         return FutureBuilder<List<Booking>>(
           future: _bookings,
           builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
+            if (snapshot.hasError) {
+              return _AdminLoadFailure(
+                message: 'تعذر تحميل حجوزات اليوم. راجع الاتصال وحاول تاني.',
+                onRetry: _reload,
+              );
+            }
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }

@@ -1,5 +1,16 @@
 # Workflow Log
 
+### 2026-09-29 | V1 Audit And Initial Security Hardening | Status: completed
+
+- Actor: Codex.
+- Scope: inspected Flutter architecture, repository wiring, SQL/RLS migrations, authentication, release configuration, test coverage, and operational documentation before making changes.
+- Audit report: added `doc/V1_AUDIT_2026-09-29.md`. Public release is **NO-GO**: the live Staging migration state is unverified; staff, match and notification features remain mock-only; release signing, monitoring, backup/restore rehearsal, and live two-account acceptance tests are incomplete.
+- Security remediation prepared: added `20260929100000_harden_direct_write_paths.sql`. It removes direct client write access to `venue_memberships` and `bookings`, removes manager-controlled membership mutation, and leaves sensitive actions to authenticated SECURITY DEFINER RPCs. It preserves all data and must be applied only after a Staging backup and after the super-admin migration.
+- UX remediation: admin week/day loading paths display a retry state on venue-settings or booking failures; payment confirmation preserves safe repository validation/conflict messages rather than replacing all failures with a generic error. Added widget coverage for dashboard booking-load failure.
+- Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; focused `admin_week_screen_test.dart` passed; full `flutter test --reporter compact` passed with 49 tests; `flutter build web --release` emitted the release web bundle locally.
+- External state: no remote database, Google OAuth, Docker registry, Android configuration, or production setting was changed by this work.
+- Source control: commit and push to `origin/main` follow this finalization.
+
 ### 2026-09-29 | Unbounded Future Booking Dates | Status: completed
 
 - Actor: Codex.

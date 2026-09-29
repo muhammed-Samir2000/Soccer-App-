@@ -1,6 +1,15 @@
 # Decisions Log
 
 ## Current Decisions
+- **2026-09-29 - Sensitive client writes must use server-owned RPCs:** direct
+  client-side mutations to `bookings` and `venue_memberships` are not
+  acceptable because they can bypass booking validation or grant access. The
+  client may read only rows permitted by RLS. Booking creation, update,
+  cancellation, invitation acceptance and team changes must be performed by
+  narrow authenticated `SECURITY DEFINER` RPCs that validate identity, role,
+  venue, state and business rules. The decision is enforced for new Staging
+  deployments by `20260929100000_harden_direct_write_paths.sql`; applying it
+  is a release prerequisite, not a UI-only change.
 - Ball is included by default and is not an optional service.
 - Optional services are limited to drinks, photography, and referee.
 - MVP excludes notifications.

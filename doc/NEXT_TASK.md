@@ -1,11 +1,17 @@
 # Next Task
 
 ## Task
-- Record the successful local Google OAuth return flow, then connect the first
-  RLS-backed slot and booking repository to the selected venue.
+- Apply the V1 Staging security migration, then replace mock staff operations
+  with an RLS/RPC-backed repository before public-release testing.
 
 ## Requirements
 - Read `SPECKIT.md`, `WORKFLOW_LOG.md`, and `DECISIONS_LOG.md` before any future work.
+- Read `doc/V1_AUDIT_2026-09-29.md` and resolve its Critical and High findings
+  before treating the application as a public V1 candidate.
+- Take a verified Staging backup, then apply pending migrations in timestamp
+  order: overnight operating hours, unbounded booking dates/update-cancel,
+  then `20260929100000_harden_direct_write_paths.sql`. Do not apply them to a
+  production project without a rehearsal and rollback plan.
 - Preserve the Flutter/Dart-only application and the domain repository contracts.
 - The configured Supabase Project URL was resumed and resolves in DNS. Verify
   the full browser return/session path before treating authentication as ready.

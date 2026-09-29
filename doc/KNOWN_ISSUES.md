@@ -1,6 +1,12 @@
 # Known Issues
 
 ## Current Limitations
+- **Release blocker:** apply and verify
+  `20260929100000_harden_direct_write_paths.sql` after the initial and
+  super-admin migrations. Until then, direct table grants/policies may allow
+  authenticated staff writes that bypass booking and team-administration RPC
+  validations. Back up Staging first and verify effective grants and RLS
+  policies after the migration.
 - `flutter build apk --release` currently fails in Kotlin incremental-cache
   cleanup because the project is on `F:` while cached pub packages are on `C:`.
   Android release signing is also configured with a debug key and is not safe
