@@ -107,7 +107,7 @@ as $$
   join public.bookings booking on booking.id = match.booking_id
   join public.venues venue on venue.id = booking.venue_id
   left join public.match_participants participant on participant.match_id = match.id
-  where invite.token_hash = encode(digest(p_invite_token, 'sha256'), 'hex')
+  where invite.token_hash = encode(extensions.digest(p_invite_token, 'sha256'), 'hex')
     and invite.revoked_at is null
     and invite.expires_at > now()
   group by booking.reference, booking.starts_at, booking.ends_at, venue.name, match.player_capacity;
@@ -146,7 +146,7 @@ begin
     into v_match_id, v_capacity
   from public.match_invites invite
   join public.matches match on match.id = invite.match_id
-  where invite.token_hash = encode(digest(p_invite_token, 'sha256'), 'hex')
+  where invite.token_hash = encode(extensions.digest(p_invite_token, 'sha256'), 'hex')
     and invite.revoked_at is null
     and invite.expires_at > now()
   for update of match;

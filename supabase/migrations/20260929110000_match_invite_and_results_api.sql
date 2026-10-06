@@ -128,7 +128,7 @@ begin
   insert into public.match_invites (match_id, token_hash, expires_at, revoked_at)
   values (
     v_match.id,
-    encode(digest(v_token, 'sha256'), 'hex'),
+    encode(extensions.digest(v_token, 'sha256'), 'hex'),
     v_booking.starts_at,
     null
   ) on conflict (match_id) do update
@@ -169,7 +169,7 @@ as $$
   join public.fields field on field.id = booking.field_id
   join public.profiles organizer on organizer.id = match.organizer_id
   left join public.match_participants participant on participant.match_id = match.id
-  where invite.token_hash = encode(digest(p_invite_token, 'sha256'), 'hex')
+  where invite.token_hash = encode(extensions.digest(p_invite_token, 'sha256'), 'hex')
     and invite.revoked_at is null
     and invite.expires_at > now()
   group by booking.reference, organizer.full_name, booking.starts_at,
@@ -213,7 +213,7 @@ begin
     into v_match_id, v_capacity
   from public.match_invites invite
   join public.matches match on match.id = invite.match_id
-  where invite.token_hash = encode(digest(p_invite_token, 'sha256'), 'hex')
+  where invite.token_hash = encode(extensions.digest(p_invite_token, 'sha256'), 'hex')
     and invite.revoked_at is null
     and invite.expires_at > now()
   for update of match;

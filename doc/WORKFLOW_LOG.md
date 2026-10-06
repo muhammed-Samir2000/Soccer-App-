@@ -800,3 +800,12 @@ At the end of your response, provide the final completion summary and state that
 - Verification: `dart format --set-exit-if-changed lib test` passed; `flutter analyze` passed with no issues; `flutter test --reporter compact` passed with 56 tests, including staff-list failure and retry rendering.
 - Source control: committed and pushed as `4013b6a` (`Add staff management error recovery`) to `origin/main`.
 - Next action: apply the pending super-admin and hardening migrations, then verify these recovery paths against a deliberately denied non-super-admin account.
+
+### 2026-10-06 | Staging Migration Attempt And pgcrypto Compatibility | Status: partially applied
+
+- Actor: Codex.
+- Intent: apply the pending Staging database migrations after the project was resumed from Supabase pause state.
+- Verified remote work: the `SOCCER APP Project` (`wfryydoiqwqtvqytulln`) was resumed and became healthy. The initial booking schema was present. The group-match invitation, admin e-mail invitation, super-admin staff-management, and overnight-hours migrations each returned `Success. No rows returned` in the Supabase SQL editor.
+- Changed: qualified all invite-token hash calls as `extensions.digest(...)` in `20260913110000_group_match_invites.sql` and `20260929110000_match_invite_and_results_api.sql`. The original unqualified call failed on this Supabase project because `pgcrypto` is installed in the `extensions` schema; the failed migration left no group-match type, tables, or RPCs behind before the corrected version succeeded.
+- Risk: the Free plan supplied no project backup. The user explicitly authorized continuing without one. The SQL editor began retaining stale execution results after later query edits, so the remaining venue setup, booking API, unbounded-date, direct-write-hardening, and persistent-match-result migrations must be executed in clean editor tabs and verified with explicit catalog/RPC queries before any pilot release.
+- Next action: complete the remaining migrations in order, then run the two-account booking, staff-denial, RSVP, and result-authorization acceptance matrix.
