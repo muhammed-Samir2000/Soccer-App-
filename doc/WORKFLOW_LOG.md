@@ -19,7 +19,8 @@
   `flutter build web --release` completed and the refreshed local entry view
   was visually inspected in the in-app browser.
 - Source control: implementation committed as `6d0ada5` (`Polish professional
-  booking experience`); push to `origin/main` follows with this log update.
+  booking experience`) and log verification as `340823a` (`Record UX flow
+  verification`); both pushed successfully to `origin/main`.
 
 ### 2026-10-06 | Truthful Demo Authentication Copy | Status: completed
 
