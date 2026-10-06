@@ -17,7 +17,8 @@
   `53144122A4DB3A3E5DA69FCD6A518AD82B16D82C6DCA2CEA6F5D83BDE3B0A218`). It
   is signed with the Android debug certificate and is suitable only for direct
   tester installation, not Google Play distribution.
-- Source control: pending commit and push after this log entry.
+- Source control: implementation committed as `623b3be` (`Fix Android release
+  APK build cache`); push to `origin/main` follows with this log update.
 
 ### 2026-09-29 | V1 Audit And Initial Security Hardening | Status: completed
 
