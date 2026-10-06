@@ -5,6 +5,7 @@ import '../../../core/utils/arabic_date.dart';
 import '../../../core/utils/booking_dates.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../../shared/widgets/booking_date_picker_field.dart';
+import '../../../shared/widgets/sports_illustration.dart';
 import '../../auth/domain/app_user.dart';
 import '../../bookings/presentation/player_bottom_navigation.dart';
 import '../domain/slot_repository.dart';
@@ -138,6 +139,7 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                 .length;
 
             return ListView(
+              key: const Key('player_slots_list'),
               padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 20, 24),
               children: [
                 Text(
@@ -191,7 +193,7 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? Theme.of(context).colorScheme.primary
-                                        : Colors.white,
+                                        : Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
                                       color: isSelected
@@ -202,6 +204,18 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                                               context,
                                             ).colorScheme.outlineVariant,
                                     ),
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                                  .withValues(alpha: 0.24),
+                                              blurRadius: 16,
+                                              offset: const Offset(0, 7),
+                                            ),
+                                          ]
+                                        : null,
                                   ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -336,51 +350,77 @@ class _PlayerSlotsHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [colors.primary, const Color(0xFF124535)],
-          begin: AlignmentDirectional.topStart,
-          end: AlignmentDirectional.bottomEnd,
-        ),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
+    return SizedBox(
+      height: 154,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          Expanded(
+          const SportsIllustration(
+            height: 154,
+            compact: true,
+            label: 'رسم لملعب ومواعيد الحجز المتاحة',
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.black.withValues(alpha: 0.12),
+                  Colors.black.withValues(alpha: 0.48),
+                ],
+                begin: AlignmentDirectional.topStart,
+                end: AlignmentDirectional.bottomEnd,
+              ),
+              borderRadius: BorderRadius.circular(22),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _AvailabilityPill(count: availableCount),
+                const Spacer(),
                 Text(
                   'جاهز للماتش؟',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(color: colors.onPrimary),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: colors.onPrimary,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   '${_dayLabel(day)} قدامك $availableCount مواعيد فاضية.',
                   style: TextStyle(
-                    color: colors.onPrimary.withValues(alpha: 0.82),
+                    color: colors.onPrimary.withValues(alpha: 0.86),
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: colors.onPrimary.withValues(alpha: 0.14),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.sports_soccer, color: colors.onPrimary, size: 30),
-          ),
         ],
       ),
     );
   }
+}
+
+class _AvailabilityPill extends StatelessWidget {
+  const _AvailabilityPill({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsetsDirectional.fromSTEB(10, 6, 12, 6),
+    decoration: BoxDecoration(
+      color: Colors.white.withValues(alpha: 0.15),
+      borderRadius: BorderRadius.circular(99),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+    ),
+    child: Text(
+      '$count متاح',
+      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+    ),
+  );
 }
 
 class _SlotCard extends StatelessWidget {
@@ -399,42 +439,59 @@ class _SlotCard extends StatelessWidget {
       label: '${_statusLabel(slot.status)}، ${_timeRange(slot)}',
       button: isAvailable,
       enabled: isAvailable,
-      child: Material(
-        color: style.background,
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          key: Key(slot.id),
-          onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: style.background,
           borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Row(
-              children: [
-                Icon(style.icon, color: style.foreground),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _timeRange(slot),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _statusLabel(slot.status),
-                        style: TextStyle(color: style.foreground),
-                      ),
-                    ],
+          border: Border.all(color: style.foreground.withValues(alpha: 0.16)),
+          boxShadow: isAvailable
+              ? [
+                  BoxShadow(
+                    color: style.foreground.withValues(alpha: 0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
-                ),
-                if (isAvailable)
-                  IconButton.filledTonal(
-                    tooltip: 'احجز الموعد',
-                    onPressed: onTap,
-                    icon: const Icon(Icons.add_circle_outline),
+                ]
+              : null,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            key: Key(slot.id),
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Row(
+                children: [
+                  Icon(style.icon, color: style.foreground),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _timeRange(slot),
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _statusLabel(slot.status),
+                          style: TextStyle(color: style.foreground),
+                        ),
+                      ],
+                    ),
                   ),
-              ],
+                  if (isAvailable)
+                    IconButton.filledTonal(
+                      tooltip: 'احجز الموعد',
+                      onPressed: onTap,
+                      icon: const Icon(Icons.add_circle_outline),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

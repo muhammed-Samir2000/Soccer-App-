@@ -10,6 +10,7 @@ import '../../bookings/domain/booking_repository.dart';
 import '../../slots/domain/time_slot.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
 import '../../../shared/widgets/booking_date_picker_field.dart';
+import '../../../shared/widgets/sports_illustration.dart';
 import '../domain/notification_repository.dart';
 import '../domain/staff_repository.dart';
 import '../domain/venue_settings.dart';
@@ -145,114 +146,182 @@ class _AdminWeekScreenState extends State<AdminWeekScreen> {
         }
         return FutureBuilder<List<Booking>>(
           future: _bookings,
-          builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
-            if (snapshot.hasError) {
-              return _AdminLoadFailure(
-                message: 'تعذر تحميل الحجوزات. راجع الاتصال وحاول تاني.',
-                onRetry: _reload,
-              );
-            }
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final List<DateTime> week = BookingDates.sevenDaysFrom(
-              _visibleStart,
-            );
-            return ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                Text(
-                  'لوحة التحكم',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '${settings.data!.fieldCount} ملاعب | ${_formatHour(settings.data!.openingHour)} - ${_formatHour(settings.data!.closingHour)}',
-                ),
-                const SizedBox(height: 16),
-                _OccupancySummary(
-                  bookings: snapshot.data!,
-                  week: week,
-                  settings: settings.data!,
-                ),
-                const SizedBox(height: 28),
-                Text(
-                  'مواعيد الحجز القادمة',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'اختار أي تاريخ جاي من التقويم لإدارة ساعاته وحجوزاته.',
-                ),
-                const SizedBox(height: 16),
-                BookingDatePickerField(
-                  selectedDate: _visibleStart,
-                  firstDate: BookingDates.today,
-                  lastDate: BookingDates.calendarLastDate,
-                  label: 'بداية عرض الأيام',
-                  onChanged: (DateTime day) => setState(
-                    () => _visibleStart = BookingDates.clampToBookableDay(day),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
+          builder:
+              (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
+                if (snapshot.hasError) {
+                  return _AdminLoadFailure(
+                    message: 'تعذر تحميل الحجوزات. راجع الاتصال وحاول تاني.',
+                    onRetry: _reload,
+                  );
+                }
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final List<DateTime> week = BookingDates.sevenDaysFrom(
+                  _visibleStart,
+                );
+                return ListView(
+                  padding: const EdgeInsets.all(20),
                   children: [
-                    OutlinedButton.icon(
-                      onPressed: _visibleStart == BookingDates.today
-                          ? null
-                          : () => setState(() {
-                              _visibleStart = BookingDates.clampToBookableDay(
-                                _visibleStart.subtract(const Duration(days: 7)),
-                              );
-                            }),
-                      icon: const Icon(Icons.arrow_forward),
-                      label: const Text('الأسبوع السابق'),
+                    _AdminVenueHero(settings: settings.data!),
+                    const SizedBox(height: 16),
+                    _OccupancySummary(
+                      bookings: snapshot.data!,
+                      week: week,
+                      settings: settings.data!,
                     ),
-                    const SizedBox(width: 12),
-                    OutlinedButton.icon(
-                      onPressed: () => setState(() {
-                        _visibleStart = _visibleStart.add(
-                          const Duration(days: 7),
-                        );
-                      }),
-                      icon: const Icon(Icons.arrow_back),
-                      label: const Text('الأسبوع التالي'),
+                    const SizedBox(height: 28),
+                    Text(
+                      'مواعيد الحجز القادمة',
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                ...week.map(
-                  (DateTime day) => _DaySummaryCard(
-                    day: day,
-                    freeFieldHours: _freeFieldHours(
-                      day,
-                      snapshot.data!,
-                      settings.data!,
+                    const SizedBox(height: 6),
+                    const Text(
+                      'اختار أي تاريخ جاي من التقويم لإدارة ساعاته وحجوزاته.',
                     ),
-                    totalFieldHours: settings.data!.dailyFieldHours,
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => AdminDayScreen(
-                            day: day,
-                            repository: widget.bookingRepository,
-                            venueSettingsRepository:
-                                widget.venueSettingsRepository,
-                          ),
+                    const SizedBox(height: 16),
+                    BookingDatePickerField(
+                      selectedDate: _visibleStart,
+                      firstDate: BookingDates.today,
+                      lastDate: BookingDates.calendarLastDate,
+                      label: 'بداية عرض الأيام',
+                      onChanged: (DateTime day) => setState(
+                        () => _visibleStart = BookingDates.clampToBookableDay(
+                          day,
                         ),
-                      );
-                      _reload();
-                    },
-                  ),
-                ),
-                const SizedBox(height: 96),
-              ],
-            );
-          },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: _visibleStart == BookingDates.today
+                              ? null
+                              : () => setState(() {
+                                  _visibleStart =
+                                      BookingDates.clampToBookableDay(
+                                        _visibleStart.subtract(
+                                          const Duration(days: 7),
+                                        ),
+                                      );
+                                }),
+                          icon: const Icon(Icons.arrow_forward),
+                          label: const Text('الأسبوع السابق'),
+                        ),
+                        const SizedBox(width: 12),
+                        OutlinedButton.icon(
+                          onPressed: () => setState(() {
+                            _visibleStart = _visibleStart.add(
+                              const Duration(days: 7),
+                            );
+                          }),
+                          icon: const Icon(Icons.arrow_back),
+                          label: const Text('الأسبوع التالي'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    ...week.map(
+                      (DateTime day) => _DaySummaryCard(
+                        day: day,
+                        freeFieldHours: _freeFieldHours(
+                          day,
+                          snapshot.data!,
+                          settings.data!,
+                        ),
+                        totalFieldHours: settings.data!.dailyFieldHours,
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => AdminDayScreen(
+                                day: day,
+                                repository: widget.bookingRepository,
+                                venueSettingsRepository:
+                                    widget.venueSettingsRepository,
+                              ),
+                            ),
+                          );
+                          _reload();
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 96),
+                  ],
+                );
+              },
         );
       },
     ),
     bottomNavigationBar: const AdminBottomNavigation(selectedIndex: 0),
+  );
+}
+
+class _AdminVenueHero extends StatelessWidget {
+  const _AdminVenueHero({required this.settings});
+
+  final VenueSettings settings;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 170,
+    child: Stack(
+      fit: StackFit.expand,
+      children: [
+        const SportsIllustration(
+          height: 170,
+          compact: true,
+          label: 'رسم ملعب للوحة تحكم الإدارة',
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withValues(alpha: 0.1),
+                Colors.black.withValues(alpha: 0.58),
+              ],
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+            ),
+            borderRadius: BorderRadius.circular(22),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsetsDirectional.fromSTEB(10, 6, 12, 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: const Text(
+                  'نظرة تشغيلية سريعة',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'لوحة التحكم',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${settings.fieldCount} ملاعب · ${_formatHour(settings.openingHour)} - ${_formatHour(settings.closingHour)}',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.86)),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
   );
 }
 

@@ -28,6 +28,11 @@ class AppTheme {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         titleSpacing: 20,
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -37,6 +42,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -46,10 +52,11 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
       cardTheme: CardThemeData(
-        color: colorScheme.surface,
+        color: isDark ? const Color(0xFF16251F) : const Color(0xFFFCFDF9),
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
@@ -83,8 +90,37 @@ class AppTheme {
         extendedTextStyle: const TextStyle(fontWeight: FontWeight.w700),
       ),
       chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        side: BorderSide(color: colorScheme.outlineVariant),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w700),
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 74,
+        backgroundColor: isDark
+            ? const Color(0xFF14221D)
+            : const Color(0xFFFCFDF9),
+        indicatorColor: colorScheme.primaryContainer,
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => TextStyle(
+            fontSize: 11,
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w800
+                : FontWeight.w600,
+          ),
+        ),
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: colorScheme.primary,
+        unselectedLabelColor: colorScheme.onSurfaceVariant,
+        labelStyle: const TextStyle(fontWeight: FontWeight.w800),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: colorScheme.outlineVariant,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      dividerTheme: DividerThemeData(color: colorScheme.outlineVariant),
       textTheme:
           (isDark
                   ? Typography.material2021().white

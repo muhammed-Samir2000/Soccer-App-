@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
 import '../../../shared/widgets/google_sign_in_button.dart';
+import '../../../shared/widgets/sports_illustration.dart';
 import '../domain/app_session.dart';
 import '../domain/app_user.dart';
 import '../domain/auth_repository.dart';
@@ -141,6 +142,7 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colors = Theme.of(context).colorScheme;
+    final bool compactHeight = MediaQuery.sizeOf(context).height < 700;
     final String title = _isAdminLogin
         ? 'دخول فريق الإدارة'
         : 'احجز ملعبك بسهولة';
@@ -180,18 +182,14 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                         label: const Text('دخول فريق الإدارة'),
                       ),
                     ),
-                  Center(
-                    child: _PitchLogo(
-                      color: _isAdminLogin ? colors.secondary : colors.primary,
-                      foregroundColor: _isAdminLogin
-                          ? colors.onSecondary
-                          : colors.onPrimary,
-                      icon: _isAdminLogin
-                          ? Icons.admin_panel_settings_outlined
-                          : Icons.sports_soccer,
-                    ),
+                  SportsIllustration(
+                    height: compactHeight ? 96 : (_isAdminLogin ? 132 : 156),
+                    compact: _isAdminLogin,
+                    label: _isAdminLogin
+                        ? 'رسم توضيحي لإدارة ملعب كرة قدم'
+                        : 'رسم توضيحي لحجز ملعب كرة قدم',
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: compactHeight ? 16 : 24),
                   Text(
                     title,
                     textAlign: TextAlign.center,
@@ -203,7 +201,28 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: compactHeight ? 12 : 18),
+                  if (!_isAdminLogin && !compactHeight)
+                    const Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _EntryFeature(
+                          icon: Icons.calendar_month_outlined,
+                          label: 'احجز بسرعة',
+                        ),
+                        _EntryFeature(
+                          icon: Icons.groups_2_outlined,
+                          label: 'لمّ فريقك',
+                        ),
+                        _EntryFeature(
+                          icon: Icons.shield_outlined,
+                          label: 'دخول آمن',
+                        ),
+                      ],
+                    ),
+                  SizedBox(height: compactHeight ? 16 : 26),
                   if (_restoredUser == null) ...[
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -340,28 +359,30 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
   }
 }
 
-class _PitchLogo extends StatelessWidget {
-  const _PitchLogo({
-    required this.color,
-    required this.foregroundColor,
-    required this.icon,
-  });
+class _EntryFeature extends StatelessWidget {
+  const _EntryFeature({required this.icon, required this.label});
 
-  final Color color;
-  final Color foregroundColor;
   final IconData icon;
+  final String label;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 104,
-    height: 104,
-    decoration: BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(30),
-      boxShadow: [
-        BoxShadow(color: color.withValues(alpha: 0.25), blurRadius: 28),
-      ],
-    ),
-    child: Icon(icon, color: foregroundColor, size: 48),
-  );
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(10, 7, 12, 7),
+      decoration: BoxDecoration(
+        color: colors.surface.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: colors.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: colors.primary),
+          const SizedBox(width: 6),
+          Text(label, style: Theme.of(context).textTheme.labelMedium),
+        ],
+      ),
+    );
+  }
 }

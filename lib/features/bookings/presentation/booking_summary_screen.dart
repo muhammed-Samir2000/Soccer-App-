@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/router.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
+import '../../../shared/widgets/sports_illustration.dart';
 import '../../auth/domain/app_user.dart';
 import '../../slots/domain/time_slot.dart';
 import '../data/mock_optional_services.dart';
@@ -43,13 +44,15 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
+            _BookingHero(slot: _draft.slot),
+            const SizedBox(height: 22),
             Text('راجع حجزك', style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
-              'زود اللي محتاجه قبل ما تكمّل.',
+              'كل التفاصيل واضحة قبل التأكيد، وزود اللي محتاجه للماتش.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
             _SummaryCard(
               title: 'ميعاد الماتش',
               child: Text(_timeRange(_draft.slot)),
@@ -75,15 +78,12 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
             ),
             const SizedBox(height: 12),
             ...(widget.slot.services ?? MockOptionalServices.all).map(
-              (OptionalService service) => Card(
-                clipBehavior: Clip.antiAlias,
-                child: CheckboxListTile(
-                  key: Key('service-${service.id}'),
-                  value: _draft.hasService(service.id),
-                  onChanged: (_) => _toggleService(service),
-                  title: Text(service.name),
-                  subtitle: Text('+ ${_formatPrice(service.price)}'),
-                  controlAffinity: ListTileControlAffinity.leading,
+              (OptionalService service) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _ServiceCard(
+                  service: service,
+                  selected: _draft.hasService(service.id),
+                  onChanged: () => _toggleService(service),
                 ),
               ),
             ),
@@ -104,6 +104,130 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
               child: Text('كمّل للدفع - ${_formatPrice(_draft.totalPrice)}'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BookingHero extends StatelessWidget {
+  const _BookingHero({required this.slot});
+
+  final TimeSlot slot;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 142,
+    child: Stack(
+      fit: StackFit.expand,
+      children: [
+        const SportsIllustration(
+          height: 142,
+          compact: true,
+          label: 'ملعب كرة قدم يرمز إلى ملخص الحجز',
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.34),
+            borderRadius: BorderRadius.circular(22),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'اختيار ممتاز',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                _timeRange(slot),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                'الوقت محجوز لك بعد تأكيد الخطوات التالية',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.82)),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _ServiceCard extends StatelessWidget {
+  const _ServiceCard({
+    required this.service,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final OptionalService service;
+  final bool selected;
+  final VoidCallback onChanged;
+
+  IconData get _icon => switch (service.id) {
+    'drinks' => Icons.local_drink_outlined,
+    'photography' => Icons.camera_alt_outlined,
+    'referee' => Icons.sports_outlined,
+    _ => Icons.add_circle_outline,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    return Material(
+      key: Key('service-${service.id}'),
+      color: selected ? colors.primaryContainer : colors.surface,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onChanged,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected ? colors.primary : colors.outlineVariant,
+              width: selected ? 1.4 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: selected
+                    ? colors.primary.withValues(alpha: 0.15)
+                    : colors.surfaceContainerHighest,
+                foregroundColor: colors.primary,
+                child: Icon(_icon),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      service.name,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 3),
+                    Text('+ ${_formatPrice(service.price)}'),
+                  ],
+                ),
+              ),
+              Checkbox(value: selected, onChanged: (_) => onChanged()),
+            ],
+          ),
         ),
       ),
     );

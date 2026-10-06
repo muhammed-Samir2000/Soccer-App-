@@ -4,6 +4,7 @@ import '../../../app/router.dart';
 import '../../../core/utils/arabic_date.dart';
 import '../../../core/utils/booking_input_validators.dart';
 import '../../../shared/widgets/app_page_app_bar.dart';
+import '../../../shared/widgets/sports_illustration.dart';
 import '../domain/booking.dart';
 import '../domain/booking_repository.dart';
 import '../domain/match_result.dart';
@@ -124,8 +125,47 @@ class _BookingsList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (bookings.isEmpty) {
       return Center(
-        child: Text(
-          isPast ? 'مفيش مباريات سابقة لسه.' : 'مفيش حجوزات جاية لسه.',
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(
+                height: 126,
+                child: SportsIllustration(
+                  height: 126,
+                  compact: true,
+                  label: 'رسم توضيحي لملعب كرة قدم',
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                isPast
+                    ? 'ذكرياتك في الملعب هتظهر هنا.'
+                    : 'لسه ما حجزتش ماتش جاي.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                isPast
+                    ? 'بعد كل مباراة تقدر تسجل رجل الماتش وأفضل هدف.'
+                    : 'اختار وقت فاضي، لمّ الفريق، واستمتع بالماتش.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              if (!isPast) ...[
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () => Navigator.of(
+                    context,
+                  ).pushReplacementNamed(AppRouter.slotsRoute),
+                  icon: const Icon(Icons.sports_soccer_outlined),
+                  label: const Text('شوف المواعيد الفاضية'),
+                ),
+              ],
+            ],
+          ),
         ),
       );
     }

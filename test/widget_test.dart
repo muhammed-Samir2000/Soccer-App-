@@ -32,10 +32,14 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('جاهز للماتش؟'), findsOneWidget);
+    final Finder slotsScrollable = find.byWidgetPredicate(
+      (Widget widget) =>
+          widget is Scrollable && widget.axisDirection == AxisDirection.down,
+    );
     await tester.scrollUntilVisible(
       find.byKey(const Key('slot-003')),
       300,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: slotsScrollable,
     );
     expect(find.text('محجوز مؤقتاً'), findsAtLeastNWidgets(1));
     expect(find.text('محجوز'), findsAtLeastNWidgets(1));
@@ -49,7 +53,7 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(const Key('slot-001')),
       300,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: slotsScrollable,
     );
     await tester.tap(find.byKey(const Key('slot-001')));
     await tester.pumpAndSettle();

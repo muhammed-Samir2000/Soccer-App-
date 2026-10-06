@@ -1,5 +1,31 @@
 # Workflow Log
 
+### 2026-10-06 | Mobile-First Sports Booking Experience | Status: completed
+
+- Actor: Codex.
+- Intent: make the player and admin journeys feel like a cohesive, polished
+  sports-booking product while preserving the existing booking rules,
+  navigation, and Arabic RTL experience.
+- Changed: introduced a reusable, code-drawn football-pitch illustration with
+  semantic labels and used it in player entry, available slots, booking
+  summary, empty bookings, and the admin overview. Refined the Material 3
+  theme for clearer navigation, chips, cards, tabs, actions, and feedback.
+  Slot and optional-service cards now have stronger selected, available, and
+  disabled states; the short-screen entry layout keeps its primary action
+  above the fold; player empty states now provide a direct booking action.
+- Accessibility: preserves textual booking states alongside color, retains
+  Arabic labels and RTL directional layout, keeps touch actions as labelled
+  Material controls, and gives decorative pitch artwork an Arabic semantic
+  label rather than relying on imagery alone.
+- Verification: `dart format` reported no remaining changes; `flutter
+  analyze` completed with no issues; full `flutter test --reporter compact`
+  passed with 56 tests; `flutter build web --release` produced
+  `build/web/main.dart.js`. The in-app-browser preview could not reach the
+  host loopback server because its network is isolated, so no unsupported
+  manual-browser assertion is claimed.
+- Source control: implementation commit and push to `origin/main` follow this
+  log update.
+
 ### 2026-10-06 | Android Trial APK Build Reliability | Status: completed
 
 - Actor: Codex.
