@@ -13,7 +13,8 @@
   issues; focused `test/widget_test.dart` passed with 10 tests, including the
   live Google-entry coverage.
 - Source control: implementation committed as `f3e095e` (`Clarify demo Google
-  sign-in state`); push to `origin/main` follows with this log update.
+  sign-in state`) and log verification as `f46e4b8` (`Record demo sign-in
+  verification`); both pushed successfully to `origin/main`.
 
 ### 2026-10-06 | Mobile-First Sports Booking Experience | Status: completed
 
