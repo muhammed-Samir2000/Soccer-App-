@@ -295,13 +295,15 @@ class _MockLoginScreenState extends State<MockLoginScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    Text(
-                      'أو سجل بحساب Google تاني',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 12),
+                    if (widget.repository.usesLiveAuthentication) ...[
+                      const SizedBox(height: 18),
+                      Text(
+                        'أو سجل بحساب Google تاني',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ],
                   if (widget.repository.usesLiveAuthentication)
                     GoogleSignInButton(

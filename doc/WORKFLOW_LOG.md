@@ -1,5 +1,20 @@
 # Workflow Log
 
+### 2026-10-06 | Truthful Demo Authentication Copy | Status: completed
+
+- Actor: Codex.
+- Issue: a restored mock/demo session showed the phrase `أو سجل بحساب Google
+  تاني` above the demo-entry action, even though the static preview was not
+  configured for live Supabase OAuth.
+- Changed: that Google-specific copy is now rendered only when the active
+  authentication repository is configured for live authentication. The demo
+  build no longer implies that the dashboard button starts Google OAuth.
+- Verification: `dart format` passed; `flutter analyze` completed with no
+  issues; focused `test/widget_test.dart` passed with 10 tests, including the
+  live Google-entry coverage.
+- Source control: implementation commit and push to `origin/main` follow this
+  log update.
+
 ### 2026-10-06 | Mobile-First Sports Booking Experience | Status: completed
 
 - Actor: Codex.
