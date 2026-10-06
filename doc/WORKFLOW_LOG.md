@@ -24,8 +24,8 @@
   host loopback server because its network is isolated, so no unsupported
   manual-browser assertion is claimed.
 - Source control: implementation committed as `439f07b` (`Refine mobile
-  booking experience`); push to `origin/main` follows with this log
-  finalization.
+  booking experience`) and log verification as `6c38f45` (`Record UX
+  refinement verification`); both pushed successfully to `origin/main`.
 
 ### 2026-10-06 | Android Trial APK Build Reliability | Status: completed
 
