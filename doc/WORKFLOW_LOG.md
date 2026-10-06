@@ -12,8 +12,8 @@
 - Verification: `dart format` passed; `flutter analyze` completed with no
   issues; focused `test/widget_test.dart` passed with 10 tests, including the
   live Google-entry coverage.
-- Source control: implementation commit and push to `origin/main` follow this
-  log update.
+- Source control: implementation committed as `f3e095e` (`Clarify demo Google
+  sign-in state`); push to `origin/main` follows with this log update.
 
 ### 2026-10-06 | Mobile-First Sports Booking Experience | Status: completed
 
