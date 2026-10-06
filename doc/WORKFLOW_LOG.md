@@ -23,8 +23,9 @@
   `build/web/main.dart.js`. The in-app-browser preview could not reach the
   host loopback server because its network is isolated, so no unsupported
   manual-browser assertion is claimed.
-- Source control: implementation commit and push to `origin/main` follow this
-  log update.
+- Source control: implementation committed as `439f07b` (`Refine mobile
+  booking experience`); push to `origin/main` follows with this log
+  finalization.
 
 ### 2026-10-06 | Android Trial APK Build Reliability | Status: completed
 
