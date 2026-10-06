@@ -1,5 +1,24 @@
 # Workflow Log
 
+### 2026-10-06 | Android Trial APK Build Reliability | Status: completed
+
+- Actor: Codex.
+- Intent: produce a current installable Android APK for on-device trial without
+  changing product behavior or committing generated binaries.
+- Changed: disabled Kotlin incremental compilation in `android/gradle.properties`.
+  This avoids an observed Windows/AGP 9 cache-registration collision while
+  compiling Android plugin modules for a clean release build.
+- Verification: `flutter analyze` passed with no issues; full `flutter test
+  --reporter compact` passed with 56 tests; `flutter build apk --release`
+  completed. The generated APK was verified with Android `apksigner` using APK
+  Signature Scheme v2.
+- Artifact: local, untracked trial file at
+  `build/app/outputs/flutter-apk/app-release.apk` (58,135,332 bytes; SHA-256
+  `53144122A4DB3A3E5DA69FCD6A518AD82B16D82C6DCA2CEA6F5D83BDE3B0A218`). It
+  is signed with the Android debug certificate and is suitable only for direct
+  tester installation, not Google Play distribution.
+- Source control: pending commit and push after this log entry.
+
 ### 2026-09-29 | V1 Audit And Initial Security Hardening | Status: completed
 
 - Actor: Codex.
