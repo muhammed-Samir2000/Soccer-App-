@@ -365,32 +365,79 @@ class _DaySummaryCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: ListTile(
-      onTap: onTap,
-      leading: const CircleAvatar(child: Icon(Icons.calendar_today_outlined)),
-      title: Text(_dayLabel(day)),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 4),
-          Text('$freeFieldHours ساعة ملعب فاضية'),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: freeFieldHours / totalFieldHours,
-              minHeight: 7,
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerHighest,
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    final double availability = totalFieldHours == 0
+        ? 0
+        : freeFieldHours / totalFieldHours;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(22),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(22),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: colors.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    Icons.calendar_today_outlined,
+                    color: colors.primary,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _dayLabel(day),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      Text('$freeFieldHours ساعة ملعب فاضية'),
+                      const SizedBox(height: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(99),
+                        child: LinearProgressIndicator(
+                          value: availability,
+                          minHeight: 7,
+                          backgroundColor: colors.surfaceContainerHighest,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  children: [
+                    Text(
+                      '${(availability * 100).round()}%',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Icon(Icons.arrow_back, size: 20),
+                  ],
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
-      trailing: const Icon(Icons.arrow_back),
-    ),
-  );
+    );
+  }
 }
 
 class AdminDayScreen extends StatefulWidget {

@@ -162,6 +162,37 @@ class _AvailableSlotsScreenState extends State<AvailableSlotsScreen> {
                 const SizedBox(height: 24),
                 Row(
                   children: [
+                    Container(
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                        10,
+                        6,
+                        12,
+                        6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: Text(
+                        'الأسبوع المختار',
+                        style: TextStyle(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      _dayLabel(_selectedDay),
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
                     IconButton(
                       tooltip: 'أيام قبل كده',
                       onPressed: _visibleStart == BookingDates.today
@@ -481,14 +512,22 @@ class _SlotCard extends StatelessWidget {
                           _statusLabel(slot.status),
                           style: TextStyle(color: style.foreground),
                         ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '${slot.basePrice} ج.م · ساعة كاملة',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ),
                   ),
                   if (isAvailable)
-                    IconButton.filledTonal(
-                      tooltip: 'احجز الموعد',
-                      onPressed: onTap,
-                      icon: const Icon(Icons.add_circle_outline),
+                    Tooltip(
+                      message: 'احجز الموعد',
+                      child: FilledButton.tonalIcon(
+                        onPressed: onTap,
+                        icon: const Icon(Icons.add_circle_outline, size: 20),
+                        label: const Text('احجز'),
+                      ),
                     ),
                 ],
               ),

@@ -1,5 +1,26 @@
 # Workflow Log
 
+### 2026-10-06 | Professional Booking Flow Refinement | Status: completed
+
+- Actor: Codex.
+- Intent: elevate the core mobile player and manager paths from a functional
+  prototype to a clearer, more contemporary sports-booking experience without
+  changing booking availability, permissions, prices, or role rules.
+- Changed: Arabic football illustration labels; an explicit selected-week
+  context in the player calendar; slot cards that surface price, duration,
+  availability and a labelled booking action; a three-step visual progress
+  indicator in the booking summary; and more scannable admin daily cards with
+  capacity percentages, progress, and clear tap affordance.
+- UX and accessibility: preserved text labels alongside color, kept existing
+  semantic labels and RTL flow, retained the previous booking-control keys,
+  and used accessible Material controls for all new actions.
+- Verification: `dart format` passed; `flutter analyze` completed with no
+  issues; focused player and admin widget suites passed with 18 tests;
+  `flutter build web --release` completed and the refreshed local entry view
+  was visually inspected in the in-app browser.
+- Source control: implementation commit and push to `origin/main` follow this
+  log update.
+
 ### 2026-10-06 | Truthful Demo Authentication Copy | Status: completed
 
 - Actor: Codex.

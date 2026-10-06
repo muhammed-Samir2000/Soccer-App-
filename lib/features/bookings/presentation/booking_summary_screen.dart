@@ -45,6 +45,8 @@ class _BookingSummaryScreenState extends State<BookingSummaryScreen> {
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
             _BookingHero(slot: _draft.slot),
+            const SizedBox(height: 16),
+            const _BookingProgress(),
             const SizedBox(height: 22),
             Text('راجع حجزك', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 6),
@@ -161,6 +163,98 @@ class _BookingHero extends StatelessWidget {
           ),
         ),
       ],
+    ),
+  );
+}
+
+class _BookingProgress extends StatelessWidget {
+  const _BookingProgress();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'خطوة 2 من 3: اختيار الخدمات',
+      child: Row(
+        children: const [
+          _ProgressStep(label: 'الموعد', isComplete: true),
+          _ProgressConnector(isActive: true),
+          _ProgressStep(label: 'الخدمات', isActive: true),
+          _ProgressConnector(),
+          _ProgressStep(label: 'التأكيد'),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProgressStep extends StatelessWidget {
+  const _ProgressStep({
+    required this.label,
+    this.isComplete = false,
+    this.isActive = false,
+  });
+
+  final String label;
+  final bool isComplete;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    final Color background = isComplete || isActive
+        ? colors.primary
+        : colors.surfaceContainerHighest;
+    final Color foreground = isComplete || isActive
+        ? colors.onPrimary
+        : colors.onSurfaceVariant;
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: background,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isComplete ? Icons.check : Icons.circle,
+              size: isComplete ? 18 : 9,
+              color: foreground,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: isActive || isComplete ? colors.primary : null,
+              fontWeight: isActive || isComplete
+                  ? FontWeight.w800
+                  : FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProgressConnector extends StatelessWidget {
+  const _ProgressConnector({this.isActive = false});
+
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+    child: Container(
+      height: 2,
+      margin: const EdgeInsetsDirectional.only(bottom: 23),
+      color: isActive
+          ? Theme.of(context).colorScheme.primary
+          : Theme.of(context).colorScheme.outlineVariant,
     ),
   );
 }

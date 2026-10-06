@@ -67,11 +67,11 @@ class SportsIllustration extends StatelessWidget {
                     bottom: compact ? 14 : 20,
                     start: compact ? 16 : 26,
                     child: Text(
-                      compact ? 'READY' : 'PLAY YOUR GAME',
+                      compact ? 'جاهز للماتش' : 'استعد للعب',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: colors.onPrimary.withValues(alpha: 0.76),
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 1.6,
+                        letterSpacing: 0.2,
                       ),
                     ),
                   ),
